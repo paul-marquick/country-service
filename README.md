@@ -1,2 +1,2 @@
-# country-service-ng-app
+# country-service
 C# country web api with angular admin app.
