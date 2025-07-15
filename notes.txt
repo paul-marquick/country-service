@@ -1,0 +1,22 @@
+To create SQL Server database, run following commands from solution root in Developer Powershell.
+
+dotnet-ef --project ./CountryService.DataAccess.SqlServer --startup-project ./CountryService.ApiService migrations add createDb
+
+dotnet-ef --project ./CountryService.DataAccess --startup-project ./CountryService.ApiService database update
+
+============================================
+
+cURL post
+
+curl -H "Content-Type: application/json" -X POST http://localhost:5581/category -d "{\"Name\":\"MotoGP\"}"
+
+
+========================================
+
+db exceptions e.g. deleting a category with articles.
+
+paging sorting, filtering
+
+move data access code from service to data access proj and create a test proj.
+
+
