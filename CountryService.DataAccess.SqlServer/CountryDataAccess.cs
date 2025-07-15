@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using CountryService.DataAccess.Exceptions;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace CountryService.DataAccess.SqlServer;
@@ -56,21 +57,53 @@ public class CountryDataAccess : ICountryDataAccess
         }
         else
         {
-            throw new DataAccessException(DataAccessExceptionType.NotFound, $"Country not found, Iso2 : {iso2}");
+            throw new CountryNotFoundException($"Country not found, Iso2 : {iso2}");
         }
     }
 
     public async Task<int> InsertAsync(Country country, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
     {
-        string sql = "INSERT \"Country\" (\"Iso2\", \"Iso3\", \"IsoNumber\", \"Name\") VALUES (@Iso2, @Iso3, @IsoNumber, @Name)";
+        try
+        {
+            string sql = "INSERT \"Country\" (\"Iso2\", \"Iso3\", \"IsoNumber\", \"Name\") VALUES (@Iso2, @Iso3, @IsoNumber, @Name)";
 
-        using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
-        sqlCommand.Parameters.AddWithValue("Iso2", country.Iso2);
-        sqlCommand.Parameters.AddWithValue("Iso3", country.Iso3);
-        sqlCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
-        sqlCommand.Parameters.AddWithValue("Name", country.Name);
+            using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
+            sqlCommand.Parameters.AddWithValue("Iso2", country.Iso2);
+            sqlCommand.Parameters.AddWithValue("Iso3", country.Iso3);
+            sqlCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
+            sqlCommand.Parameters.AddWithValue("Name", country.Name);
 
-        return await sqlCommand.ExecuteNonQueryAsync();
+            return await sqlCommand.ExecuteNonQueryAsync();
+        }
+        catch (SqlException sqlException)
+        {
+            var constraintName = Utils.GetConstraintName(sqlException.Message);
+
+            if (constraintName == null)
+            {
+                throw new DataAccessException("Constraint name is null.", sqlException);
+            }
+            else
+            {
+                switch (constraintName)
+                {
+                    case Constraints.PrimaryKeyCountryIso2:
+                        throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", sqlException);
+
+                    case Constraints.UniqueIndexCountryIso3:
+                        throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", sqlException);
+
+                    case Constraints.UniqueIndexCountryIsoNumber:
+                        throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", sqlException);
+
+                    case Constraints.UniqueIndexCountryName:
+                        throw new CountryNameDuplicatedException($"Country Name : {country.Name}", sqlException);
+
+                    default:
+                        throw new DataAccessException($"Unknown constraint name : {constraintName}", sqlException);
+                }
+            }
+        }
     }
 
     public async Task<int> UpdateByIso2Async(string iso2, Country country, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
@@ -95,5 +128,13 @@ public class CountryDataAccess : ICountryDataAccess
         sqlCommand.Parameters.AddWithValue("Iso2", iso2);
 
         return await sqlCommand.ExecuteNonQueryAsync();
+    }
+
+    private static class Constraints
+    {
+        internal const string PrimaryKeyCountryIso2 = "PK_Country_Iso2";
+        internal const string UniqueIndexCountryIso3 = "UI_Country_Iso3";
+        internal const string UniqueIndexCountryIsoNumber = "UI_Country_IsoNumber";
+        internal const string UniqueIndexCountryName = "UI_Country_Name";
     }
 }
