@@ -1,4 +1,5 @@
 ﻿using CountryService.DataAccess.Exceptions;
+using CountryService.DataAccess.Models;
 using Microsoft.Data.SqlClient;
 
 namespace CountryService.DataAccess.Test;
@@ -15,8 +16,8 @@ public class CountryDataAccessTest(DatabaseFixture databaseFixture)
         {
             Iso2 = iso2,
             Iso3 = iso2 + DatabaseFixture.CreateRandomString(1),
-            Name = DatabaseFixture.CreateRandomString(50),
             IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
         };
 
         using SqlConnection sqlConnection = new(databaseFixture.ConnectionString);
@@ -38,7 +39,7 @@ public class CountryDataAccessTest(DatabaseFixture databaseFixture)
         using SqlConnection sqlConnection = new(databaseFixture.ConnectionString);
         await sqlConnection.OpenAsync();
 
-        await Assert.ThrowsAsync<NotFoundException>(() => databaseFixture.CountryDataAccess.SelectByIso2Async(DatabaseFixture.CreateRandomString(2), sqlConnection));
+        await Assert.ThrowsAsync<CountryNotFoundException>(() => databaseFixture.CountryDataAccess.SelectByIso2Async(DatabaseFixture.CreateRandomString(2), sqlConnection));
     }
 
     [Fact]
@@ -50,8 +51,8 @@ public class CountryDataAccessTest(DatabaseFixture databaseFixture)
         {
             Iso2 = iso2,
             Iso3 = iso2 + DatabaseFixture.CreateRandomString(1),
-            Name = DatabaseFixture.CreateRandomString(50),
             IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
         };
 
         using SqlConnection sqlConnection = new(databaseFixture.ConnectionString);
@@ -62,7 +63,36 @@ public class CountryDataAccessTest(DatabaseFixture databaseFixture)
     }
 
     [Fact]
-    public async Task InsertAsync_Duplication()
+    public async Task InsertAsync_DuplicateIso2()
+    {
+        string iso2 = DatabaseFixture.CreateRandomString(2);
+
+        Country country1 = new()
+        {
+            Iso2 = iso2,
+            Iso3 = iso2 + DatabaseFixture.CreateRandomString(1),
+            IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
+        };
+
+        using SqlConnection sqlConnection = new(databaseFixture.ConnectionString);
+        await sqlConnection.OpenAsync();
+
+        await databaseFixture.CountryDataAccess.InsertAsync(country1, sqlConnection);
+
+        Country country2 = new()
+        {
+            Iso2 = iso2,
+            Iso3 = iso2 + DatabaseFixture.CreateRandomString(1),
+            IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
+        };
+
+        await Assert.ThrowsAsync<CountryIso2DuplicatedException>(() => databaseFixture.CountryDataAccess.InsertAsync(country2, sqlConnection));
+    }
+
+    [Fact]
+    public async Task UpdateByIso2Async()
     {
         string iso2 = DatabaseFixture.CreateRandomString(2);
 
@@ -70,8 +100,8 @@ public class CountryDataAccessTest(DatabaseFixture databaseFixture)
         {
             Iso2 = iso2,
             Iso3 = iso2 + DatabaseFixture.CreateRandomString(1),
-            Name = DatabaseFixture.CreateRandomString(50),
             IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
         };
 
         using SqlConnection sqlConnection = new(databaseFixture.ConnectionString);
@@ -79,6 +109,45 @@ public class CountryDataAccessTest(DatabaseFixture databaseFixture)
 
         await databaseFixture.CountryDataAccess.InsertAsync(country, sqlConnection);
 
-        await Assert.ThrowsAsync<DuplicationException>(() => databaseFixture.CountryDataAccess.InsertAsync(country, sqlConnection));
+        country.Name = DatabaseFixture.CreateRandomString(50);
+
+        int affectedRows = await databaseFixture.CountryDataAccess.UpdateByIso2Async(iso2, country, sqlConnection);
+        Assert.True(0 < affectedRows);
+    }
+
+    [Fact]
+    public async Task UpdateByIso2Async_DuplicateName()
+    {
+        string country1Iso2 = DatabaseFixture.CreateRandomString(2);
+
+        Country country1 = new()
+        {
+            Iso2 = country1Iso2,
+            Iso3 = country1Iso2 + DatabaseFixture.CreateRandomString(1),
+            IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
+        };
+
+        string country2Iso2 = DatabaseFixture.CreateRandomString(2);
+
+        Country country2 = new()
+        {
+            Iso2 = country2Iso2,
+            Iso3 = country2Iso2 + DatabaseFixture.CreateRandomString(1),
+            IsoNumber = DatabaseFixture.CreateRandomInt32(),
+            Name = DatabaseFixture.CreateRandomString(50)
+        };
+
+        using SqlConnection sqlConnection = new(databaseFixture.ConnectionString);
+        await sqlConnection.OpenAsync();
+
+        await databaseFixture.CountryDataAccess.InsertAsync(country1, sqlConnection);
+
+        await databaseFixture.CountryDataAccess.InsertAsync(country2, sqlConnection);
+
+        // Set country 2 name same as country 1.
+        country2.Name = country1.Name;
+
+        await Assert.ThrowsAsync<CountryNameDuplicatedException>(() => databaseFixture.CountryDataAccess.UpdateByIso2Async(country2Iso2, country2, sqlConnection));
     }
 }

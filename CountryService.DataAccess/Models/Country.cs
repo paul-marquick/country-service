@@ -1,4 +1,4 @@
-﻿namespace CountryService.DataAccess;
+﻿namespace CountryService.DataAccess.Models;
 
 public record Country
 {

@@ -2,6 +2,7 @@
 using CountryService.DataAccess;
 using Microsoft.Data.SqlClient;
 using CountryService.DataAccess.Exceptions;
+using CountryService.DataAccess.Models;
 
 namespace CountryService.ApiService.Controllers;
 
@@ -36,7 +37,7 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
         }
         catch (DataAccessException dataAccessException)
         {
-            if (dataAccessException is NotFoundException)
+            if (dataAccessException is CountryNotFoundException)
             {
                 return NotFound();
             }
@@ -63,13 +64,13 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
         }
         catch (DataAccessException dataAccessException)
         {
-            if (dataAccessException is DuplicationException)
+            switch (dataAccessException)
             {
-                return BadRequest();
-            }
-            else
-            {
-                throw;
+                case CountryIso2DuplicatedException ex:
+                    return BadRequest();
+
+                default:
+                    throw;
             }
         }
     }
@@ -95,11 +96,11 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
         {
             switch (dataAccessException)
             {
-                case DuplicationException duplicationException:
-                    return BadRequest();
-
-                case NotFoundException notFoundException:
+                case CountryNotFoundException ex:
                     return NotFound();
+
+                case CountryIso2DuplicatedException ex:
+                    return BadRequest();
 
                 default:
                     throw;
