@@ -3,6 +3,7 @@ using CountryService.DataAccess;
 using Microsoft.Data.SqlClient;
 using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.Models;
+using System.Net;
 
 namespace CountryService.ApiService.Controllers;
 
@@ -10,6 +11,12 @@ namespace CountryService.ApiService.Controllers;
 [ApiController]
 public class CountryController(ILogger<CountryController> logger, DatabaseOptions databaseOptions, ICountryDataAccess countryDataAccess) : ControllerBase
 {
+    [HttpGet("Throw")]
+    public IActionResult Throw()
+    {
+        throw new Exception("Sample exception.");
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Country>>> GetAsync()
     {
@@ -39,7 +46,7 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
         {
             if (dataAccessException is CountryNotFoundException)
             {
-                return NotFound();
+                throw new ProblemDetailsException(HttpStatusCode.NotFound, "Country not found", $"Country with iso2: '{iso2}' not found.");
             }
             else
             {

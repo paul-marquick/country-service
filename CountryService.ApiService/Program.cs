@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using CountryService.DataAccess;
 using CountryService.DataAccess.SqlServer;
+using Microsoft.AspNetCore.Mvc;
+using static System.Net.Mime.MediaTypeNames;
+using Scalar.AspNetCore;
 
 namespace CountryService.ApiService;
 
@@ -16,7 +19,12 @@ internal class Program
         // https://learn.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-9.0#problem-details-service
         builder.Services.AddProblemDetails();
 
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        // https://stackoverflow.com/questions/79188513/addopenapi-adding-error-response-types-to-all-operations-net-9
+
+        // Customise default API behaviour.
+        builder.Services.AddEndpointsApiExplorer();
+
+        // Add the Open API document generation services.
         builder.Services.AddOpenApi();
 
         // Data access.
@@ -27,7 +35,17 @@ internal class Program
             });
         builder.Services.AddSingleton<ICountryDataAccess, CountryDataAccess>();
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<ProblemDetailsExceptionFilter>();
+        })
+        .ConfigureApiBehaviorOptions(options =>
+        {
+            options.InvalidModelStateResponseFactory = context =>
+            {
+                return new ModelStateToValidationProblemDetails();
+            };
+        });
 
         var app = builder.Build();
 
@@ -37,8 +55,17 @@ internal class Program
 
         if (app.Environment.IsDevelopment())
         {
-            app.UseDeveloperExceptionPage();
             app.MapOpenApi();
+            app.MapScalarApiReference(options =>
+            {
+                options
+                    .WithTitle("TITLE_HERE")
+             //       .WithDownloadButton(true)
+                    .WithTheme(ScalarTheme.Purple)
+                    .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios);
+            });
+
+            app.UseExceptionHandler();
         }
 
         // https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/service-defaults#provided-extension-methods
