@@ -1,5 +1,5 @@
 ﻿using CountryService.DataAccess.Exceptions;
-using CountryService.DataAccess.Models;
+using CountryService.DataAccess.Models.Country;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
@@ -15,21 +15,38 @@ public class CountryDataAccess : ICountryDataAccess
         this.logger = logger;
     }
 
-    public async Task<List<Country>> SelectAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
+    public async Task<List<Country>> SelectListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
     {
         string sql = $"SELECT {selectColumns} FROM \"Country\" ORDER BY \"Name\" ASC;";
 
         using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
         using SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
 
-        List<Country> countries = new List<Country>();
+        List<Country> countryList = new List<Country>();
 
         while (sqlDataReader.Read())
         {
-            countries.Add(ReadData(sqlDataReader));            
+            countryList.Add(ReadData(sqlDataReader));
         }
 
-        return countries;
+        return countryList;
+    }
+
+    public async Task<List<CountryLookup>> SelectLookupListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
+    {
+        string sql = $"SELECT iso2, name FROM \"Country\" ORDER BY \"Name\" ASC;";
+
+        using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
+        using SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+
+        List<CountryLookup> countryLookupList = new List<CountryLookup>();
+
+        while (sqlDataReader.Read())
+        {
+            countryLookupList.Add(new CountryLookup(sqlDataReader.GetString(0), sqlDataReader.GetString(1)));
+        }
+
+        return countryLookupList;
     }
 
     public async Task<Country> SelectByIso2Async(string iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)

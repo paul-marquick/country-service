@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using CountryService.DataAccess;
 using CountryService.DataAccess.SqlServer;
-using Microsoft.AspNetCore.Mvc;
-using static System.Net.Mime.MediaTypeNames;
 using Scalar.AspNetCore;
 
 namespace CountryService.ApiService;

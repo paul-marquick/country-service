@@ -1,12 +1,14 @@
 ﻿using CountryService.DataAccess.Exceptions;
-using CountryService.DataAccess.Models;
+using CountryService.DataAccess.Models.Country;
 using Microsoft.Data.SqlClient;
 
 namespace CountryService.DataAccess;
 
 public interface ICountryDataAccess
 {
-    Task<List<Country>> SelectAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<List<Country>> SelectListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+
+    Task<List<CountryLookup>> SelectLookupListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
 
     /// <summary>
     /// Selects a country row by iso2.

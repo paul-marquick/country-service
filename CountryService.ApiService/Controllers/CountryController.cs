@@ -2,8 +2,8 @@
 using CountryService.DataAccess;
 using Microsoft.Data.SqlClient;
 using CountryService.DataAccess.Exceptions;
-using CountryService.DataAccess.Models;
 using System.Net;
+using CountryService.DataAccess.Models.Country;
 
 namespace CountryService.ApiService.Controllers;
 
@@ -25,7 +25,7 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
         using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
         await sqlConnection.OpenAsync();
 
-        return Ok(await countryDataAccess.SelectAsync(sqlConnection));
+        return Ok(await countryDataAccess.SelectListAsync(sqlConnection));
     }
 
     [HttpGet("{iso2}")]

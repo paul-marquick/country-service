@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CountryService.DataAccess.Models;
+namespace CountryService.DataAccess.Models.Country;
 
 public record Country
 {
