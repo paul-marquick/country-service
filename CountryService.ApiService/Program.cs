@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using CountryService.DataAccess;
 using CountryService.DataAccess.SqlServer;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Events;
 
 namespace CountryService.ApiService;
 
@@ -11,8 +13,28 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Host.UseSerilog((ctx, lc) => lc
+            .WriteTo.Console(outputTemplate: "level={Level:w} {Properties} msg={Message:lj} {NewLine}{Exception}")
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("Application_name", "CountryService.ApiService")
+            .Enrich.WithCorrelationIdHeader("correlation-id")
+          );
+
         // Add service defaults & Aspire client integrations.
         builder.AddServiceDefaults();
+
+        // https://www.code4it.dev/blog/serilog-correlation-id/
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddHeaderPropagation(options => options.Headers.Add("correlation-id"));
+
+        // Example just to show how to add header propagation to a named HTTP client.
+        //builder.Services.AddHttpClient("cars_system", c =>
+        //{
+        //    c.BaseAddress = new Uri("https://localhost:7159/");
+        //}).AddHeaderPropagation();
 
         // https://learn.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-9.0#problem-details-service
         builder.Services.AddProblemDetails();
@@ -65,6 +87,8 @@ internal class Program
 
             app.UseExceptionHandler();
         }
+
+        app.UseHeaderPropagation();
 
         // https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/service-defaults#provided-extension-methods
 

@@ -33,6 +33,10 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
     {
         logger.LogDebug($"GetByIso2Async, iso2: {iso2}");
 
+        // Just to show how to get the correlation id in code.
+        Request.Headers.TryGetValue("correlation-id", out var correlationId);
+        logger.LogDebug($"Correlation ID: {correlationId}");
+
         using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
         await sqlConnection.OpenAsync();
 
