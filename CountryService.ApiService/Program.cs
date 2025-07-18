@@ -20,20 +20,20 @@ internal class Program
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .Enrich.FromLogContext()
             .Enrich.WithProperty("Application_name", "CountryService.ApiService")
-            .Enrich.WithCorrelationIdHeader("correlation-id")
-          );
+            .Enrich.WithCorrelationIdHeader("x-correlation-id")
+        );
 
         // Add service defaults & Aspire client integrations.
         builder.AddServiceDefaults();
 
         // https://www.code4it.dev/blog/serilog-correlation-id/
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddHeaderPropagation(options => options.Headers.Add("correlation-id"));
+        builder.Services.AddHeaderPropagation(options => options.Headers.Add("x-correlation-id"));
 
         // Example just to show how to add header propagation to a named HTTP client.
         //builder.Services.AddHttpClient("cars_system", c =>
         //{
-        //    c.BaseAddress = new Uri("https://localhost:7159/");
+        //    c.BaseAddress = new Uri("https://localhost:xxxx/");
         //}).AddHeaderPropagation();
 
         // https://learn.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-9.0#problem-details-service
@@ -72,6 +72,22 @@ internal class Program
         // Configure the HTTP request pipeline.
         app.UseExceptionHandler();
         app.UseStatusCodePages();
+
+        // create proper middleware class.
+
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine("Before next middleware");
+
+            if (!context.Request.Headers.TryGetValue("x-correlation-id", out var correlationId))
+            {
+                Console.WriteLine("x-correlation-id not found in headers."); 
+                context.Request.Headers.Add("x-correlation-id", Guid.NewGuid().ToString());
+            }            
+
+            await next(); // Calls the next middleware in the pipeline
+            Console.WriteLine("After next middleware");
+        });
 
         if (app.Environment.IsDevelopment())
         {

@@ -1,0 +1,52 @@
+﻿@page "/category"
+@using NewsPlatform.Web.ApiClients
+@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)]
+
+@inject CountryServiceApiClient NewsApiClient
+
+<PageTitle>Categories</PageTitle>
+
+<h1>Categories</h1>
+
+@if (categories == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="yoyo">Id</th>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in categories)
+            {
+                <tr>
+                    <td>
+                        <NavLink class="nav-link" href="category/edit">
+                            <i class="bi bi-pencil" style="color: green;"></i>
+                        </NavLink>
+                    </td>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td><i class="bi bi-trash" style="color: red;"></i></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Country[]? categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await NewsApiClient.GetCategoriesAsync();
+    }
+}

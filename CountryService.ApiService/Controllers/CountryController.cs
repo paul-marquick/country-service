@@ -9,7 +9,10 @@ namespace CountryService.ApiService.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class CountryController(ILogger<CountryController> logger, DatabaseOptions databaseOptions, ICountryDataAccess countryDataAccess) : ControllerBase
+public class CountryController(
+    ILogger<CountryController> logger, 
+    DatabaseOptions databaseOptions, 
+    ICountryDataAccess countryDataAccess) : ControllerBase
 {
     [HttpGet("Throw")]
     public IActionResult Throw()
@@ -33,9 +36,9 @@ public class CountryController(ILogger<CountryController> logger, DatabaseOption
     {
         logger.LogDebug($"GetByIso2Async, iso2: {iso2}");
 
-        // Just to show how to get the correlation id in code.
-        Request.Headers.TryGetValue("correlation-id", out var correlationId);
-        logger.LogDebug($"Correlation ID: {correlationId}");
+        // Just to show how to get the correlation id in code. NOT WORKING.
+        Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
+        logger.LogDebug($"x-correlation-id: {correlationId}");
 
         using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
         await sqlConnection.OpenAsync();
