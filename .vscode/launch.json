@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to find out which attributes exist for C# debugging
+    // Use hover for the description of the existing attributes
+    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Launch Web Api",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/CountryService.WebApi/bin/Debug/net9.0/CountryService.WebApi.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/CountryService.WebApi",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "development"
+            }
+        }
+    ]
+}

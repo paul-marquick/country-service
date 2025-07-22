@@ -2,13 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.AppHost", "CountryService.AppHost\CountryService.AppHost.csproj", "{735A56E2-637B-4670-A781-B816839E5A0B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.ServiceDefaults", "CountryService.ServiceDefaults\CountryService.ServiceDefaults.csproj", "{2B0D2C02-4716-6239-4929-E70FB8B12A4E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.ApiService", "CountryService.ApiService\CountryService.ApiService.csproj", "{7C02CAAF-C25D-12F1-913E-4C47F0403791}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.Tests", "CountryService.Tests\CountryService.Tests.csproj", "{849F5BEC-C849-EF00-B25F-5A0677039EAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.WebApi", "CountryService.WebApi\CountryService.WebApi.csproj", "{7C02CAAF-C25D-12F1-913E-4C47F0403791}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.DataAccess.SqlServer", "CountryService.DataAccess.SqlServer\CountryService.DataAccess.SqlServer.csproj", "{DBB36A9E-CA0F-4B93-938B-5E9C2AE69D08}"
 EndProject
@@ -30,22 +24,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{735A56E2-637B-4670-A781-B816839E5A0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{735A56E2-637B-4670-A781-B816839E5A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{735A56E2-637B-4670-A781-B816839E5A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{735A56E2-637B-4670-A781-B816839E5A0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2B0D2C02-4716-6239-4929-E70FB8B12A4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B0D2C02-4716-6239-4929-E70FB8B12A4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B0D2C02-4716-6239-4929-E70FB8B12A4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B0D2C02-4716-6239-4929-E70FB8B12A4E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7C02CAAF-C25D-12F1-913E-4C47F0403791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7C02CAAF-C25D-12F1-913E-4C47F0403791}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C02CAAF-C25D-12F1-913E-4C47F0403791}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C02CAAF-C25D-12F1-913E-4C47F0403791}.Release|Any CPU.Build.0 = Release|Any CPU
-		{849F5BEC-C849-EF00-B25F-5A0677039EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{849F5BEC-C849-EF00-B25F-5A0677039EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{849F5BEC-C849-EF00-B25F-5A0677039EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{849F5BEC-C849-EF00-B25F-5A0677039EAF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DBB36A9E-CA0F-4B93-938B-5E9C2AE69D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DBB36A9E-CA0F-4B93-938B-5E9C2AE69D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBB36A9E-CA0F-4B93-938B-5E9C2AE69D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
