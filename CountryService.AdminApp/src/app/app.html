@@ -1,26 +1,50 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
 
-  <div class="container-fluid">
+    <div class="container-fluid">
 
-    <a class="navbar-brand" href="#">Fixed navbar</a>
+        <a [routerLink]="['']" class="navbar-brand">
+            <i class="bi bi-globe-europe-africa"></i>
+            Country Service
+        </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="collapse navbar-collapse" id="navbarCollapse">
 
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li class="nav-item"> <a class="nav-link active" aria-current="page" href="#">Home</a> </li>
-        <li class="nav-item"> <a class="nav-link" href="country">Countries</a> </li>
-      </ul>
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
 
-      <a class="d-flex" href="https://github.com/paul-marquick/country-service">GitHub</a>
+                <li class="nav-item"> 
+                    <a [routerLink]="['']" class="nav-link">
+                        <i class="bi bi-house"></i>
+                        Home
+                    </a> 
+                </li>
+
+                <li class="nav-item"> 
+                    <a [routerLink]="['country']" class="nav-link">
+                        <i class="bi bi-geo-alt"></i>
+                        Countries
+                    </a> 
+                </li>
+
+            </ul>
+
+            <ul class="navbar-nav ml-auto mb-2 mb-md-0">
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="https://github.com/paul-marquick/country-service" target="_blank">
+                        <i class="bi bi-github" title="GitHub"></i>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
 
     </div>
-
-  </div>
 
 </nav>
 
@@ -28,6 +52,6 @@
 
     <ngx-spinner type="ball-scale-multiple"></ngx-spinner>
 
-  <router-outlet />
+    <router-outlet />
 
 </main>
