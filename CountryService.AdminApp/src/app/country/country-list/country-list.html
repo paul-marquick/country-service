@@ -1,0 +1,35 @@
+<h1>Countries</h1>
+
+@if (countryList) {
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Iso 2</th>
+                <th>Iso 3</th>
+                <th>Iso number</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>   
+            @for(country of countryList | async; track $index) {            
+                <tr>
+                    <td>
+                        <a [routerLink]="['edit', country.iso2]">
+                            <i class="bi-pencil text-success"></i>
+                        </a>
+                    </td>
+                    <td>{{country.name}}</td>
+                    <td>{{country.iso2}}</td>
+                    <td>{{country.iso3}}</td>
+                    <td>{{country.isoNumber}}</td>
+                    <td>
+                        <i class="bi-trash text-danger"></i>
+                    </td>
+                </tr>
+            }    
+        </tbody>
+    </table>
+}
