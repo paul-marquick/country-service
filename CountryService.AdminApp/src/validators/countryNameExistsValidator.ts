@@ -11,7 +11,7 @@ export class CountryNameExistsValidator {
 
     private countryService: CountryService = inject(CountryService);
 
-    checkCountryNameExists(iso2: string | null): AsyncValidatorFn {
+    public checkCountryNameExists(iso2: string | null): AsyncValidatorFn {
         
         return (control: AbstractControl): Observable<ValidationErrors | null> => {
 

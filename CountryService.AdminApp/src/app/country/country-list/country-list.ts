@@ -16,6 +16,7 @@ export class CountryList {
 
     private countryService: CountryService = inject(CountryService);
     private spinner: NgxSpinnerService = inject(NgxSpinnerService);
+
     protected countryList: Observable<Country[]>;    
 
     constructor()
@@ -23,7 +24,7 @@ export class CountryList {
         /** spinner starts on init */
     //    this.spinner.show();
 
+        // Get list of countries.
         this.countryList = this.countryService.getCountryListAsync();
-    }
-           
+    }           
 }

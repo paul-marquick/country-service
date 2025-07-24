@@ -2,9 +2,8 @@
 
 <form [formGroup]="countryForm" (ngSubmit)="handleSubmit()">
 
-    =={{ countryForm.controls["name"].errors | json }}==
-
     <div class="mb-3">
+
         <label class="form-label">Name</label>
         <input type="text" class="form-control" formControlName="name">
 
@@ -35,6 +34,7 @@
     </div>
 
     <div class="mb-3">
+
         <label class="form-label">Iso 2</label>
         <input type="text" class="form-control" formControlName="iso2">
 
@@ -62,6 +62,7 @@
     </div>
 
     <div class="mb-3">
+
         <label class="form-label">Iso 3</label>
         <input type="text" class="form-control" formControlName="iso3">
 
@@ -89,6 +90,7 @@
     </div>
 
     <div class="mb-3">
+        
         <label class="form-label">Iso number</label>
         <input type="number" class="form-control" formControlName="isoNumber">
 
