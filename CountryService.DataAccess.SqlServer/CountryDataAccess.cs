@@ -17,7 +17,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<List<Country>> SelectListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
     {
-        string sql = $"SELECT {selectColumns} FROM \"Country\" ORDER BY \"Name\" ASC;";
+        string sql = $"SELECT {selectColumns} FROM \"Country\" ORDER BY \"Name\" ASC";
 
         using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
         using SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
@@ -34,7 +34,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<List<CountryLookup>> SelectLookupListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
     {
-        string sql = $"SELECT iso2, name FROM \"Country\" ORDER BY \"Name\" ASC;";
+        string sql = "SELECT iso2, name FROM \"Country\" ORDER BY \"Name\" ASC";
 
         using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
         using SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
@@ -51,7 +51,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<Country> SelectByIso2Async(string iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null)
     {
-        string sql = $"SELECT {selectColumns} FROM \"Country\" WHERE \"Iso2\" = @Iso2;";
+        string sql = $"SELECT {selectColumns} FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 
         using SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection, sqlTransaction);
         sqlCommand.Parameters.AddWithValue("Iso2", iso2);
@@ -167,6 +167,22 @@ public class CountryDataAccess : ICountryDataAccess
         sqlCommand.Parameters.AddWithValue("Iso2", iso2);
 
         return await sqlCommand.ExecuteNonQueryAsync();
+    }
+
+    public async Task<bool> DoesCountryNameExistAsync(string name, string? iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction)
+    {
+        SqlCommand sqlCommand = new SqlCommand("SELECT 1 FROM \"Country\" WHERE \"Name\" = @Name", sqlConnection, sqlTransaction);
+        sqlCommand.Parameters.AddWithValue("Name", name);
+
+        if (iso2 != null)
+        {
+            sqlCommand.CommandText += " AND Iso2 <> @Iso2;";
+            sqlCommand.Parameters.AddWithValue("Iso2", iso2);
+        }
+
+        using SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+
+        return sqlDataReader.Read();
     }
 
     private static class Constraints

@@ -134,4 +134,19 @@ public class CountryController(
 
         return NoContent();
     }
+
+    [HttpGet]
+    [Route("does-country-name-exist/{name}/{iso2}")]
+    [Route("does-country-name-exist/{name}")]
+    public async Task<ActionResult<bool>> DoesCountryNameExistAsync(string name, string? iso2)
+    {
+        logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");
+
+        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
+        await sqlConnection.OpenAsync();
+
+        bool exists = await countryDataAccess.DoesCountryNameExistAsync(name, iso2, sqlConnection);
+
+        return Ok(exists);
+    }
 }

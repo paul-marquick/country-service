@@ -1,10 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import CountryService from '../../country.service';
+import { CountryService } from '../../../services/country.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { Observable } from 'rxjs';
-import Country from '../../country';
-import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Country } from '../../../models/country';
+import { ReactiveFormsModule, FormControl, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+
+import { CountryNameExistsValidator } from '../../../validators/countryNameExistsValidator';
+import { forbiddenNameValidator } from '../../../validators/forbiddenNameValidator';
 
 @Component({
     selector: 'app-country-edit',
@@ -16,6 +19,7 @@ export class CountryEdit {
 
     private countryService: CountryService = inject(CountryService);
     private route: ActivatedRoute = inject(ActivatedRoute);
+    private countryNameExistsValidator: CountryNameExistsValidator = inject(CountryNameExistsValidator);
     
     protected country$: Observable<Country | undefined>;
     protected countryForm: FormGroup;
@@ -26,7 +30,7 @@ export class CountryEdit {
         this.country$ = this.countryService.getCountryByIso2(iso2);
 
         this.countryForm = new FormGroup({    
-            name: new FormControl('', { validators: [Validators.required]}),    
+            name: new FormControl('', { validators: [Validators.required, forbiddenNameValidator], asyncValidators: [this.countryNameExistsValidator.checkCountryNameExists(iso2)] }),    
             iso2: new FormControl('', { validators: [Validators.required, Validators.minLength(2), Validators.maxLength(2)]}),    
             iso3: new FormControl('', { validators: [Validators.required, Validators.minLength(3), Validators.maxLength(3)]}),    
             isoNumber: new FormControl('', { validators: [Validators.required]}),   
@@ -37,7 +41,7 @@ export class CountryEdit {
             this.countryForm.controls["iso2"].setValue(country?.iso2);
             this.countryForm.controls["iso3"].setValue(country?.iso3);
             this.countryForm.controls["isoNumber"].setValue(country?.isoNumber);
-        });        
+        }); 
     }
 
     handleSubmit() {

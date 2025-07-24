@@ -11,6 +11,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/CountryService.WebApi/bin/Debug/net9.0/CountryService.WebApi.dll",
             "args": [],
+            "preLaunchTask": "build",
             "cwd": "${workspaceFolder}/CountryService.WebApi",
             "stopAtEntry": false,
             "env": {

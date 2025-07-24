@@ -49,4 +49,6 @@ public interface ICountryDataAccess
     Task<int> UpdateByIso2Async(string iso2, Country country, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
 
     Task<int> DeleteByIso2Async(string iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+
+    Task<bool> DoesCountryNameExistAsync(string name, string? iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
 }

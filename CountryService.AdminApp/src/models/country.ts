@@ -1,4 +1,4 @@
-export default interface Country {
+export interface Country {
     iso2: string;
     iso3: string;
     isoNumber: number;
