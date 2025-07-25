@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, isDevMode, signal } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { NgxSpinnerModule } from "ngx-spinner";
 
@@ -10,4 +10,16 @@ import { NgxSpinnerModule } from "ngx-spinner";
 })
 export class App {
     protected readonly title = signal('countryservice-adminapp');
+
+    ngOnInit() 
+    {
+        if (isDevMode()) 
+        {
+            console.log('Development');
+        } 
+        else 
+        {
+            console.log('Production');
+        }
+    }
 }

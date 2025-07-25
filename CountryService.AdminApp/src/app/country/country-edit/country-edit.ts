@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CountryService } from '../../../services/country.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { Observable } from 'rxjs';
-import { Country } from '../../../models/country';
+import { Country } from '../../../models/country/country';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CountryNameExistsValidator } from '../../../validators/countryNameExistsValidator';
 import { forbiddenNameValidator } from '../../../validators/forbiddenNameValidator';

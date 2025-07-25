@@ -4,12 +4,10 @@ angular needs
 
     display server errors after submit
 
-    config json file or similar
-
     get spinner working
 
     add country component
 
-    edit country component
+    delete country component
 
     

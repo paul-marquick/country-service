@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { Country } from '../../../models/country';
+import { Country } from '../../../models/country/country';
 import { CountryService } from '../../../services/country.service';
 import { NgxSpinnerService,  } from "ngx-spinner";
 import { Observable } from 'rxjs';

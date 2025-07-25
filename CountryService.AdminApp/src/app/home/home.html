@@ -1,1 +1,19 @@
-<p>home works!</p>
+<h1>home works!</h1>
+
+<h2>Environment Variables</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">production</dt>
+    <dd class="col-sm-9">{{env.production}}</dd> 
+    <dt class="col-sm-3">api url</dt>
+    <dd class="col-sm-9">{{env.apiUrl}}</dd>    
+    <dt class="col-sm-3">default Ui Settings</dt>
+    <dd class="col-sm-9">
+        <dl class="row">
+            <dt class="col-sm-3">theme</dt>
+            <dd class="col-sm-9">{{env.defaultUiSettings.theme}}</dd>
+            <dt class="col-sm-3">itemsPerPage</dt>
+            <dd class="col-sm-9">{{env.defaultUiSettings.itemsPerPage}}</dd>
+        </dl>
+    </dd>    
+</dl>
