@@ -2,14 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, ValidationErrors } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { debounceTime, map, catchError, switchMap } from 'rxjs/operators';
-import { CountryService } from '../services/country.service';
+import { CountryHttpClient } from '../httpClients/countryHttpClient';
 
 // Custom async validator.
 // Checks if the country name is already in the database, if iso2 is passed in then that one is ignored.
 @Injectable({ providedIn: 'root' })
 export class CountryNameExistsValidator {
 
-    private countryService: CountryService = inject(CountryService);
+    private countryHttpClient: CountryHttpClient = inject(CountryHttpClient);
 
     public checkCountryNameExists(iso2: string | null): AsyncValidatorFn {
         
@@ -27,7 +27,7 @@ export class CountryNameExistsValidator {
 
                 // Cancel previous requests and switch to the latest.
                 switchMap((name) =>
-                    this.countryService.checkIfCountryNameExists(name, iso2).pipe(
+                    this.countryHttpClient.checkIfCountryNameExists(name, iso2).pipe(
 
                         // If the API returns data, emit { countryNameExists: true }; otherwise null.
                         map((response) => (response ? { countryNameExists: true } : null)),

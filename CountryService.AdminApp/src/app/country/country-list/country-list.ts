@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Country } from '../../../models/country/country';
-import { CountryService } from '../../../services/country.service';
+import { CountryHttpClient } from '../../../httpClients/countryHttpClient';
 import { NgxSpinnerService,  } from "ngx-spinner";
 import { Observable } from 'rxjs';
 import { RouterLink } from '@angular/router';
@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class CountryList {
 
-    private countryService: CountryService = inject(CountryService);
+    private countryHttpClient: CountryHttpClient = inject(CountryHttpClient);
     private spinner: NgxSpinnerService = inject(NgxSpinnerService);
 
     protected countryList: Observable<Country[]>;    
@@ -25,6 +25,6 @@ export class CountryList {
     //    this.spinner.show();
 
         // Get list of countries.
-        this.countryList = this.countryService.getCountryListAsync();
+        this.countryList = this.countryHttpClient.getCountryList();
     }           
 }

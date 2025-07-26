@@ -3,17 +3,19 @@
 <h2>Environment Variables</h2>
 
 <dl class="row">
-    <dt class="col-sm-3">production</dt>
+    <dt class="col-sm-3">Production</dt>
     <dd class="col-sm-9">{{env.production}}</dd> 
-    <dt class="col-sm-3">api url</dt>
+    <dt class="col-sm-3">Api URL</dt>
     <dd class="col-sm-9">{{env.apiUrl}}</dd>    
-    <dt class="col-sm-3">default Ui Settings</dt>
+    <dt class="col-sm-3">Default Ui Settings</dt>
     <dd class="col-sm-9">
         <dl class="row">
-            <dt class="col-sm-3">theme</dt>
+            <dt class="col-sm-3">Theme</dt>
             <dd class="col-sm-9">{{env.defaultUiSettings.theme}}</dd>
-            <dt class="col-sm-3">itemsPerPage</dt>
+            <dt class="col-sm-3">Items per page</dt>
             <dd class="col-sm-9">{{env.defaultUiSettings.itemsPerPage}}</dd>
         </dl>
     </dd>    
 </dl>
+
+<button type="button" (click)="testLogger()">Test logger</button>

@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CountryService } from '../../../services/country.service';
+import { CountryHttpClient } from '../../../httpClients/countryHttpClient';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { Country } from '../../../models/country/country';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CountryNameExistsValidator } from '../../../validators/countryNameExistsValidator';
 import { forbiddenNameValidator } from '../../../validators/forbiddenNameValidator';
+import { Logger } from '../../../logging/logger';
 
 @Component({
     selector: 'app-country-edit',
@@ -16,7 +17,8 @@ import { forbiddenNameValidator } from '../../../validators/forbiddenNameValidat
 })
 export class CountryEdit {
 
-    private countryService: CountryService = inject(CountryService);
+    private logger: Logger = inject(Logger);
+    private countryHttpClient: CountryHttpClient = inject(CountryHttpClient);
     private route: ActivatedRoute = inject(ActivatedRoute);
     private countryNameExistsValidator: CountryNameExistsValidator = inject(CountryNameExistsValidator);
     
@@ -29,7 +31,7 @@ export class CountryEdit {
         const iso2: string = this.route.snapshot.params["iso2"];
 
         // Get the country.
-        this.country$ = this.countryService.getCountryByIso2(iso2);
+        this.country$ = this.countryHttpClient.getCountryByIso2(iso2);
 
         //TODO: handle errors.
 
@@ -49,7 +51,10 @@ export class CountryEdit {
         error: error => console.log('oops', error)}); 
     }    
 
+    /** Handles form submission. */
     protected handleSubmit() {
+
+        this.logger.debug("CountryEdit.handleSubmit.");
 
         if (this.countryForm.valid) {
             console.log("form is valid.");
