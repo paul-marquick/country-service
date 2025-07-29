@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CountryService.DataAccess;
-using Microsoft.Data.SqlClient;
+﻿using CountryService.DataAccess;
 using CountryService.DataAccess.Exceptions;
-using System.Net;
 using CountryService.DataAccess.Models.Country;
+using Microsoft.AspNetCore.Mvc;
+using System.Data.Common;
+using System.Net;
 
 namespace CountryService.WebApi.Controllers;
 
@@ -11,7 +11,7 @@ namespace CountryService.WebApi.Controllers;
 [ApiController]
 public class CountryController(
     ILogger<CountryController> logger, 
-    DatabaseOptions databaseOptions, 
+    IDbConnectionFactory dbConnectionFactory, 
     ICountryDataAccess countryDataAccess) : ControllerBase
 {
     [HttpGet("Throw")]
@@ -25,10 +25,10 @@ public class CountryController(
     {
         logger.LogDebug("GetCountryListAsync");
 
-        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
-        await sqlConnection.OpenAsync();
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
 
-        return Ok(await countryDataAccess.SelectListAsync(sqlConnection));
+        return Ok(await countryDataAccess.SelectListAsync(dbConnection));
     }
 
     [HttpGet("{iso2}")]
@@ -40,12 +40,12 @@ public class CountryController(
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
         logger.LogDebug($"x-correlation-id: {correlationId}");
 
-        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
-        await sqlConnection.OpenAsync();
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
 
         try
         {
-            Country country = await countryDataAccess.SelectByIso2Async(iso2, sqlConnection);
+            Country country = await countryDataAccess.SelectByIso2Async(iso2, dbConnection);
 
             return Ok(country);
         }
@@ -67,12 +67,12 @@ public class CountryController(
     {
         logger.LogDebug($"PostAsync, country.Iso2: {country.Iso2}");
 
-        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
-        await sqlConnection.OpenAsync();
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
 
         try
         {
-            await countryDataAccess.InsertAsync(country, sqlConnection);
+            await countryDataAccess.InsertAsync(country, dbConnection);
 
             return Created($"https://api.example.com/country/{country.Iso2}", country);
         }
@@ -94,20 +94,26 @@ public class CountryController(
     {
         logger.LogDebug($"PutByIso2Async, iso2: {iso2}");
 
-        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
-        await sqlConnection.OpenAsync();
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
+
+        DbTransaction? dbTransaction = await dbConnection.BeginTransactionAsync();
 
         try
-        {
+        {         
             // Check row exists.
-            await countryDataAccess.SelectByIso2Async(iso2, sqlConnection);
+            await countryDataAccess.SelectByIso2Async(iso2, dbConnection, dbTransaction);
 
-            await countryDataAccess.UpdateByIso2Async(iso2, country, sqlConnection);
+            await countryDataAccess.UpdateByIso2Async(iso2, country, dbConnection, dbTransaction);
+
+            await dbTransaction.CommitAsync();
 
             return NoContent();
         }
         catch (DataAccessException dataAccessException)
         {
+            await dbTransaction.RollbackAsync();
+
             switch (dataAccessException)
             {
                 case CountryNotFoundException ex:
@@ -127,10 +133,10 @@ public class CountryController(
     {
         logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}.");
 
-        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
-        await sqlConnection.OpenAsync();
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
 
-        await countryDataAccess.DeleteByIso2Async(iso2, sqlConnection);
+        await countryDataAccess.DeleteByIso2Async(iso2, dbConnection);
 
         return NoContent();
     }
@@ -142,10 +148,10 @@ public class CountryController(
     {
         logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");
 
-        using SqlConnection sqlConnection = new(databaseOptions.ConnectionString);
-        await sqlConnection.OpenAsync();
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
 
-        bool exists = await countryDataAccess.DoesCountryNameExistAsync(name, iso2, sqlConnection);
+        bool exists = await countryDataAccess.DoesCountryNameExistAsync(name, iso2, dbConnection);
 
         return Ok(exists);
     }

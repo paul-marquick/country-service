@@ -1,54 +1,54 @@
 ﻿using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.Models.Country;
-using Microsoft.Data.SqlClient;
+using System.Data.Common;
 
 namespace CountryService.DataAccess;
 
 public interface ICountryDataAccess
 {
-    Task<List<Country>> SelectListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<List<Country>> SelectListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
-    Task<List<CountryLookup>> SelectLookupListAsync(SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<List<CountryLookup>> SelectLookupListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Selects a country row by iso2.
     /// </summary>
     /// <param name="iso2"></param>
-    /// <param name="sqlConnection"></param>
-    /// <param name="sqlTransaction"></param>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
     /// <exception cref="CountryNotFoundException"></exception>
     /// <returns>Country</returns>
-    Task<Country> SelectByIso2Async(string iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<Country> SelectByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Inserts a country row into the database.
     /// </summary>
     /// <param name="country"></param>
-    /// <param name="sqlConnection"></param>
-    /// <param name="sqlTransaction"></param>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
     /// <exception cref="CountryIso2DuplicatedException"></exception>
     /// <exception cref="CountryIso3DuplicatedException"></exception>
     /// <exception cref="CountryIsoNumberDuplicatedException"></exception>
     /// <exception cref="CountryNameDuplicatedException"></exception>
     /// <returns>Number of affected rows.</returns>
-    Task<int> InsertAsync(Country country, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<int> InsertAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Inserts a country row into the database.
     /// </summary>
     /// <param name="iso2"></param>
     /// <param name="country"></param>
-    /// <param name="sqlConnection"></param>
-    /// <param name="sqlTransaction"></param>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
     /// <exception cref="CountryNotFoundException"></exception>
     /// <exception cref="CountryIso2DuplicatedException"></exception>
     /// <exception cref="CountryIso3DuplicatedException"></exception>
     /// <exception cref="CountryIsoNumberDuplicatedException"></exception>
     /// <exception cref="CountryNameDuplicatedException"></exception>
     /// <returns>Number of affected rows.</returns>
-    Task<int> UpdateByIso2Async(string iso2, Country country, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<int> UpdateByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
-    Task<int> DeleteByIso2Async(string iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
-    Task<bool> DoesCountryNameExistAsync(string name, string? iso2, SqlConnection sqlConnection, SqlTransaction? sqlTransaction = null);
+    Task<bool> DoesCountryNameExistAsync(string name, string? iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 }

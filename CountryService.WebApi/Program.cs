@@ -48,11 +48,7 @@ internal class Program
         builder.Services.AddOpenApi();
 
         // Data access.
-        builder.Services.AddSingleton(
-            new DatabaseOptions
-            {
-                ConnectionString = builder.Configuration.GetConnectionString("CountryServiceConnection")!
-            });
+        builder.Services.AddSingleton<IDbConnectionFactory>(new SqlServerConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
         builder.Services.AddSingleton<ICountryDataAccess, CountryDataAccess>();
 
         builder.Services.AddCors(options =>
