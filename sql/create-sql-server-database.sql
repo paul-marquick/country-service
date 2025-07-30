@@ -7,6 +7,7 @@ CREATE TABLE CountryService.dbo.Country
     Iso3 nvarchar(3) NOT NULL,
     IsoNumber int NOT NULL,
     Name nvarchar(100) NOT NULL,
+    CallingCode nvarchar(100),
     CONSTRAINT PK_Country_Iso2 PRIMARY KEY  (Iso2)
 ); 
 
