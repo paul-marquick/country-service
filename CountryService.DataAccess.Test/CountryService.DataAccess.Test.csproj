@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CountryService.DataAccess.MySql\CountryService.DataAccess.MySql.csproj" />
     <ProjectReference Include="..\CountryService.DataAccess.PostgreSql\CountryService.DataAccess.PostgreSql.csproj" />
     <ProjectReference Include="..\CountryService.DataAccess.SqlServer\CountryService.DataAccess.SqlServer.csproj" />
     <ProjectReference Include="..\CountryService.DataAccess\CountryService.DataAccess.csproj" />

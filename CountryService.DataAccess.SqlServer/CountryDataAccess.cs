@@ -20,8 +20,8 @@ public class CountryDataAccess : ICountryDataAccess
     {
         string sql = $"SELECT {selectColumns} FROM \"Country\" ORDER BY \"Name\" ASC";
 
-        using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection) dbConnection, (SqlTransaction?) dbTransaction);
-        using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
+        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection) dbConnection, (SqlTransaction?) dbTransaction);
+        await using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
 
         List<Country> countryList = new List<Country>();
 
@@ -37,8 +37,8 @@ public class CountryDataAccess : ICountryDataAccess
     {
         string sql = "SELECT \"Iso2\", \"Name\" FROM \"Country\" ORDER BY \"Name\" ASC";
 
-        using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
-        using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
+        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
+        await using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
 
         List<CountryLookup> countryLookupList = new List<CountryLookup>();
 
@@ -54,10 +54,10 @@ public class CountryDataAccess : ICountryDataAccess
     {
         string sql = $"SELECT {selectColumns} FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 
-        using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
+        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
         dbCommand.Parameters.AddWithValue("Iso2", iso2);
 
-        using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
+        await using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
 
         if (dbDataReader.Read())
         {
@@ -75,7 +75,7 @@ public class CountryDataAccess : ICountryDataAccess
         {
             string sql = "INSERT INTO \"Country\" (\"Iso2\", \"Iso3\", \"IsoNumber\", \"Name\", \"CallingCode\") VALUES (@Iso2, @Iso3, @IsoNumber, @Name, @CallingCode)";
 
-            using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
+            await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
             dbCommand.Parameters.AddWithValue("Iso2", country.Iso2);
             dbCommand.Parameters.AddWithValue("Iso3", country.Iso3);
             dbCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
@@ -121,7 +121,7 @@ public class CountryDataAccess : ICountryDataAccess
         {
             string sql = "UPDATE \"Country\" SET \"Iso2\" = @Iso2, \"Iso3\" = @Iso3, \"IsoNumber\" = @IsoNumber, \"Name\" = @Name, \"CallingCode\" = @CallingCode WHERE \"Iso2\" = @pIso2";
 
-            using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
+            await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
             dbCommand.Parameters.AddWithValue("Iso2", country.Iso2);
             dbCommand.Parameters.AddWithValue("Iso3", country.Iso3);
             dbCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
@@ -166,7 +166,7 @@ public class CountryDataAccess : ICountryDataAccess
     {
         string sql = "DELETE FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 
-        using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
+        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
         dbCommand.Parameters.AddWithValue("Iso2", iso2);
 
         return await dbCommand.ExecuteNonQueryAsync();
@@ -176,7 +176,7 @@ public class CountryDataAccess : ICountryDataAccess
     {
         string sql = "SELECT 1 FROM \"Country\" WHERE \"Name\" = @Name";
 
-        SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
+        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
         dbCommand.Parameters.AddWithValue("Name", name);
 
         if (iso2 != null)
@@ -185,7 +185,7 @@ public class CountryDataAccess : ICountryDataAccess
             dbCommand.Parameters.AddWithValue("Iso2", iso2);
         }
 
-        using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
+        await using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
 
         return dbDataReader.Read();
     }
