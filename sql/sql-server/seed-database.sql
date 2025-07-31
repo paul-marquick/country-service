@@ -1,4 +1,4 @@
-﻿-- Some calling codes are left null on purpose.
+﻿-- Some calling codes are intentionally left null.
 
 USE [CountryService]
 GO

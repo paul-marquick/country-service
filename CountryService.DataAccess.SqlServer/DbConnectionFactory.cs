@@ -1,13 +1,13 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data.Common;
 
-namespace CountryService.DataAccess;
+namespace CountryService.DataAccess.SqlServer;
 
-public class SqlServerConnectionFactory : IDbConnectionFactory
+public class DbConnectionFactory : IDbConnectionFactory
 {
     private readonly string connectionString;
 
-    public SqlServerConnectionFactory(string connectionString)
+    public DbConnectionFactory(string connectionString)
     {
         this.connectionString = connectionString;
     }

@@ -15,4 +15,6 @@ public record Country
 
     [Required]
     public required string Name { get; set; }
+
+    public string? CallingCode { get; set; }
 }

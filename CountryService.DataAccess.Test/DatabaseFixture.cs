@@ -5,16 +5,24 @@ namespace CountryService.DataAccess.Test;
 
 public class DatabaseFixture
 {
-    public DatabaseFixture() 
+    public DatabaseFixture()
     {
-        ConnectionString = "Server=.;Database=CountryService;Trusted_Connection=true;TrustServerCertificate=true;MultipleActiveResultSets=true";
+        // Sql Server.
+        SqlServerCountryDataAccess = new SqlServer.CountryDataAccess(Mock.Of<ILogger<SqlServer.CountryDataAccess>>());
 
-        CountryDataAccess = new SqlServer.CountryDataAccess(Mock.Of<ILogger<SqlServer.CountryDataAccess>>());
+        // PostgreSql.
+        PostgreSqlCountryDataAccess = new PostgreSql.CountryDataAccess(Mock.Of<ILogger<PostgreSql.CountryDataAccess>>());
     }
 
-    public string ConnectionString { get; private set; }
+    // Sql Server.
+    public IDbConnectionFactory SqlServerDbConnectionFactory => new SqlServer.DbConnectionFactory(
+            "Server=.;Database=CountryService;Trusted_Connection=true;TrustServerCertificate=true;MultipleActiveResultSets=true");
+    public ICountryDataAccess SqlServerCountryDataAccess { get; private set; }
 
-    public ICountryDataAccess CountryDataAccess { get; private set; }
+    // PosgreSql.
+    public IDbConnectionFactory PostgreSqlDbConnectionFactory => new PostgreSql.DbConnectionFactory(
+            "Server=localhost; Port=5433; Database=country_service; Password=password; User Id=postgres; Include Error Detail=true;");
+    public ICountryDataAccess PostgreSqlCountryDataAccess { get; private set; }
 
     public static string CreateRandomString(int length)
     {

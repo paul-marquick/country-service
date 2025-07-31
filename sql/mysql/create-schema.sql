@@ -1,0 +1,1 @@
+CREATE SCHEMA `country_service`;
