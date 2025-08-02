@@ -18,6 +18,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<List<Country>> SelectListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug("SelectListAsync");
+
         string sql = $"SELECT {selectColumns} FROM \"Country\" ORDER BY \"Name\" ASC";
 
         await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection) dbConnection, (SqlTransaction?) dbTransaction);
@@ -35,6 +37,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<List<CountryLookup>> SelectLookupListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug("SelectLookupListAsync");
+
         string sql = "SELECT \"Iso2\", \"Name\" FROM \"Country\" ORDER BY \"Name\" ASC";
 
         await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
@@ -52,6 +56,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<Country> SelectByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"SelectByIso2Async, iso2: {iso2}");
+
         string sql = $"SELECT {selectColumns} FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 
         await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
@@ -71,6 +77,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> InsertAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"InsertAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+
         try
         {
             string sql = "INSERT INTO \"Country\" (\"Iso2\", \"Iso3\", \"IsoNumber\", \"Name\", \"CallingCode\") VALUES (@Iso2, @Iso3, @IsoNumber, @Name, @CallingCode)";
@@ -86,7 +94,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
         catch (SqlException dbException)
         {
-            var constraintName = Utils.GetConstraintName(dbException.Message);
+            var constraintName = Utils.GetConstraintName(logger, dbException.Message);
 
             if (constraintName == null)
             {
@@ -117,6 +125,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> UpdateByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"UpdateByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+
         try
         {
             string sql = "UPDATE \"Country\" SET \"Iso2\" = @Iso2, \"Iso3\" = @Iso3, \"IsoNumber\" = @IsoNumber, \"Name\" = @Name, \"CallingCode\" = @CallingCode WHERE \"Iso2\" = @pIso2";
@@ -133,7 +143,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
         catch (SqlException dbException)
         {
-            var constraintName = Utils.GetConstraintName(dbException.Message);
+            var constraintName = Utils.GetConstraintName(logger, dbException.Message);
 
             if (constraintName == null)
             {
@@ -164,6 +174,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");
+
         string sql = "DELETE FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 
         await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
@@ -174,6 +186,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<bool> DoesCountryNameExistAsync(string name, string? iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");
+
         string sql = "SELECT 1 FROM \"Country\" WHERE \"Name\" = @Name";
 
         await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);

@@ -18,6 +18,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<List<Country>> SelectListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug("SelectListAsync");
+
         string sql = $"SELECT {selectColumns} FROM \"country\" ORDER BY \"name\" ASC";
 
         await using NpgsqlCommand dbCommand = new NpgsqlCommand(sql, (NpgsqlConnection)dbConnection, (NpgsqlTransaction?)dbTransaction);
@@ -35,6 +37,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<List<CountryLookup>> SelectLookupListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug("SelectLookupListAsync");
+
         string sql = "SELECT iso_2, name FROM \"country\" ORDER BY \"name\" ASC";
 
         await using NpgsqlCommand dbCommand = new NpgsqlCommand(sql, (NpgsqlConnection)dbConnection, (NpgsqlTransaction?)dbTransaction);
@@ -52,6 +56,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<Country> SelectByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"SelectByIso2Async, iso2: {iso2}");
+
         string sql = $"SELECT {selectColumns} FROM \"country\" WHERE \"iso_2\" = @iso_2";
 
         await using NpgsqlCommand dbCommand = new NpgsqlCommand(sql, (NpgsqlConnection)dbConnection, (NpgsqlTransaction?)dbTransaction);
@@ -71,6 +77,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> InsertAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"InsertAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+
         try
         {
             string sql = "INSERT INTO \"country\" (\"iso_2\", \"iso_3\", \"iso_number\", \"name\", \"calling_code\") VALUES (@iso_2, @iso_3, @iso_number, @name, @calling_code)";
@@ -115,6 +123,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> UpdateByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"UpdateByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+
         try
         {
             string sql = "UPDATE \"country\" SET \"iso_2\" = @iso_2, \"iso_3\" = @iso_3, \"iso_number\" = @iso_number, \"name\" = @name, \"calling_code\" = @calling_code WHERE \"iso_2\" = @p_iso_2";
@@ -160,6 +170,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");
+
         string sql = "DELETE FROM \"country\" WHERE \"iso_2\" = @iso_2";
 
         await using NpgsqlCommand dbCommand = new NpgsqlCommand(sql, (NpgsqlConnection)dbConnection, (NpgsqlTransaction?)dbTransaction);
@@ -170,6 +182,8 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<bool> DoesCountryNameExistAsync(string name, string? iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
+        logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");
+
         string sql = "SELECT 1 FROM \"country\" WHERE \"name\" = @name";
 
         await using NpgsqlCommand dbCommand = new NpgsqlCommand(sql, (NpgsqlConnection)dbConnection, (NpgsqlTransaction?)dbTransaction);
