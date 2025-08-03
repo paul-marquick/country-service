@@ -1,26 +1,34 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace CountryService.WebApi;
+namespace CountryService.WebApi.Problems;
 
 /// <summary>
 /// Converts ModelState validation failure to problem details instance containing validation errors.
 /// </summary>
-public class ModelStateToValidationProblemDetails : ActionResult
+public class ModelStateToValidationProblemDetails(ILogger<ModelStateToValidationProblemDetails> logger) : ActionResult
 {
     public override Task ExecuteResultAsync(ActionContext context)
     {
+        string problemDetailsInstance = Guid.NewGuid().ToString();
+
+        logger.LogDebug("ExecuteResultAsync, Problem details instance: {}", problemDetailsInstance);
+
         ValidationProblemDetails validationProblemDetails = new(context.ModelState)
         {
-            Type = "https://datatracker.ietf.org/doc/html/rfc9110#name-400-bad-request",
-            Title = "Failed validation",
+            Type = ProblemType.FailedValidation,
+            Title = ProblemTitle.FailedValidation,
             Detail = "Invalid input.",
             Status = StatusCodes.Status400BadRequest,
-            Instance = Guid.NewGuid().ToString()
+            Instance = problemDetailsInstance,
+            Extensions =
+            {
+                { "requestId", context.HttpContext.TraceIdentifier },
+                { "x-correlation-id", context.HttpContext.Request.Headers["x-correlation-id"].FirstOrDefault()}
+            }
         };
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;

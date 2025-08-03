@@ -25,4 +25,19 @@
 	  <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Problems\ProblemTitle.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ProblemTitle.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Problems\ProblemTitle.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProblemTitle.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

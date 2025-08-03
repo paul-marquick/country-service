@@ -1,9 +1,9 @@
 ﻿using CountryService.DataAccess;
 using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.Models.Country;
+using CountryService.WebApi.Problems;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Common;
-using System.Net;
 
 namespace CountryService.WebApi.Controllers;
 
@@ -12,11 +12,18 @@ namespace CountryService.WebApi.Controllers;
 public class CountryController(
     ILogger<CountryController> logger, 
     IDbConnectionFactory dbConnectionFactory, 
-    ICountryDataAccess countryDataAccess) : ControllerBase
+    ICountryDataAccess countryDataAccess, 
+    ProblemDetailsCreator problemDetailsCreator) : ControllerBase
 {
     [HttpGet("Throw")]
     public IActionResult Throw()
     {
+        // Just to show how to get the request id in code.
+        Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
+        logger.LogDebug($"x-correlation-id: {correlationId}");
+
+        // Could store the correlation ID in an event table in the database, for example.
+
         throw new Exception("Sample exception.");
     }
 
@@ -36,9 +43,11 @@ public class CountryController(
     {
         logger.LogDebug($"GetByIso2Async, iso2: {iso2}");
 
-        // Just to show how to get the correlation id in code. NOT WORKING.
+        // Just to show how to get the request id in code.
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
         logger.LogDebug($"x-correlation-id: {correlationId}");
+
+        // Could store the correlation ID in an event table in the database, for example.
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
@@ -53,7 +62,13 @@ public class CountryController(
         {
             if (dataAccessException is CountryNotFoundException)
             {
-                throw new ProblemDetailsException(HttpStatusCode.NotFound, "Country not found", $"Country with iso2: '{iso2}' not found.");
+                return NotFound(
+                    problemDetailsCreator.CreateProblemDetails(
+                        HttpContext, 
+                        StatusCodes.Status404NotFound,
+                        ProblemType.CountryNotFound,
+                        ProblemTitle.CountryNotFound,
+                        $"Country with iso2: '{iso2}' not found."));
             }
             else
             {
@@ -80,8 +95,41 @@ public class CountryController(
         {
             switch (dataAccessException)
             {
-                case CountryIso2DuplicatedException ex:
-                    return BadRequest();
+                case CountryIso2DuplicatedException countryIso2DuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryIso2Duplicated,
+                            ProblemTitle.CountryIso2Duplicated,
+                            $"Country has iso2: '{country.Iso2}' duplicated."));
+
+                case CountryIso3DuplicatedException countryIso3DuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryIso3Duplicated,
+                            ProblemTitle.CountryIso3Duplicated,
+                            $"Country has iso3: '{country.Iso3}' duplicated."));
+
+                case CountryIsoNumberDuplicatedException countryIsoNumberDuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryIsoNumberDuplicated,
+                            ProblemTitle.CountryIsoNumberDuplicated,
+                            $"Country has isoNumber: '{country.IsoNumber}' duplicated."));
+
+                case CountryNameDuplicatedException countryNameDuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryNameDuplicated,
+                            ProblemTitle.CountryNameDuplicated,
+                            $"Country has name: '{country.Name}' duplicated."));
 
                 default:
                     throw;
@@ -116,11 +164,50 @@ public class CountryController(
 
             switch (dataAccessException)
             {
-                case CountryNotFoundException ex:
-                    return NotFound();
+                case CountryNotFoundException countryNotFoundException:
+                    return NotFound(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status404NotFound,
+                            ProblemType.CountryNotFound,
+                            ProblemTitle.CountryNotFound,
+                            $"Country with iso2: '{iso2}' not found."));
 
-                case CountryIso2DuplicatedException ex:
-                    return BadRequest();
+                case CountryIso2DuplicatedException countryIso2DuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryIso2Duplicated,
+                            ProblemTitle.CountryIso2Duplicated,
+                            $"Country has iso2: '{country.Iso2}' duplicated."));
+
+                case CountryIso3DuplicatedException countryIso3DuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryIso3Duplicated,
+                            ProblemTitle.CountryIso3Duplicated,
+                            $"Country has iso3: '{country.Iso3}' duplicated."));
+
+                case CountryIsoNumberDuplicatedException countryIsoNumberDuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryIsoNumberDuplicated,
+                            ProblemTitle.CountryIsoNumberDuplicated,
+                            $"Country has isoNumber: '{country.IsoNumber}' duplicated."));
+
+                case CountryNameDuplicatedException countryNameDuplicatedException:
+                    return BadRequest(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status400BadRequest,
+                            ProblemType.CountryNameDuplicated,
+                            ProblemTitle.CountryNameDuplicated,
+                            $"Country has name: '{country.Name}' duplicated."));
 
                 default:
                     throw;

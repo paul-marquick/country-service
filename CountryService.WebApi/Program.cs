@@ -5,6 +5,7 @@ using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
 using CountryService.WebApi.Middleware;
+using CountryService.WebApi.Problems;
 
 namespace CountryService.WebApi;
 
@@ -14,16 +15,14 @@ internal class Program
     {
         const string allowAdminApp = "allowAdminApp";
 
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         builder.Host.UseSerilog((ctx, lc) => lc
             .WriteTo.Console(outputTemplate: "level={Level:w} {Properties} msg={Message:lj} {NewLine}{Exception}")
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .Enrich.FromLogContext()
             .Enrich.WithProperty("Application_name", "CountryService.ApiService")
-            .Enrich.WithCorrelationIdHeader("x-correlation-id")
+        //    .Enrich.WithCorrelationIdHeader("x-correlation-id")
+            .ReadFrom.Configuration(builder.Configuration)
         );
 
         // https://www.code4it.dev/blog/serilog-correlation-id/
@@ -36,8 +35,14 @@ internal class Program
         //    c.BaseAddress = new Uri("https://localhost:xxxx/");
         //}).AddHeaderPropagation();
 
-        // https://learn.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-9.0#problem-details-service
-        builder.Services.AddProblemDetails();
+        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.problemdetailsservicecollectionextensions.addproblemdetails?view=aspnetcore-9.0
+        builder.Services.AddProblemDetails(options =>
+            options.CustomizeProblemDetails = ctx =>
+            {
+                // Microsoft code NEVER works 100% in the real world. It's all workarounds and hacks.
+                //  ctx.ProblemDetails.Extensions.Add("requestId", ctx.HttpContext.TraceIdentifier);
+            });
+        builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 
         // https://stackoverflow.com/questions/79188513/addopenapi-adding-error-response-types-to-all-operations-net-9
 
@@ -46,6 +51,9 @@ internal class Program
 
         // Add the Open API document generation services.
         builder.Services.AddOpenApi();
+
+        // Code.
+        builder.Services.AddSingleton<ProblemDetailsCreator>();
 
         // Data access.
         builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
@@ -64,43 +72,52 @@ internal class Program
 
         builder.Services.AddControllers(options =>
         {
-            options.Filters.Add<ProblemDetailsExceptionFilter>();
+ // Example:         //  options.Filters.Add<ProblemDetailsExceptionFilter>();
         })
         .ConfigureApiBehaviorOptions(options =>
         {
             options.InvalidModelStateResponseFactory = context =>
             {
-                return new ModelStateToValidationProblemDetails();
+                return new ModelStateToValidationProblemDetails(context.HttpContext.RequestServices.GetRequiredService<ILogger<ModelStateToValidationProblemDetails>>());
             };
         });
 
-        var app = builder.Build();
+        WebApplication app = builder.Build();
 
-        // Configure the HTTP request pipeline.
-        app.UseExceptionHandler();
-        app.UseStatusCodePages();
-
+        // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-9.0
         app.UseMiddleware<CheckCorrelationIdMiddleware>();
 
+        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.statuscodepagesextensions.usestatuscodepages?view=aspnetcore-9.0
+        app.UseStatusCodePages();
+
+        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.exceptionhandlerextensions.useexceptionhandler?view=aspnetcore-9.0
+        app.UseExceptionHandler();
+
+        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.hostingenvironmentextensions.isdevelopment?view=aspnetcore-9.0
         if (app.Environment.IsDevelopment())
         {
+            // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-9.0
             app.MapOpenApi();
+
+            // https://scalar.com/
             app.MapScalarApiReference(options =>
             {
                 options
                     .WithTitle("TITLE_HERE")
-             //       .WithDownloadButton(true)
                     .WithTheme(ScalarTheme.Purple)
                     .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios);
             });
-
-            app.UseExceptionHandler();
         }
 
+        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.headerpropagationapplicationbuilderextensions.useheaderpropagation?view=aspnetcore-9.0
+        // Used for the correlation id header.
         app.UseHeaderPropagation();
 
+        // https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-9.0
+        // Use the CORS policy, defined above. 
         app.UseCors(allowAdminApp);
 
+        // https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-9.0
         app.MapControllers();
 
         app.Run();
