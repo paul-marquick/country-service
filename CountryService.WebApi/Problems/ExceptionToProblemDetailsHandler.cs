@@ -1,8 +1,7 @@
 ﻿namespace CountryService.WebApi.Problems;
 
 /// <summary>
-/// Global exception handler that translates exceptions into ProblemDetails responses.
-/// Checks exception type, as may be a thrown ProblemDetailsException.
+/// Global exception handler that translates exceptions into ProblemDetails responses and sends them via the ProblemDetailsService.
 /// </summary>
 /// <see cref="https://timdeschryver.dev/blog/translating-exceptions-into-problem-details-responses"/>
 public class ExceptionToProblemDetailsHandler(
@@ -16,11 +15,13 @@ public class ExceptionToProblemDetailsHandler(
         string problemDetailsInstance = Guid.NewGuid().ToString();
 
         logger.LogError(
-            exception, 
-            "TryHandleAsync, error has occurred. Problem details instance: {0}", problemDetailsInstance);
+            exception,
+            "TryHandleAsync, error has occurred. Problem details instance: {problemDetailsInstance}", problemDetailsInstance);
+
+        // Replace some context which has been lost due to the standard exception handler reissuing the response.
+        httpContext.Response.Headers["x-correlation-id"] = httpContext.Request.Headers["x-correlation-id"].FirstOrDefault();
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
         return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,

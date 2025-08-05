@@ -1,11 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using CountryService.DataAccess;
-using CountryService.DataAccess.SqlServer;
-using Scalar.AspNetCore;
-using Serilog;
-using Serilog.Events;
+using CountryService.Shared;
+using CountryService.WebApi.Configuration;
 using CountryService.WebApi.Middleware;
 using CountryService.WebApi.Problems;
+using Scalar.AspNetCore;
+using Serilog;
 
 namespace CountryService.WebApi;
 
@@ -13,6 +12,8 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        Console.WriteLine("Country Service Web Api start up.");
+
         const string allowAdminApp = "allowAdminApp";
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -21,16 +22,21 @@ internal class Program
             .WriteTo.Console(outputTemplate: "level={Level:w} {Properties} msg={Message:lj} {NewLine}{Exception}")
             .Enrich.FromLogContext()
             .Enrich.WithProperty("Application_name", "CountryService.ApiService")
-        //    .Enrich.WithCorrelationIdHeader("x-correlation-id")
             .ReadFrom.Configuration(builder.Configuration)
         );
+
+        // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-9.0
+        builder.Services.AddOptions();
+        builder.AddAppSettings();
+        Config config = builder.GetConfig();
 
         // https://www.code4it.dev/blog/serilog-correlation-id/
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddHeaderPropagation(options => options.Headers.Add("x-correlation-id"));
 
-        // Example just to show how to add header propagation to a named HTTP client.
-        //builder.Services.AddHttpClient("cars_system", c =>
+        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.headerpropagationservicecollectionextensions.addheaderpropagation?view=aspnetcore-9.0
+        // Example: how to add header propagation to a named HTTP client.
+        //builder.Services.AddHttpClient("planetsClient", c =>
         //{
         //    c.BaseAddress = new Uri("https://localhost:xxxx/");
         //}).AddHeaderPropagation();
@@ -39,14 +45,14 @@ internal class Program
         builder.Services.AddProblemDetails(options =>
             options.CustomizeProblemDetails = ctx =>
             {
-                // Microsoft code NEVER works 100% in the real world. It's all workarounds and hacks.
+                // You can add custom properties to the ProblemDetails instance.
                 //  ctx.ProblemDetails.Extensions.Add("requestId", ctx.HttpContext.TraceIdentifier);
             });
         builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 
         // https://stackoverflow.com/questions/79188513/addopenapi-adding-error-response-types-to-all-operations-net-9
 
-        // Customise default API behaviour.
+        // Generate Open API documentation for the API.
         builder.Services.AddEndpointsApiExplorer();
 
         // Add the Open API document generation services.
@@ -56,8 +62,31 @@ internal class Program
         builder.Services.AddSingleton<ProblemDetailsCreator>();
 
         // Data access.
-        builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
-        builder.Services.AddSingleton<ICountryDataAccess, CountryDataAccess>();
+        // Can simply switch between different database systems by editing the appsettings.json file.
+        // Need to change the database system value and the database connection string.
+        switch (config.DatabaseSystem)
+        {
+            case DatabaseSystem.SqlServer:
+                Console.WriteLine("Using SQL Server database system.");
+                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.SqlServer.DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
+                builder.Services.AddSingleton<ICountryDataAccess, DataAccess.SqlServer.CountryDataAccess>();
+                break;
+
+            case DatabaseSystem.PostgreSql:
+                Console.WriteLine("Using PostgreSQL database system.");
+                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.PostgreSql.DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
+                builder.Services.AddSingleton<ICountryDataAccess, DataAccess.PostgreSql.CountryDataAccess>();
+                break;
+
+            case DatabaseSystem.MySql:
+                Console.WriteLine("Using MySQL database system.");
+                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.MySql.DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
+                builder.Services.AddSingleton<ICountryDataAccess, DataAccess.MySql.CountryDataAccess>();
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException($"Start up exception: Unknown database system, specified in the appsettings, '{config.DatabaseSystem}'.");
+        }        
 
         builder.Services.AddCors(options =>
         {
@@ -72,7 +101,9 @@ internal class Program
 
         builder.Services.AddControllers(options =>
         {
- // Example:         //  options.Filters.Add<ProblemDetailsExceptionFilter>();
+            // https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-9.0
+            // Example: how to add a filter to the request processing pipeline.
+            // options.Filters.Add<ProblemDetailsExceptionFilter>();
         })
         .ConfigureApiBehaviorOptions(options =>
         {
@@ -84,8 +115,11 @@ internal class Program
 
         WebApplication app = builder.Build();
 
-        // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-9.0
-        app.UseMiddleware<CheckCorrelationIdMiddleware>();
+        // Example: how to add middleware into the request processing pipeline.       
+        // app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
+        // Custom middleware added using an IApplicationBuilder extension.
+        app.UseCorrelationId();
 
         // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.statuscodepagesextensions.usestatuscodepages?view=aspnetcore-9.0
         app.UseStatusCodePages();

@@ -15,7 +15,7 @@ public class ModelStateToValidationProblemDetails(ILogger<ModelStateToValidation
     {
         string problemDetailsInstance = Guid.NewGuid().ToString();
 
-        logger.LogDebug("ExecuteResultAsync, Problem details instance: {}", problemDetailsInstance);
+        logger.LogDebug("ExecuteResultAsync, Problem details instance: {problemDetailsInstance}", problemDetailsInstance);
 
         ValidationProblemDetails validationProblemDetails = new(context.ModelState)
         {

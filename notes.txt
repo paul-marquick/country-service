@@ -1,6 +1,14 @@
-angular needs
+web service needs
 
-    logging?
+    health / liveness endpoint, with db conn check.
+
+    metrics endpoint.
+
+    config endpoint - see all web service config.
+
+ 
+
+angular needs
 
     display server errors after submit
 
@@ -13,3 +21,5 @@ angular needs
     Create grid component.
 
     csrf 
+
+Create a blazor app to match angular app.

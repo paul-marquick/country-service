@@ -7,27 +7,27 @@ namespace CountryService.WebApi.Middleware;
 /// especially useful in distributed systems for tracing the request's path and troubleshooting issues.
 /// </summary>
 /// <see cref="https://microsoft.github.io/code-with-engineering-playbook/observability/correlation-id/"/>
-public class CheckCorrelationIdMiddleware
+public class CorrelationIdMiddleware
 {
     private readonly RequestDelegate next;
 
-    public CheckCorrelationIdMiddleware(RequestDelegate next)
+    public CorrelationIdMiddleware(RequestDelegate next)
     {
         this.next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext httpContext)
     {
         // If we haven't received a correlation ID in the request headers, generate a new one.
-        if (!context.Request.Headers.TryGetValue("x-correlation-id", out var correlationId))
+        if (!httpContext.Request.Headers.TryGetValue("x-correlation-id", out var correlationId))
         {
-            context.Request.Headers["x-correlation-id"] = Guid.NewGuid().ToString();
+            httpContext.Request.Headers["x-correlation-id"] = Guid.NewGuid().ToString();
         }
 
         // Log the correlation ID and add it to the response headers.
-        LogContext.PushProperty("x-correlation-id", context.Request.Headers["x-correlation-id"]);
-        context.Response.Headers["x-correlation-id"] = context.Request.Headers["x-correlation-id"].FirstOrDefault();
+        LogContext.PushProperty("x-correlation-id", httpContext.Request.Headers["x-correlation-id"]);
+        httpContext.Response.Headers["x-correlation-id"] = httpContext.Request.Headers["x-correlation-id"].FirstOrDefault();
 
-        await next(context);
+        await next(httpContext);
     }
 }
