@@ -3,6 +3,7 @@ using CountryService.Shared;
 using CountryService.WebApi.Configuration;
 using CountryService.WebApi.Middleware;
 using CountryService.WebApi.Problems;
+using OpenTelemetry.Metrics;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -33,16 +34,24 @@ internal class Program
         // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-9.0
         builder.Services.AddHealthChecks();
 
-        // https://www.code4it.dev/blog/serilog-correlation-id/
+        // https://learn.microsoft.com/en-us/aspnet/core/log-mon/metrics/metrics?view=aspnetcore-9.0
+        builder.Services.AddOpenTelemetry()
+            .WithMetrics(builder =>
+            {
+                builder.AddPrometheusExporter();
+                builder.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
+            });
+
+        // Access HttpContext through the injected IHttpContextAccessor.
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddHeaderPropagation(options => options.Headers.Add("x-correlation-id"));
 
         // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.headerpropagationservicecollectionextensions.addheaderpropagation?view=aspnetcore-9.0
         // Example: how to add header propagation to a named HTTP client.
+        // Uncomment use header propagation below to use this. (approx line 160
         //builder.Services.AddHttpClient("planetsClient", c =>
         //{
         //    c.BaseAddress = new Uri("https://localhost:xxxx/");
-        //}).AddHeaderPropagation();
+        //}).AddHeaderPropagation(options => options.Headers.Add("x-correlation-id"));
 
         // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.problemdetailsservicecollectionextensions.addproblemdetails?view=aspnetcore-9.0
         builder.Services.AddProblemDetails(options =>
@@ -140,10 +149,13 @@ internal class Program
             app.MapOpenApi();
 
             // https://scalar.com/
+            // Endpoints
+            // /openapi/v1.json
+            // /scalar
             app.MapScalarApiReference(options =>
             {
                 options
-                    .WithTitle("TITLE_HERE")
+                    .WithTitle("Country Service")
                     .WithTheme(ScalarTheme.Purple)
                     .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios);
             });
@@ -151,7 +163,7 @@ internal class Program
 
         // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.headerpropagationapplicationbuilderextensions.useheaderpropagation?view=aspnetcore-9.0
         // Used for the correlation id header.
-        app.UseHeaderPropagation();
+    // Uncomment if use header propagation above.     app.UseHeaderPropagation();
 
         // https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-9.0
         // Use the CORS policy, defined above. 
@@ -159,6 +171,9 @@ internal class Program
 
         // https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-9.0
         app.MapControllers();
+
+        // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-prgrja-example
+        app.MapPrometheusScrapingEndpoint();
 
         app.Run();
     }

@@ -1,16 +1,6 @@
-﻿using CountryService.Shared;
-using CountryService.WebApi.Configuration;
+﻿using CountryService.WebApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-
-
-// Want 
-
-// health endpoint
-// prometheus endpoint
-// with query param for db check
-// system info endpoint
-// system config endpoint
 
 namespace CountryService.WebApi.Controllers;
 
@@ -18,15 +8,12 @@ namespace CountryService.WebApi.Controllers;
 [ApiController]
 public class ServiceInfoController(
     ILogger<ServiceInfoController> logger,
-    IConfiguration configuration,
     IOptionsMonitor<Config> optionsMonitorConfig) : ControllerBase
 {
     [HttpGet]
     public ActionResult<Config> Get()
     {
         logger.LogDebug("Get");
-
-     //   var connString = configuration.GetConnectionString("Constants.CountryServiceConnectionStringName");
 
         var sysInfo = new
         {

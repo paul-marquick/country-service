@@ -3,7 +3,7 @@ C# country web api with angular admin app.
 
 Data access projects
 
-- Interface and several implementations for differnet DBS such as PostgreSql, MySql, Sql Server.
+- Interface and several implementations for different DBS such as PostgreSql, MySql, Sql Server.
 - Unit tests for data access projects.    
 
 .NET web api
@@ -14,6 +14,8 @@ Data access projects
 - Middleware that checks for a correlation id, if none, it creates a correlation id, passed on by header propagation.
 - CORS.
 - Health check at /healthz endpoint.
+- Prometheus metrics at /metrics endpoint.
+- OpenApi at /scalar endpoint. 
 
 Angular web app
 

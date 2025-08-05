@@ -1,7 +1,5 @@
 web service needs
 
-    health / liveness endpoint, with db conn check.
-
     metrics endpoint.
 
     config endpoint - see all web service config.
