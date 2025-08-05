@@ -30,6 +30,9 @@ internal class Program
         builder.AddAppSettings();
         Config config = builder.GetConfig();
 
+        // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-9.0
+        builder.Services.AddHealthChecks();
+
         // https://www.code4it.dev/blog/serilog-correlation-id/
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddHeaderPropagation(options => options.Headers.Add("x-correlation-id"));
@@ -68,19 +71,19 @@ internal class Program
         {
             case DatabaseSystem.SqlServer:
                 Console.WriteLine("Using SQL Server database system.");
-                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.SqlServer.DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
+                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.SqlServer.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
                 builder.Services.AddSingleton<ICountryDataAccess, DataAccess.SqlServer.CountryDataAccess>();
                 break;
 
             case DatabaseSystem.PostgreSql:
                 Console.WriteLine("Using PostgreSQL database system.");
-                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.PostgreSql.DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
+                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.PostgreSql.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
                 builder.Services.AddSingleton<ICountryDataAccess, DataAccess.PostgreSql.CountryDataAccess>();
                 break;
 
             case DatabaseSystem.MySql:
                 Console.WriteLine("Using MySQL database system.");
-                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.MySql.DbConnectionFactory(builder.Configuration.GetConnectionString("CountryServiceConnection")!));
+                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.MySql.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
                 builder.Services.AddSingleton<ICountryDataAccess, DataAccess.MySql.CountryDataAccess>();
                 break;
 
@@ -120,6 +123,9 @@ internal class Program
 
         // Custom middleware added using an IApplicationBuilder extension.
         app.UseCorrelationId();
+
+        // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-9.0#basic-health-probe
+        app.MapHealthChecks("/healthz");
 
         // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.statuscodepagesextensions.usestatuscodepages?view=aspnetcore-9.0
         app.UseStatusCodePages();

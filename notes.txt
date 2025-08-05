@@ -6,6 +6,7 @@ web service needs
 
     config endpoint - see all web service config.
 
+    options endpoint.
  
 
 angular needs
