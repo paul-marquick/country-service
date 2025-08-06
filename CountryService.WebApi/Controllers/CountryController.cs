@@ -4,6 +4,7 @@ using CountryService.DataAccess.Models.Country;
 using CountryService.WebApi.Problems;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Common;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Controllers;
 
@@ -34,26 +35,43 @@ public class CountryController(
         throw new Exception("Sample exception.");
     }
 
+    [HttpHead]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Country>>> GetCountryListAsync()
     {
-        logger.LogDebug("GetCountryListAsync");
+        string method = HttpContext.Request.Method;
+
+        logger.LogDebug($"GetCountryListAsync, method: {method}");
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        return Ok(await countryDataAccess.SelectListAsync(dbConnection));
+        List<Country> countryList = await countryDataAccess.SelectListAsync(dbConnection);
+
+        if (method == HttpMethod.Head.Method)
+        {
+            Response.Headers.ContentType = Application.Json;
+            Response.Headers.ContentLength = countryList.ToString()!.Length;
+
+            return new EmptyResult();
+        }
+        else
+        {
+            return Ok(countryList);
+        }
     }
 
+    [HttpHead("{iso2}")]
     [HttpGet("{iso2}")]
     public async Task<ActionResult<Country>> GetByIso2Async(string iso2)
     {
-        logger.LogDebug($"GetByIso2Async, iso2: {iso2}");
+        string method = HttpContext.Request.Method;
+
+        logger.LogDebug($"GetByIso2Async, method: {method}, iso2: {iso2}");
 
         // Just to show how to get the request id in code.
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
         logger.LogDebug($"x-correlation-id: {correlationId}");
-
         // Could store the correlation ID in an event table in the database, for example.
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
@@ -63,19 +81,38 @@ public class CountryController(
         {
             Country country = await countryDataAccess.SelectByIso2Async(iso2, dbConnection);
 
-            return Ok(country);
+            if (method == HttpMethod.Head.Method)
+            {
+                Response.Headers.ContentType = Application.Json;
+                Response.Headers.ContentLength = country.ToString()!.Length;
+
+                return new EmptyResult();
+            }
+            else
+            {
+                return Ok(country);
+            }
         }
         catch (DataAccessException dataAccessException)
         {
             if (dataAccessException is CountryNotFoundException)
             {
-                return NotFound(
-                    problemDetailsCreator.CreateProblemDetails(
-                        HttpContext, 
-                        StatusCodes.Status404NotFound,
-                        ProblemType.CountryNotFound,
-                        ProblemTitle.CountryNotFound,
-                        $"Country with iso2: '{iso2}' not found."));
+                if (method == HttpMethod.Head.Method)
+                {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    Response.Headers.ContentLength = 0;
+                    return new EmptyResult();
+                }
+                else
+                {
+                    return NotFound(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status404NotFound,
+                            ProblemType.CountryNotFound,
+                            ProblemTitle.CountryNotFound,
+                            $"Country with iso2: '{iso2}' not found."));
+                }
             }
             else
             {

@@ -16,6 +16,7 @@ Data access projects
 - Health check at /healthz endpoint.
 - Prometheus metrics at /metrics endpoint.
 - OpenApi at /scalar endpoint. 
+- Method handlers for Options, Head, Get, Post, Put, Patch and Delete HTTP methods.
 
 Angular web app
 

@@ -1,7 +1,7 @@
 web service needs
 
 
-    head and options endpoints
+    head and options patch endpoints
  
 
 angular needs
