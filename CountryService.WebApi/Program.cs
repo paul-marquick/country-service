@@ -26,15 +26,15 @@ internal class Program
             .ReadFrom.Configuration(builder.Configuration)
         );
 
-        // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-9.0
+        // The options pattern uses classes to provide strongly typed access to groups of related settings.
         builder.Services.AddOptions();
         builder.AddAppSettings();
         Config config = builder.GetConfig();
 
-        // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-9.0
+        // Basic health probe. (See below for endpoint)
         builder.Services.AddHealthChecks();
 
-        // https://learn.microsoft.com/en-us/aspnet/core/log-mon/metrics/metrics?view=aspnetcore-9.0
+        // Prometheus metrics.
         builder.Services.AddOpenTelemetry()
             .WithMetrics(builder =>
             {
@@ -45,7 +45,6 @@ internal class Program
         // Access HttpContext through the injected IHttpContextAccessor.
         builder.Services.AddHttpContextAccessor();
 
-        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.headerpropagationservicecollectionextensions.addheaderpropagation?view=aspnetcore-9.0
         // Example: how to add header propagation to a named HTTP client.
         // Uncomment use header propagation below to use this. (approx line 160
         //builder.Services.AddHttpClient("planetsClient", c =>
@@ -53,7 +52,7 @@ internal class Program
         //    c.BaseAddress = new Uri("https://localhost:xxxx/");
         //}).AddHeaderPropagation(options => options.Headers.Add("x-correlation-id"));
 
-        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.problemdetailsservicecollectionextensions.addproblemdetails?view=aspnetcore-9.0
+        // Problem details service.
         builder.Services.AddProblemDetails(options =>
             options.CustomizeProblemDetails = ctx =>
             {
@@ -61,8 +60,6 @@ internal class Program
                 //  ctx.ProblemDetails.Extensions.Add("requestId", ctx.HttpContext.TraceIdentifier);
             });
         builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
-
-        // https://stackoverflow.com/questions/79188513/addopenapi-adding-error-response-types-to-all-operations-net-9
 
         // Generate Open API documentation for the API.
         builder.Services.AddEndpointsApiExplorer();
@@ -113,7 +110,6 @@ internal class Program
 
         builder.Services.AddControllers(options =>
         {
-            // https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-9.0
             // Example: how to add a filter to the request processing pipeline.
             // options.Filters.Add<ProblemDetailsExceptionFilter>();
         })
@@ -133,19 +129,20 @@ internal class Program
         // Custom middleware added using an IApplicationBuilder extension.
         app.UseCorrelationId();
 
-        // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-9.0#basic-health-probe
+        // Map health check endpoint.
         app.MapHealthChecks("/healthz");
 
-        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.statuscodepagesextensions.usestatuscodepages?view=aspnetcore-9.0
+        // Adds a StatusCodePages middleware with a default response handler that checks for
+        // responses with status codes between 400 and 599 that do not have a body.
         app.UseStatusCodePages();
 
-        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.exceptionhandlerextensions.useexceptionhandler?view=aspnetcore-9.0
+        // Adds a middleware to the pipeline that will catch exceptions, log them, and re-execute
+        // the request in an alternate pipeline. The request will not be re-executed if the response has already started.
         app.UseExceptionHandler();
 
-        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.hostingenvironmentextensions.isdevelopment?view=aspnetcore-9.0
         if (app.Environment.IsDevelopment())
         {
-            // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-9.0
+            // OpenAPI document generation.
             app.MapOpenApi();
 
             // https://scalar.com/
@@ -161,18 +158,18 @@ internal class Program
             });
         }
 
-        // https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.headerpropagationapplicationbuilderextensions.useheaderpropagation?view=aspnetcore-9.0
-        // Used for the correlation id header.
-    // Uncomment if use header propagation above.     app.UseHeaderPropagation();
+        // Adds a middleware that collect headers to be propagated to a HttpClient
+        // E.g. correlation id.
+        // app.UseHeaderPropagation();
 
-        // https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-9.0
+        // Cross-Origin Resource Sharing.
         // Use the CORS policy, defined above. 
         app.UseCors(allowAdminApp);
 
-        // https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-9.0
+        // Routing middleware to match the URLs of incoming requests and map them to actions.
         app.MapControllers();
 
-        // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-prgrja-example
+        // Prometheus for metrics collection.
         app.MapPrometheusScrapingEndpoint();
 
         app.Run();

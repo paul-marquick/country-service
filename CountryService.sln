@@ -45,6 +45,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.DataAccess.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryService.Shared", "CountryService.Shared\CountryService.Shared.csproj", "{E9C0F9C3-D71C-4F63-959E-DE346AE8CB2B}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "CountryService.AngularAdminApp", "CountryService.AngularAdminApp\", "{EDACBAF7-037F-F1B9-E3B1-D751047E05BD}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_63140"
+		Debug.AspNetCompiler.PhysicalPath = "CountryService.AngularAdminApp\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63140\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_63140"
+		Release.AspNetCompiler.PhysicalPath = "CountryService.AngularAdminApp\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63140\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "63140"
+		SlnRelativePath = "CountryService.AngularAdminApp\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +100,10 @@ Global
 		{E9C0F9C3-D71C-4F63-959E-DE346AE8CB2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9C0F9C3-D71C-4F63-959E-DE346AE8CB2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9C0F9C3-D71C-4F63-959E-DE346AE8CB2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDACBAF7-037F-F1B9-E3B1-D751047E05BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDACBAF7-037F-F1B9-E3B1-D751047E05BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDACBAF7-037F-F1B9-E3B1-D751047E05BD}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDACBAF7-037F-F1B9-E3B1-D751047E05BD}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

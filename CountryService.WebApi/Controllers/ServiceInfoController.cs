@@ -1,6 +1,7 @@
 ﻿using CountryService.WebApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Controllers;
 
@@ -10,10 +11,20 @@ public class ServiceInfoController(
     ILogger<ServiceInfoController> logger,
     IOptionsMonitor<Config> optionsMonitorConfig) : ControllerBase
 {
+    [HttpOptions]
+    public void Options()
+    {
+        Response.Headers.Allow = $"{HttpMethod.Options}, {HttpMethod.Head}, {HttpMethod.Get}";
+        Response.ContentLength = 0;
+    }
+
+    [HttpHead]
     [HttpGet]
     public ActionResult<Config> Get()
     {
-        logger.LogDebug("Get");
+        string method = HttpContext.Request.Method;
+
+        logger.LogDebug($"Get, method: {method}");
 
         var sysInfo = new
         {
@@ -29,6 +40,16 @@ public class ServiceInfoController(
             Uptime = DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime()
         };
 
-        return Ok(sysInfo);
+        if (method == HttpMethod.Head.Method)
+        {
+            Response.Headers.ContentType = Application.Json;
+            Response.Headers.ContentLength = sysInfo.ToString()!.Length;
+
+            return new EmptyResult();
+        }
+        else
+        {
+            return Ok(sysInfo);
+        }
     }
 }

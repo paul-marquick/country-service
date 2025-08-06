@@ -15,7 +15,14 @@ public class CountryController(
     ICountryDataAccess countryDataAccess, 
     ProblemDetailsCreator problemDetailsCreator) : ControllerBase
 {
-    [HttpGet("Throw")]
+    [HttpOptions]
+    public void Options()
+    {
+        Response.Headers.Allow = $"{HttpMethod.Options}, {HttpMethod.Head}, {HttpMethod.Get}, {HttpMethod.Post}, {HttpMethod.Put}, {HttpMethod.Patch}, {HttpMethod.Delete}";
+        Response.ContentLength = 0;
+    }
+
+    [HttpGet("throw")]
     public IActionResult Throw()
     {
         // Just to show how to get the request id in code.

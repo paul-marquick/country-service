@@ -2,5 +2,5 @@
 
 public static class Constants
 {
-    public const string CountryServiceConnectionStringName = "CountryServiceConnectionString";
+    public const string CountryServiceConnectionStringName = "CountryService";
 }

@@ -1,10 +1,7 @@
 web service needs
 
-    metrics endpoint.
 
-    config endpoint - see all web service config.
-
-    options endpoint.
+    head and options endpoints
  
 
 angular needs
