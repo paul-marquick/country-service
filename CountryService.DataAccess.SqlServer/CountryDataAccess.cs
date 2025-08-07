@@ -172,6 +172,89 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
+    public async Task<int> PartialUpdateByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    {
+        logger.LogDebug($"PartialUpdateByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+
+        try
+        {
+            string sql = "UPDATE \"Country\" SET ";
+            await using SqlCommand dbCommand = new SqlCommand();
+            dbCommand.Connection = (SqlConnection)dbConnection;
+            dbCommand.Transaction = (SqlTransaction?)dbTransaction;
+            
+            if (dirtyColumns.Contains("Iso2", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += "\"Iso2\" = @Iso2,";
+                dbCommand.Parameters.AddWithValue("Iso2", country.Iso2);
+            }
+
+            if (dirtyColumns.Contains("Iso3", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"Iso3\" = @Iso3,";
+                dbCommand.Parameters.AddWithValue("Iso3", country.Iso3);
+            }
+
+            if (dirtyColumns.Contains("IsoNumber", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"IsoNumber\" = @IsoNumber,";
+                dbCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
+            }
+
+            if (dirtyColumns.Contains("Name", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"Name\" = @Name,";
+                dbCommand.Parameters.AddWithValue("Name", country.Name);
+            }
+
+            if (dirtyColumns.Contains("CallingCode", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"CallingCode\" = @CallingCode";
+                dbCommand.Parameters.AddWithNullableValue("CallingCode", country.CallingCode);
+            }
+
+            // Remove the last comma if any columns were updated.
+            sql = sql.TrimEnd(',');
+
+            sql += " WHERE \"Iso2\" = @pIso2";
+
+            dbCommand.Parameters.AddWithValue("pIso2", iso2);
+
+            dbCommand.CommandText = sql;
+
+            return await dbCommand.ExecuteNonQueryAsync();
+        }
+        catch (SqlException dbException)
+        {
+            var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+
+            if (constraintName == null)
+            {
+                throw new DataAccessException("Constraint name is null.", dbException);
+            }
+            else
+            {
+                switch (constraintName)
+                {
+                    case Constraints.PrimaryKeyCountryIso2:
+                        throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
+
+                    case Constraints.UniqueIndexCountryIso3:
+                        throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
+
+                    case Constraints.UniqueIndexCountryIsoNumber:
+                        throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
+
+                    case Constraints.UniqueIndexCountryName:
+                        throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
+
+                    default:
+                        throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
+                }
+            }
+        }
+    }
+
     public async Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");

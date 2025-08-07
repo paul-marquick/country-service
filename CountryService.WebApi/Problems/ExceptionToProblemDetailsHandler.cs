@@ -11,7 +11,7 @@ public class ExceptionToProblemDetailsHandler(
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         logger.LogDebug("TryHandleAsync");
-        
+
         string problemDetailsInstance = Guid.NewGuid().ToString();
 
         logger.LogError(
@@ -32,7 +32,7 @@ public class ExceptionToProblemDetailsHandler(
                     Type = ProblemType.InternalServerError,
                     Status = StatusCodes.Status500InternalServerError,
                     Instance = problemDetailsInstance,
-                    Extensions = 
+                    Extensions =
                     {
                         { "requestId", httpContext.TraceIdentifier },
                         { "x-correlation-id", httpContext.Request.Headers["x-correlation-id"].FirstOrDefault()}

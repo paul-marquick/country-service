@@ -150,4 +150,7 @@
   <data name="InternalServerError" xml:space="preserve">
     <value>An error has occurred</value>
   </data>
+  <data name="UnsupportedPatchOperation" xml:space="preserve">
+    <value>Unsupported patch operation specified</value>
+  </data>
 </root>

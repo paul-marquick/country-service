@@ -190,6 +190,11 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
+    public async Task<int> PartialUpdateByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    {
+        throw new NotImplementedException("Partial update is not implemented yet.");
+    }
+
     public async Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");

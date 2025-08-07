@@ -2,6 +2,7 @@ using CountryService.DataAccess;
 using CountryService.Shared;
 using CountryService.WebApi.Configuration;
 using CountryService.WebApi.Middleware;
+using CountryService.WebApi.Patching;
 using CountryService.WebApi.Problems;
 using OpenTelemetry.Metrics;
 using Scalar.AspNetCore;
@@ -110,6 +111,9 @@ internal class Program
 
         builder.Services.AddControllers(options =>
         {
+            // https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-9.0
+            options.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
+
             // Example: how to add a filter to the request processing pipeline.
             // options.Filters.Add<ProblemDetailsExceptionFilter>();
         })
@@ -119,7 +123,7 @@ internal class Program
             {
                 return new ModelStateToValidationProblemDetails(context.HttpContext.RequestServices.GetRequiredService<ILogger<ModelStateToValidationProblemDetails>>());
             };
-        });
+        }).AddNewtonsoftJson();
 
         WebApplication app = builder.Build();
 

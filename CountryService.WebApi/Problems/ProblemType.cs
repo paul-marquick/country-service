@@ -10,6 +10,7 @@ public static class ProblemType
     // General problem types.
     public const string FailedValidation = "failed-validation";
     public const string InternalServerError = "internal-server-error";
+    public const string UnsupportedPatchOperation = "unsupported-patch-operation";
 
     // Country resource specific problem types.
     public const string CountryNotFound = "country-not-found";

@@ -158,5 +158,14 @@ namespace CountryService.WebApi.Problems {
                 return ResourceManager.GetString("InternalServerError", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported patch operation specified.
+        /// </summary>
+        internal static string UnsupportedPatchOperation {
+            get {
+                return ResourceManager.GetString("UnsupportedPatchOperation", resourceCulture);
+            }
+        }
     }
 }

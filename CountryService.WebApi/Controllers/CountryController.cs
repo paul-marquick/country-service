@@ -2,6 +2,7 @@
 using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.Models.Country;
 using CountryService.WebApi.Problems;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Common;
 using static System.Net.Mime.MediaTypeNames;
@@ -252,6 +253,121 @@ public class CountryController(
                             ProblemType.CountryNameDuplicated,
                             ProblemTitle.CountryNameDuplicated,
                             $"Country has name: '{country.Name}' duplicated."));
+
+                default:
+                    throw;
+            }
+        }
+    }
+
+    //TODO: Validation of the patch document, needs thorough testing. Not sure it is being validated.
+
+    [HttpPatch("{iso2}")]
+    public async Task<ActionResult> PatchByIso2Async([FromRoute] string iso2, [FromBody] JsonPatchDocument<Country> countryPatch)
+    {
+        logger.LogDebug($"PatchByIso2Async, iso2: {iso2}");
+
+        // Currently only supports replace operations.
+        if (countryPatch.Operations.Any(x => x.OperationType != Microsoft.AspNetCore.JsonPatch.Operations.OperationType.Replace))
+        {
+            return BadRequest(
+                problemDetailsCreator.CreateProblemDetails(
+                    HttpContext,
+                    StatusCodes.Status400BadRequest,
+                    ProblemType.UnsupportedPatchOperation,
+                    ProblemTitle.UnsupportedPatchOperation,
+                    $"Unsupported patch operation, currently only replace is supported."));
+        }
+
+        using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
+        await dbConnection.OpenAsync();
+
+        DbTransaction? dbTransaction = await dbConnection.BeginTransactionAsync();
+
+        try
+        {
+            // Check row exists, will throw if not found.
+            Country country = await countryDataAccess.SelectByIso2Async(iso2, dbConnection, dbTransaction);
+
+            // Apply the patch.
+            countryPatch.ApplyTo(country, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            List<string> dirtyColumns = countryPatch.Operations.Select(x => x.path).ToList();
+
+            logger.LogDebug($"PatchByIso2Async, dirtyColumns: {dirtyColumns}");
+
+            try
+            {
+                await countryDataAccess.PartialUpdateByIso2Async(iso2, country, dirtyColumns, dbConnection, dbTransaction);
+
+                await dbTransaction.CommitAsync();
+
+                return NoContent();
+            }
+            catch (DataAccessException dataAccessException)
+            {
+                await dbTransaction.RollbackAsync();
+
+                switch (dataAccessException)
+                {
+                    case CountryIso2DuplicatedException countryIso2DuplicatedException:
+                        return BadRequest(
+                            problemDetailsCreator.CreateProblemDetails(
+                                HttpContext,
+                                StatusCodes.Status400BadRequest,
+                                ProblemType.CountryIso2Duplicated,
+                                ProblemTitle.CountryIso2Duplicated,
+                                $"Country has iso2: '{country.Iso2}' duplicated."));
+
+                    case CountryIso3DuplicatedException countryIso3DuplicatedException:
+                        return BadRequest(
+                            problemDetailsCreator.CreateProblemDetails(
+                                HttpContext,
+                                StatusCodes.Status400BadRequest,
+                                ProblemType.CountryIso3Duplicated,
+                                ProblemTitle.CountryIso3Duplicated,
+                                $"Country has iso3: '{country.Iso3}' duplicated."));
+
+                    case CountryIsoNumberDuplicatedException countryIsoNumberDuplicatedException:
+                        return BadRequest(
+                            problemDetailsCreator.CreateProblemDetails(
+                                HttpContext,
+                                StatusCodes.Status400BadRequest,
+                                ProblemType.CountryIsoNumberDuplicated,
+                                ProblemTitle.CountryIsoNumberDuplicated,
+                                $"Country has isoNumber: '{country.IsoNumber}' duplicated."));
+
+                    case CountryNameDuplicatedException countryNameDuplicatedException:
+                        return BadRequest(
+                            problemDetailsCreator.CreateProblemDetails(
+                                HttpContext,
+                                StatusCodes.Status400BadRequest,
+                                ProblemType.CountryNameDuplicated,
+                                ProblemTitle.CountryNameDuplicated,
+                                $"Country has name: '{country.Name}' duplicated."));
+
+                    default:
+                        throw;
+                }
+            }
+        }
+        catch (DataAccessException dataAccessException)
+        {
+            switch (dataAccessException)
+            {
+                case CountryNotFoundException countryNotFoundException:
+                    return NotFound(
+                        problemDetailsCreator.CreateProblemDetails(
+                            HttpContext,
+                            StatusCodes.Status404NotFound,
+                            ProblemType.CountryNotFound,
+                            ProblemTitle.CountryNotFound,
+                            $"Country with iso2: '{iso2}' not found."));
 
                 default:
                     throw;
