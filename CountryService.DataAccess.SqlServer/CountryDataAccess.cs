@@ -94,31 +94,38 @@ public class CountryDataAccess : ICountryDataAccess
         }
         catch (SqlException dbException)
         {
-            var constraintName = Utils.GetConstraintName(logger, dbException.Message);
-
-            if (constraintName == null)
+            if (dbException.Number == 2601 || dbException.Number == 2627) // 2601 index dup, 2627 pk dup.
             {
-                throw new DataAccessException("Constraint name is null.", dbException);
+                var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+
+                if (constraintName == null)
+                {
+                    throw new DataAccessException("Constraint name is null.", dbException);
+                }
+                else
+                {
+                    switch (constraintName)
+                    {
+                        case Constraints.PrimaryKeyCountryIso2:
+                            throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
+
+                        case Constraints.UniqueIndexCountryIso3:
+                            throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
+
+                        case Constraints.UniqueIndexCountryIsoNumber:
+                            throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
+
+                        case Constraints.UniqueIndexCountryName:
+                            throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
+
+                        default:
+                            throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
+                    }
+                }
             }
             else
             {
-                switch (constraintName)
-                {
-                    case Constraints.PrimaryKeyCountryIso2:
-                        throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
-
-                    case Constraints.UniqueIndexCountryIso3:
-                        throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
-
-                    case Constraints.UniqueIndexCountryIsoNumber:
-                        throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
-
-                    case Constraints.UniqueIndexCountryName:
-                        throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
-
-                    default:
-                        throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
-                }
+                throw new DataAccessException($"Sql Server unknown error number: {dbException.Number}.", dbException);
             }
         }
     }
@@ -143,31 +150,38 @@ public class CountryDataAccess : ICountryDataAccess
         }
         catch (SqlException dbException)
         {
-            var constraintName = Utils.GetConstraintName(logger, dbException.Message);
-
-            if (constraintName == null)
+            if (dbException.Number == 2601 || dbException.Number == 2627) 
             {
-                throw new DataAccessException("Constraint name is null.", dbException);
+                var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+
+                if (constraintName == null)
+                {
+                    throw new DataAccessException("Constraint name is null.", dbException);
+                }
+                else
+                {
+                    switch (constraintName)
+                    {
+                        case Constraints.PrimaryKeyCountryIso2:
+                            throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
+
+                        case Constraints.UniqueIndexCountryIso3:
+                            throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
+
+                        case Constraints.UniqueIndexCountryIsoNumber:
+                            throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
+
+                        case Constraints.UniqueIndexCountryName:
+                            throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
+
+                        default:
+                            throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
+                    }
+                }
             }
             else
             {
-                switch (constraintName)
-                {
-                    case Constraints.PrimaryKeyCountryIso2:
-                        throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
-
-                    case Constraints.UniqueIndexCountryIso3:
-                        throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
-
-                    case Constraints.UniqueIndexCountryIsoNumber:
-                        throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
-
-                    case Constraints.UniqueIndexCountryName:
-                        throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
-
-                    default:
-                        throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
-                }
+                throw new DataAccessException($"Sql Server unknown error number: {dbException.Number}.", dbException);
             }
         }
     }
@@ -226,31 +240,38 @@ public class CountryDataAccess : ICountryDataAccess
         }
         catch (SqlException dbException)
         {
-            var constraintName = Utils.GetConstraintName(logger, dbException.Message);
-
-            if (constraintName == null)
+            if (dbException.Number == 2601 || dbException.Number == 2627)
             {
-                throw new DataAccessException("Constraint name is null.", dbException);
+                var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+
+                if (constraintName == null)
+                {
+                    throw new DataAccessException("Constraint name is null.", dbException);
+                }
+                else
+                {
+                    switch (constraintName)
+                    {
+                        case Constraints.PrimaryKeyCountryIso2:
+                            throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
+
+                        case Constraints.UniqueIndexCountryIso3:
+                            throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
+
+                        case Constraints.UniqueIndexCountryIsoNumber:
+                            throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
+
+                        case Constraints.UniqueIndexCountryName:
+                            throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
+
+                        default:
+                            throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
+                    }
+                }
             }
             else
             {
-                switch (constraintName)
-                {
-                    case Constraints.PrimaryKeyCountryIso2:
-                        throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", dbException);
-
-                    case Constraints.UniqueIndexCountryIso3:
-                        throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", dbException);
-
-                    case Constraints.UniqueIndexCountryIsoNumber:
-                        throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", dbException);
-
-                    case Constraints.UniqueIndexCountryName:
-                        throw new CountryNameDuplicatedException($"Country Name : {country.Name}", dbException);
-
-                    default:
-                        throw new DataAccessException($"Unknown constraint name : {constraintName}", dbException);
-                }
+                throw new DataAccessException($"Sql Server unknown error number: {dbException.Number}.", dbException);
             }
         }
     }
