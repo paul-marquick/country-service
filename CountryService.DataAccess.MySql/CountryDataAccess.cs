@@ -58,10 +58,10 @@ public class CountryDataAccess : ICountryDataAccess
     {
         logger.LogDebug($"SelectByIso2Async, iso2: {iso2}");
 
-        string sql = $"SELECT {selectColumns} FROM `country` WHERE `iso_2` = @iso_2";
+        string sql = $"SELECT {selectColumns} FROM `country` WHERE `iso_2` = @Iso2";
 
         await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
-        dbCommand.Parameters.AddWithValue("iso_2", iso2);
+        dbCommand.Parameters.AddWithValue("Iso2", iso2);
 
         await using MySqlDataReader dbDataReader = dbCommand.ExecuteReader();
 
@@ -81,14 +81,14 @@ public class CountryDataAccess : ICountryDataAccess
 
         try
         {
-            string sql = "INSERT INTO `country` (`iso_2`, `iso_3`, `iso_number`, `name`, `calling_code`) VALUES (@iso_2, @iso_3, @iso_number, @name, @calling_code)";
+            string sql = "INSERT INTO `country` (`iso_2`, `iso_3`, `iso_number`, `name`, `calling_code`) VALUES (@Iso2, @Iso3, @IsoNumber, @Name, @CallingCode)";
 
             await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
-            dbCommand.Parameters.AddWithValue("iso_2", country.Iso2);
-            dbCommand.Parameters.AddWithValue("iso_3", country.Iso3);
-            dbCommand.Parameters.AddWithValue("iso_number", country.IsoNumber);
-            dbCommand.Parameters.AddWithValue("name", country.Name);
-            dbCommand.Parameters.AddWithNullableValue("calling_code", country.CallingCode);
+            dbCommand.Parameters.AddWithValue("Iso2", country.Iso2);
+            dbCommand.Parameters.AddWithValue("Iso3", country.Iso3);
+            dbCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
+            dbCommand.Parameters.AddWithValue("Name", country.Name);
+            dbCommand.Parameters.AddWithNullableValue("CallingCode", country.CallingCode);
 
             return await dbCommand.ExecuteNonQueryAsync();
         }
@@ -138,15 +138,15 @@ public class CountryDataAccess : ICountryDataAccess
 
         try
         {
-            string sql = "UPDATE `country` SET `iso_2` = @iso_2, `iso_3` = @iso_3, `iso_number` = @iso_number, `name` = @name, `calling_code` = @calling_code WHERE `iso_2` = @p_iso_2";
+            string sql = "UPDATE `country` SET `iso_2` = @Iso2, `iso_3` = @Iso3, `iso_number` = @IsoNumber, `name` = @Name, `calling_code` = @CallingCode WHERE `iso_2` = @pIso2";
 
             await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
-            dbCommand.Parameters.AddWithValue("iso_2", country.Iso2);
-            dbCommand.Parameters.AddWithValue("iso_3", country.Iso3);
-            dbCommand.Parameters.AddWithValue("iso_number", country.IsoNumber);
-            dbCommand.Parameters.AddWithValue("name", country.Name);
-            dbCommand.Parameters.AddWithNullableValue("calling_code", country.CallingCode);
-            dbCommand.Parameters.AddWithValue("p_iso_2", iso2);
+            dbCommand.Parameters.AddWithValue("Iso_2", country.Iso2);
+            dbCommand.Parameters.AddWithValue("Iso3", country.Iso3);
+            dbCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
+            dbCommand.Parameters.AddWithValue("Name", country.Name);
+            dbCommand.Parameters.AddWithNullableValue("CallingCode", country.CallingCode);
+            dbCommand.Parameters.AddWithValue("pIso2", iso2);
 
             return await dbCommand.ExecuteNonQueryAsync();
         }
@@ -192,17 +192,105 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> PartialUpdateByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        throw new NotImplementedException("Partial update is not implemented yet.");
+        logger.LogDebug($"PartialUpdateByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+
+        try
+        {
+            string sql = "UPDATE `country` SET ";
+
+            await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
+            dbCommand.Connection = (MySqlConnection)dbConnection;
+            dbCommand.Transaction = (MySqlTransaction?)dbTransaction;
+
+            if (dirtyColumns.Contains("Iso2", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += "\"iso_2\" = @Iso2,";
+                dbCommand.Parameters.AddWithValue("Iso2", country.Iso2);
+            }
+
+            if (dirtyColumns.Contains("Iso3", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"iso_3\" = @Iso3,";
+                dbCommand.Parameters.AddWithValue("Iso3", country.Iso3);
+            }
+
+            if (dirtyColumns.Contains("IsoNumber", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"iso_number\" = @IsoNumber,";
+                dbCommand.Parameters.AddWithValue("IsoNumber", country.IsoNumber);
+            }
+
+            if (dirtyColumns.Contains("Name", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"name\" = @Name,";
+                dbCommand.Parameters.AddWithValue("Name", country.Name);
+            }
+
+            if (dirtyColumns.Contains("CallingCode", StringComparer.OrdinalIgnoreCase))
+            {
+                sql += " \"calling_code\" = @CallingCode";
+                dbCommand.Parameters.AddWithNullableValue("CallingCode", country.CallingCode);
+            }
+
+            // Remove the last comma if any columns were updated.
+            sql = sql.TrimEnd(',');
+
+            sql += " WHERE \"iso_2\" = @pIso2";
+
+            dbCommand.Parameters.AddWithValue("pIso2", iso2);
+
+            dbCommand.CommandText = sql;
+
+            return await dbCommand.ExecuteNonQueryAsync();
+        }
+        catch (MySqlException mySqlException)
+        {
+            var constraintName = Utils.GetConstraintName(logger, mySqlException.Message);
+
+            if (constraintName == null)
+            {
+                throw new DataAccessException("Constraint name is null.", mySqlException);
+            }
+            else
+            {
+                var dataExceptionType = Utils.GetDataExceptionType(logger, mySqlException.Message);
+
+                if (dataExceptionType == DataExceptionType.Duplication)
+                {
+                    switch (constraintName)
+                    {
+                        case Constraints.PrimaryKeyCountryIso2:
+                            throw new CountryIso2DuplicatedException($"Country Iso2 (PK) : {country.Iso2}", mySqlException);
+
+                        case Constraints.UniqueIndexCountryIso3:
+                            throw new CountryIso3DuplicatedException($"Country Iso3 : {country.Iso3}", mySqlException);
+
+                        case Constraints.UniqueIndexCountryIsoNumber:
+                            throw new CountryIsoNumberDuplicatedException($"Country IsoNumber : {country.IsoNumber}", mySqlException);
+
+                        case Constraints.UniqueIndexCountryName:
+                            throw new CountryNameDuplicatedException($"Country Name : {country.Name}", mySqlException);
+
+                        default:
+                            throw new DataAccessException($"Unknown constraint name : {constraintName}", mySqlException);
+                    }
+                }
+                else
+                {
+                    throw new DataAccessException($"Unknown data exception type : {dataExceptionType}", mySqlException);
+                }
+            }
+        }
     }
 
     public async Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");
 
-        string sql = "DELETE FROM `country` WHERE `iso_2` = @iso_2";
+        string sql = "DELETE FROM `country` WHERE `iso_2` = @Iso2";
 
         await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
-        dbCommand.Parameters.AddWithValue("iso_2", iso2);
+        dbCommand.Parameters.AddWithValue("Iso2", iso2);
 
         return await dbCommand.ExecuteNonQueryAsync();
     }
@@ -211,15 +299,15 @@ public class CountryDataAccess : ICountryDataAccess
     {
         logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");
 
-        string sql = "SELECT 1 FROM `country` WHERE `name` = @name";
+        string sql = "SELECT 1 FROM `country` WHERE `name` = @Name";
 
         await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
-        dbCommand.Parameters.AddWithValue("name", name);
+        dbCommand.Parameters.AddWithValue("Name", name);
 
         if (iso2 != null)
         {
-            dbCommand.CommandText += " AND `iso_2` <> @iso_2;";
-            dbCommand.Parameters.AddWithValue("iso_2", iso2);
+            dbCommand.CommandText += " AND `iso_2` <> @Iso2;";
+            dbCommand.Parameters.AddWithValue("Iso2", iso2);
         }
 
         await using MySqlDataReader dbDataReader = dbCommand.ExecuteReader();

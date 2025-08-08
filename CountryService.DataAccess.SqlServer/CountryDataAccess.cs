@@ -193,6 +193,7 @@ public class CountryDataAccess : ICountryDataAccess
         try
         {
             string sql = "UPDATE \"Country\" SET ";
+
             await using SqlCommand dbCommand = new SqlCommand();
             dbCommand.Connection = (SqlConnection)dbConnection;
             dbCommand.Transaction = (SqlTransaction?)dbTransaction;
