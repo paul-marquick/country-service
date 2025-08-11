@@ -25,7 +25,7 @@ public class CorrelationIdMiddleware
         }
 
         // Log the correlation ID and add it to the response headers.
-        LogContext.PushProperty("x-correlation-id", httpContext.Request.Headers["x-correlation-id"]);
+        LogContext.PushProperty("correlationId", httpContext.Request.Headers["x-correlation-id"]);
         httpContext.Response.Headers["x-correlation-id"] = httpContext.Request.Headers["x-correlation-id"].FirstOrDefault();
 
         await next(httpContext);

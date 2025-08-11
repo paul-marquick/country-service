@@ -38,7 +38,7 @@ public class ProblemDetailsCreator(ILogger<ProblemDetailsCreator> logger)
             Extensions =
             {
                 { "requestId", httpContext.TraceIdentifier },
-                { "x-correlation-id", httpContext.Request.Headers["x-correlation-id"].FirstOrDefault() }
+                { "correlationId", httpContext.Request.Headers["x-correlation-id"].FirstOrDefault() }
             }
         };
     }

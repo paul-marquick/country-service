@@ -1,8 +1,9 @@
 web service needs
 
 
-    head and options patch endpoints
- 
+    query with paging, sorting, and filtering etc.
+
+     
 
 angular needs
 
@@ -14,7 +15,7 @@ angular needs
 
     delete country component
 
-    Create grid component.
+    Create grid component with child row component.
 
     csrf 
 

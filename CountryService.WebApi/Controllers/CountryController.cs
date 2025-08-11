@@ -29,7 +29,7 @@ public class CountryController(
     {
         // Just to show how to get the request id in code.
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
-        logger.LogDebug($"x-correlation-id: {correlationId}");
+        logger.LogDebug($"correlationId: {correlationId}");
 
         // Could store the correlation ID in an event table in the database, for example.
 
@@ -64,15 +64,15 @@ public class CountryController(
 
     [HttpHead("{iso2}")]
     [HttpGet("{iso2}")]
-    public async Task<ActionResult<Country>> GetByIso2Async(string iso2)
+    public async Task<ActionResult<Country>> GetCountryByIso2Async(string iso2)
     {
         string method = HttpContext.Request.Method;
 
-        logger.LogDebug($"GetByIso2Async, method: {method}, iso2: {iso2}");
+        logger.LogDebug($"GetCountryByIso2Async, method: {method}, iso2: {iso2}");
 
         // Just to show how to get the request id in code.
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
-        logger.LogDebug($"x-correlation-id: {correlationId}");
+        logger.LogDebug($"correlationId: {correlationId}");
         // Could store the correlation ID in an event table in the database, for example.
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
@@ -123,9 +123,9 @@ public class CountryController(
     }
 
     [HttpPost]
-    public async Task<ActionResult<Country>> PostAsync([FromBody] Country country)
+    public async Task<ActionResult<Country>> PostCountryAsync([FromBody] Country country)
     {
-        logger.LogDebug($"PostAsync, country.Iso2: {country.Iso2}");
+        logger.LogDebug($"PostCountryAsync, country.Iso2: {country.Iso2}");
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
@@ -183,9 +183,9 @@ public class CountryController(
     }
 
     [HttpPut("{iso2}")]
-    public async Task<ActionResult> PutByIso2Async(string iso2, [FromBody] Country country)
+    public async Task<ActionResult> PutCountryByIso2Async(string iso2, [FromBody] Country country)
     {
-        logger.LogDebug($"PutByIso2Async, iso2: {iso2}");
+        logger.LogDebug($"PutCountryByIso2Async, iso2: {iso2}");
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
@@ -263,9 +263,9 @@ public class CountryController(
     //TODO: Validation of the patch document, needs thorough testing. Not sure it is being validated.
 
     [HttpPatch("{iso2}")]
-    public async Task<ActionResult> PatchByIso2Async([FromRoute] string iso2, [FromBody] JsonPatchDocument<Country> countryPatch)
+    public async Task<ActionResult> PatchCountryByIso2Async([FromRoute] string iso2, [FromBody] JsonPatchDocument<Country> countryPatch)
     {
-        logger.LogDebug($"PatchByIso2Async, iso2: {iso2}");
+        logger.LogDebug($"PatchCountryByIso2Async, iso2: {iso2}");
 
         // Currently only supports replace operations.
         if (countryPatch.Operations.Any(x => x.OperationType != Microsoft.AspNetCore.JsonPatch.Operations.OperationType.Replace))
@@ -376,9 +376,9 @@ public class CountryController(
     }
 
     [HttpDelete("{iso2}")]
-    public async Task<ActionResult> DeleteByIso2Async(string iso2)
+    public async Task<ActionResult> DeleteCountryByIso2Async(string iso2)
     {
-        logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}.");
+        logger.LogDebug($"DeleteCountryByIso2Async, iso2: {iso2}.");
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();

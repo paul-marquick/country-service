@@ -27,7 +27,7 @@ public class ModelStateToValidationProblemDetails(ILogger<ModelStateToValidation
             Extensions =
             {
                 { "requestId", context.HttpContext.TraceIdentifier },
-                { "x-correlation-id", context.HttpContext.Request.Headers["x-correlation-id"].FirstOrDefault()}
+                { "correlationId", context.HttpContext.Request.Headers["x-correlation-id"].FirstOrDefault()}
             }
         };
 
