@@ -5,7 +5,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Controllers;
 
-[Route("system-info")]
+[Route("service-info")]
 [ApiController]
 public class ServiceInfoController(
     ILogger<ServiceInfoController> logger,
@@ -34,6 +34,7 @@ public class ServiceInfoController(
             Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production",
             MachineName = Environment.MachineName,
             OSVersion = Environment.OSVersion.ToString(),
+            IsDebugLogLevelEnabled = logger.IsEnabled(LogLevel.Debug),
             FrameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
             RuntimeIdentifier = System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier,
             ProcessId = Environment.ProcessId,
