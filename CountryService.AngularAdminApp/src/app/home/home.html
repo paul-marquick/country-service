@@ -19,3 +19,17 @@
 </dl>
 
 <button type="button" (click)="testLogger()">Test logger</button>
+
+<br><br>
+<h2>Select a Continent</h2>
+<select [formControl]="continentSelect">
+    <option>Antarctica</option>
+    <option>Africa</option>
+    <option>Asia</option>
+    <option>Europe</option>
+    <option>North America</option>
+    <option>South America</option>
+    <option>Oceania</option>
+</select>
+
+<p>You selected: {{ currentSelection }}</p>

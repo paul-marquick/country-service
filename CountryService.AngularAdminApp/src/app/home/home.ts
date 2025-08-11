@@ -3,10 +3,11 @@ import { environment } from '../../environments/environment';
 import { Environment } from '../../models/environment';
 import { Logger } from '../../logging/logger';
 import { LogLevel } from '../../logging/logLevel';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-home',
-    imports: [],
+    imports: [ReactiveFormsModule],
     templateUrl: './home.html',
     styleUrl: './home.css'
 })
@@ -14,6 +15,14 @@ export class Home {
 
     private readonly logger: Logger = inject(Logger);
     protected env: Environment = environment;
+    protected continentSelect: FormControl = new FormControl();
+    protected currentSelection: string;
+
+    constructor() {
+        this.continentSelect.valueChanges.subscribe(
+            (newValue) => (this.currentSelection = newValue)
+        );
+    }
 
     protected testLogger(): void 
     {
