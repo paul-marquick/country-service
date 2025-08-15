@@ -40,11 +40,11 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country1, dbConnection);
-        await countryDataAccess.InsertAsync(country2, dbConnection);
-        await countryDataAccess.InsertAsync(country3, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country1, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country2, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country3, dbConnection);
 
-        List<Country> countryList = await countryDataAccess.SelectListAsync(dbConnection);
+        List<Country> countryList = await countryDataAccess.SelectCountriesAsync(dbConnection);
         Assert.NotNull(countryList);
         Assert.NotEmpty(countryList);
         Assert.True(3 <= countryList.Count);
@@ -83,11 +83,11 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country1, dbConnection);
-        await countryDataAccess.InsertAsync(country2, dbConnection);
-        await countryDataAccess.InsertAsync(country3, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country1, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country2, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country3, dbConnection);
 
-        List<CountryLookup> countryLookupList = await countryDataAccess.SelectLookupListAsync(dbConnection);
+        List<CountryLookup> countryLookupList = await countryDataAccess.SelectCountryLookupsAsync(dbConnection);
         Assert.NotNull(countryLookupList);
         Assert.NotEmpty(countryLookupList);
         Assert.True(3 <= countryLookupList.Count);
@@ -109,9 +109,9 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country, dbConnection);
 
-        Country _country = await countryDataAccess.SelectByIso2Async(country.Iso2, dbConnection);
+        Country _country = await countryDataAccess.SelectCountryByIso2Async(country.Iso2, dbConnection);
         Assert.NotNull(_country);
         Assert.Equal(country.Iso2, _country.Iso2);
         Assert.Equal(country.Iso3, _country.Iso3);
@@ -124,7 +124,7 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await Assert.ThrowsAsync<CountryNotFoundException>(() => countryDataAccess.SelectByIso2Async(DatabaseFixture.CreateRandomString(2), dbConnection));
+        await Assert.ThrowsAsync<CountryNotFoundException>(() => countryDataAccess.SelectCountryByIso2Async(DatabaseFixture.CreateRandomString(2), dbConnection));
     }
 
     protected async Task _InsertAsync(IDbConnectionFactory dbConnectionFactory, ICountryDataAccess countryDataAccess)
@@ -142,7 +142,7 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        int affectedRows = await countryDataAccess.InsertAsync(country, dbConnection);
+        int affectedRows = await countryDataAccess.InsertCountryAsync(country, dbConnection);
         Assert.Equal(1, affectedRows);
     }
 
@@ -162,7 +162,7 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country1, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country1, dbConnection);
 
         Country country2 = new()
         {
@@ -172,7 +172,7 @@ public abstract class CountryDataAccessTestBase()
             Name = DatabaseFixture.CreateRandomString(50)
         };
 
-        await Assert.ThrowsAsync<CountryIso2DuplicatedException>(() => countryDataAccess.InsertAsync(country2, dbConnection));
+        await Assert.ThrowsAsync<CountryIso2DuplicatedException>(() => countryDataAccess.InsertCountryAsync(country2, dbConnection));
     }
 
     protected async Task _UpdateByIso2Async(IDbConnectionFactory dbConnectionFactory, ICountryDataAccess countryDataAccess)
@@ -191,11 +191,11 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country, dbConnection);
 
         country.Name = DatabaseFixture.CreateRandomString(50);
 
-        int affectedRows = await countryDataAccess.UpdateByIso2Async(iso2, country, dbConnection);
+        int affectedRows = await countryDataAccess.UpdateCountryByIso2Async(iso2, country, dbConnection);
         Assert.Equal(1, affectedRows);
     }
 
@@ -225,14 +225,14 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country1, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country1, dbConnection);
 
-        await countryDataAccess.InsertAsync(country2, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country2, dbConnection);
 
         // Set country 2 name same as country 1.
         country2.Name = country1.Name;
 
-        await Assert.ThrowsAsync<CountryNameDuplicatedException>(() => countryDataAccess.UpdateByIso2Async(country2Iso2, country2, dbConnection));
+        await Assert.ThrowsAsync<CountryNameDuplicatedException>(() => countryDataAccess.UpdateCountryByIso2Async(country2Iso2, country2, dbConnection));
     }
 
     protected async Task _DeleteByIso2Async_Delete(IDbConnectionFactory dbConnectionFactory, ICountryDataAccess countryDataAccess)
@@ -250,9 +250,9 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country, dbConnection);
 
-        int affectedRows = await countryDataAccess.DeleteByIso2Async(iso2, dbConnection);
+        int affectedRows = await countryDataAccess.DeleteCountryByIso2Async(iso2, dbConnection);
         Assert.Equal(1, affectedRows);
     }
 
@@ -272,9 +272,9 @@ public abstract class CountryDataAccessTestBase()
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.InsertAsync(country, dbConnection);
+        await countryDataAccess.InsertCountryAsync(country, dbConnection);
 
-        int affectedRows = await countryDataAccess.DeleteByIso2Async(DatabaseFixture.CreateRandomString(2), dbConnection);
+        int affectedRows = await countryDataAccess.DeleteCountryByIso2Async(DatabaseFixture.CreateRandomString(2), dbConnection);
         Assert.Equal(0, affectedRows);
     }
 }

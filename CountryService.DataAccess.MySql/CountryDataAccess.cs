@@ -16,7 +16,7 @@ public class CountryDataAccess : ICountryDataAccess
         this.logger = logger;
     }
 
-    public async Task<List<Country>> SelectListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug("SelectListAsync");
 
@@ -35,7 +35,7 @@ public class CountryDataAccess : ICountryDataAccess
         return countryList;
     }
 
-    public async Task<List<CountryLookup>> SelectLookupListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<List<CountryLookup>> SelectCountryLookupsAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug("SelectLookupListAsync");
 
@@ -54,7 +54,7 @@ public class CountryDataAccess : ICountryDataAccess
         return countryLookupList;
     }
 
-    public async Task<Country> SelectByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<Country> SelectCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"SelectByIso2Async, iso2: {iso2}");
 
@@ -75,7 +75,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    public async Task<int> InsertAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<int> InsertCountryAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"InsertAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
@@ -132,7 +132,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    public async Task<int> UpdateByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<int> UpdateCountryByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"UpdateByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
@@ -190,7 +190,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    public async Task<int> PartialUpdateByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<int> PartialUpdateCountryByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"PartialUpdateByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
@@ -283,7 +283,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    public async Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public async Task<int> DeleteCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");
 

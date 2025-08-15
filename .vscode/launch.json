@@ -4,9 +4,8 @@
     // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
     "version": "0.2.0",
     "configurations": [
-
         {
-            "name": "Launch Web Api",
+            "name": "Launch WebApi",
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceFolder}/CountryService.WebApi/bin/Debug/net9.0/CountryService.WebApi.dll",
@@ -15,8 +14,20 @@
             "cwd": "${workspaceFolder}/CountryService.WebApi",
             "stopAtEntry": false,
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "development"
+                "ASPNETCORE_ENVIRONMENT": "Development"
             }
+        },       
+        {
+            "name": "Launch Blazor App",
+            "type": "blazorwasm",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/CountryService.BlazorAdminApp"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "launch multi",
+            "configurations": ["Launch WebApi", "Launch Blazor App"]
         }
     ]
 }

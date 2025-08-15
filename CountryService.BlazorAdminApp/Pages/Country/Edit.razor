@@ -1,0 +1,105 @@
+﻿@page "/country/edit/{iso2}"
+
+@using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.BlazorAdminApp.Models
+
+@inject ICountryHttpClient countryHttpClient
+
+<PageTitle>Edit Country</PageTitle>
+
+<h1>Edit Country</h1>
+
+@if (modeDataLoaded)
+{
+    <EditForm Model="@country" OnValidSubmit="@SaveCountry">
+
+        <div class="mb-3">
+            <label for="@country.Iso2" class="form-label">@Resource.Iso2</label>
+            <InputText class="form-control" @bind-Value="@country.Iso2" />
+        </div>
+
+        <div class="mb-3">
+            <label for="@country.Iso3" class="form-label">@Resource.Iso3</label>
+            <InputText class="form-control" @bind-Value="@country.Iso3" />
+        </div>
+
+        <div class="mb-3">
+            <label for="@country.IsoNumber" class="form-label">@Resource.IsoNumber</label>
+            <InputNumber class="form-control" @bind-Value="@country.IsoNumber" />
+        </div>
+
+        <div class="mb-3">
+            <label for="@country.Name" class="form-label">@Resource.Name</label>
+            <InputText class="form-control" @bind-Value="@country.Name" />
+        </div>
+
+        <div class="mb-3">
+            <label for="@country.CallingCode" class="form-label">@Resource.CallingCode</label>
+            <InputText class="form-control" @bind-Value="@country.CallingCode" />
+        </div>
+
+        <div class="btn-group">
+
+            <button type="submit" class="btn btn-success" @onclick="SaveCountry">
+                <i class="bi bi-floppy"></i>
+                Save
+            </button>
+
+            <a class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Back
+            </a>
+
+            <a class="btn btn-danger" href="country/delete/@iso2">
+                <i class="bi bi-trash"></i>
+                Delete
+            </a>
+
+        </div>
+
+    </EditForm>
+}
+else
+{
+    <p>Loading country data...</p>
+}
+
+@code {
+    private Country country;
+    private bool modeDataLoaded = false;
+
+    [Parameter]
+    public string iso2 { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("country/edit - OnInitializedAsync.");
+
+        country = await countryHttpClient.GetCountryByIso2Async(iso2);
+
+        Thread.Sleep(2000);
+
+        Console.WriteLine(country);
+
+        modeDataLoaded = true;
+
+        StateHasChanged();
+    }
+
+    // private void ShowLoading()
+    // {
+    //     loading = true;
+    // }
+
+    // private void HideLoading()
+    // {
+    //     loading = false;
+    // }
+
+    private Task SaveCountry()
+    {
+        Console.WriteLine("country/edit, SaveCountry.");
+
+        throw new NotImplementedException();
+    }
+}

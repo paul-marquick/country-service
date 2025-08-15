@@ -27,7 +27,7 @@ public class CountryController(
     [HttpGet("throw")]
     public IActionResult Throw()
     {
-        // Just to show how to get the request id in code.
+        // Just to show how to get the correlation id in code.
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
         logger.LogDebug($"correlationId: {correlationId}");
 
@@ -38,27 +38,27 @@ public class CountryController(
 
     [HttpHead]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Country>>> GetCountryListAsync()
+    public async Task<ActionResult<IEnumerable<Country>>> GetCountriesAsync()
     {
         string method = HttpContext.Request.Method;
 
-        logger.LogDebug($"GetCountryListAsync, method: {method}");
+        logger.LogDebug($"GetCountriesAsync, method: {method}");
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        List<Country> countryList = await countryDataAccess.SelectListAsync(dbConnection);
+        List<Country> countries = await countryDataAccess.SelectCountriesAsync(dbConnection);
 
         if (method == HttpMethod.Head.Method)
         {
             Response.Headers.ContentType = Application.Json;
-            Response.Headers.ContentLength = countryList.ToString()!.Length;
+            Response.Headers.ContentLength = countries.ToString()!.Length;
 
             return new EmptyResult();
         }
         else
         {
-            return Ok(countryList);
+            return Ok(countries);
         }
     }
 
@@ -70,7 +70,7 @@ public class CountryController(
 
         logger.LogDebug($"GetCountryByIso2Async, method: {method}, iso2: {iso2}");
 
-        // Just to show how to get the request id in code.
+        // Just to show how to get the correlation id in code.
         Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
         logger.LogDebug($"correlationId: {correlationId}");
         // Could store the correlation ID in an event table in the database, for example.
@@ -80,7 +80,7 @@ public class CountryController(
 
         try
         {
-            Country country = await countryDataAccess.SelectByIso2Async(iso2, dbConnection);
+            Country country = await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection);
 
             if (method == HttpMethod.Head.Method)
             {
@@ -132,7 +132,7 @@ public class CountryController(
 
         try
         {
-            await countryDataAccess.InsertAsync(country, dbConnection);
+            await countryDataAccess.InsertCountryAsync(country, dbConnection);
 
             return Created($"https://api.example.com/country/{country.Iso2}", country);
         }
@@ -195,9 +195,9 @@ public class CountryController(
         try
         {         
             // Check row exists.
-            await countryDataAccess.SelectByIso2Async(iso2, dbConnection, dbTransaction);
+            await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection, dbTransaction);
 
-            await countryDataAccess.UpdateByIso2Async(iso2, country, dbConnection, dbTransaction);
+            await countryDataAccess.UpdateCountryByIso2Async(iso2, country, dbConnection, dbTransaction);
 
             await dbTransaction.CommitAsync();
 
@@ -287,7 +287,7 @@ public class CountryController(
         try
         {
             // Check row exists, will throw if not found.
-            Country country = await countryDataAccess.SelectByIso2Async(iso2, dbConnection, dbTransaction);
+            Country country = await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection, dbTransaction);
 
             // Apply the patch.
             countryPatch.ApplyTo(country, ModelState);
@@ -303,7 +303,7 @@ public class CountryController(
 
             try
             {
-                await countryDataAccess.PartialUpdateByIso2Async(iso2, country, dirtyColumns, dbConnection, dbTransaction);
+                await countryDataAccess.PartialUpdateCountryByIso2Async(iso2, country, dirtyColumns, dbConnection, dbTransaction);
 
                 await dbTransaction.CommitAsync();
 
@@ -383,7 +383,7 @@ public class CountryController(
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        await countryDataAccess.DeleteByIso2Async(iso2, dbConnection);
+        await countryDataAccess.DeleteCountryByIso2Async(iso2, dbConnection);
 
         return NoContent();
     }

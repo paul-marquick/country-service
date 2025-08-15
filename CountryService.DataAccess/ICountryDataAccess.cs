@@ -6,9 +6,9 @@ namespace CountryService.DataAccess;
 
 public interface ICountryDataAccess
 {
-    Task<List<Country>> SelectListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
-    Task<List<CountryLookup>> SelectLookupListAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<List<CountryLookup>> SelectCountryLookupsAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Selects a country row by iso2.
@@ -18,7 +18,7 @@ public interface ICountryDataAccess
     /// <param name="dbTransaction"></param>
     /// <exception cref="CountryNotFoundException"></exception>
     /// <returns>Country</returns>
-    Task<Country> SelectByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<Country> SelectCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Inserts a country row into the database.
@@ -31,7 +31,7 @@ public interface ICountryDataAccess
     /// <exception cref="CountryIsoNumberDuplicatedException"></exception>
     /// <exception cref="CountryNameDuplicatedException"></exception>
     /// <returns>Number of affected rows.</returns>
-    Task<int> InsertAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<int> InsertCountryAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Updates a country row in the database.
@@ -46,7 +46,7 @@ public interface ICountryDataAccess
     /// <exception cref="CountryIsoNumberDuplicatedException"></exception>
     /// <exception cref="CountryNameDuplicatedException"></exception>
     /// <returns>Number of affected rows.</returns>
-    Task<int> UpdateByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<int> UpdateCountryByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
     /// Partial update a country row into the database.
@@ -62,9 +62,9 @@ public interface ICountryDataAccess
     /// <exception cref="CountryIsoNumberDuplicatedException"></exception>
     /// <exception cref="CountryNameDuplicatedException"></exception>
     /// <returns>Number of affected rows.</returns>
-    Task<int> PartialUpdateByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<int> PartialUpdateCountryByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
-    Task<int> DeleteByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
+    Task<int> DeleteCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     Task<bool> DoesCountryNameExistAsync(string name, string? iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 }

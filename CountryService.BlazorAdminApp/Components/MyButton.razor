@@ -1,0 +1,16 @@
+﻿<h3>MyButton</h3>
+
+<button class="btn btn-primary" @onclick="OnClick">Click Me</button><br />
+<span>@text</span>
+
+@code {
+
+    private string text = string.Empty;
+
+    private void OnClick()
+    {
+        text = "Button clicked at " + DateTime.Now.ToString("T");
+
+        Console.WriteLine("Button clicked!");
+    }
+}

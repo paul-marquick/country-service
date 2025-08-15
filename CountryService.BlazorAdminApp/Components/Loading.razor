@@ -1,0 +1,21 @@
+﻿<div class="brit-container">
+    @ChildContent
+    <div class="brit-overlay" hidden="@(!Visible)">
+        <div class="brit-spinner-container">
+            <div class="spinner-border spinner-border-sm"></div>
+            @Text
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter, EditorRequired]
+    public bool Visible { get; set; } = false;
+
+    [Parameter]
+    public string Text { get; set; } = "Loading";
+}
