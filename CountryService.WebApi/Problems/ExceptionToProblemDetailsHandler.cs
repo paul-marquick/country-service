@@ -28,7 +28,7 @@ public class ExceptionToProblemDetailsHandler(
             ProblemDetails =
                 {
                     Title = ProblemTitle.InternalServerError,
-                    Detail = "An internal server error has occurred. The Administrator has been notified.",
+                    Detail = "An error has occurred. The Administrator has been notified.",
                     Type = ProblemType.InternalServerError,
                     Status = StatusCodes.Status500InternalServerError,
                     Instance = problemDetailsInstance,

@@ -3,6 +3,7 @@
 @using CountryService.BlazorAdminApp.HttpClients
 @using CountryService.BlazorAdminApp.Models
 @using CountryService.BlazorAdminApp.Components.DataGrid
+@using System.Threading
 
 @inject ICountryHttpClient countryHttpClient
 
@@ -67,7 +68,7 @@
 <br /><br /> *@
 
 
-<DataGrid columns="columns" TItem="Country" rows="countries" keyColumnName="iso2" showEditColumn="true" showDeleteColumn="true" />
+<DataGrid columns="columns" TRow="Country" rows="countries" keyColumnName="Iso2" showEditColumn="true" showDeleteColumn="true" />
 
 @code {
     private List<Country>? countries;

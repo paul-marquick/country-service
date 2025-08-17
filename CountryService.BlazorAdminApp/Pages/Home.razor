@@ -1,5 +1,9 @@
 ﻿@page "/"
 @using CountryService.BlazorAdminApp.Components
+@using Microsoft.Extensions.Logging
+
+@inject ILogger<Home> logger
+
 
 <PageTitle>Home</PageTitle>
 
@@ -9,3 +13,26 @@ Welcome to your new app.
 
 <br />
 <MyButton />
+
+<br><br>
+<button type="button" onclick="@testLogging">test logging</button>
+
+@code
+{
+    private void testLogging()
+    {
+        Console.WriteLine("Trace : " + logger.IsEnabled(LogLevel.Trace));
+        Console.WriteLine("Debug : " + logger.IsEnabled(LogLevel.Debug));
+        Console.WriteLine("Information : " + logger.IsEnabled(LogLevel.Information));
+        Console.WriteLine("Warning : " + logger.IsEnabled(LogLevel.Warning));
+        Console.WriteLine("Error : " + logger.IsEnabled(LogLevel.Error));
+        Console.WriteLine("Critical : " + logger.IsEnabled(LogLevel.Critical));
+
+        logger.LogTrace("Trace log statement.");
+        logger.LogDebug("Debug log statement.");
+        logger.LogInformation("Information log statement.");
+        logger.LogWarning("Warning log statement.");
+        logger.LogError("Error log statement.");
+        logger.LogCritical("Critical log statement.");
+    }
+}

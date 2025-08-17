@@ -1,0 +1,31 @@
+@page "/counter"
+
+<h1>Counter</h1>
+
+<p>Current count: <span style="font-size:42px">@currentCount</span></p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+//    [CascadingParameter]
+  //  public ProcessError? ProcessError { get; set; }
+
+    private void IncrementCount()
+    {
+    //    try
+    //    {
+            currentCount++;
+
+            if (currentCount > 5)
+            {
+                throw new InvalidOperationException("Current count is over five!");
+            }
+        @* }
+        catch (Exception ex)
+        {
+            ProcessError?.LogError(ex);
+        } *@
+    }
+}

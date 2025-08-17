@@ -1,11 +1,12 @@
 ﻿@using CountryService.BlazorAdminApp.Models
-@typeparam TItem where TItem : class  
+@using Microsoft.Extensions.Logging
+@typeparam TRow where TRow : class  
+@inject ILogger<DataGrid.DataGrid<TRow>> logger
 
 <table class="table table-striped table-hover table-bordered mt-3">
 
     <thead>
         <tr>
-
             @if (showEditColumn)
             {
                 <th class="text-center">
@@ -33,14 +34,14 @@
 
         @if (rows != null)
         {
-            foreach (TItem item in rows)
+            foreach (TRow row in rows)
             {
                 <tr>
                     @if (showEditColumn)
                     {
                         <td class="text-center">
-                            <a href="country/edit/aa">
-                                <i class="text-primary bi bi-pencil"></i>    
+                            <a href="@createLink("country/edit", row)">
+                                <i class="bi bi-pencil text-primary"></i>    
                             </a>
                         </td>
                     }
@@ -48,15 +49,15 @@
                     @foreach (Column column in columns)
                     {
                         <td>
-                            @item!.GetType().GetProperty(column.Name!)!.GetValue(item, null)
+                            @row!.GetType().GetProperty(column.Name!)!.GetValue(row, null)
                         </td>
                     }
 
                     @if (showDeleteColumn)
                     {
                         <td class="text-center">
-                            <NavLink href="country/delete">
-                                <i class="text-danger bi bi-trash"></i>
+                            <NavLink href="country/delete/aa">
+                                <i class="bi bi-trash text-danger"></i>
                             </NavLink>
                         </td>
                     }
@@ -70,8 +71,8 @@
                 <tr>
                     @if (showEditColumn)
                     {   
-                        <td>
-                            &nbsp;
+                        <td class="text-center">
+                            <i class="bi bi-pencil disabled"></i>    
                         </td>
                     }
 
@@ -84,8 +85,8 @@
 
                     @if (showDeleteColumn)
                     {
-                        <td>
-                            &nbsp;
+                        <td class="text-center">
+                            <i class="bi bi-trash disabled"></i>    
                         </td>
                     }
                 </tr>
@@ -107,7 +108,7 @@
     public List<Column> columns { get; set; }
 
     [Parameter, EditorRequired]
-    public List<TItem>? rows { get; set; }
+    public List<TRow>? rows { get; set; }
 
     [Parameter, EditorRequired]
     public string keyColumnName { get; set; }
@@ -118,4 +119,10 @@
     [Parameter]
     public bool showDeleteColumn { get; set; } = false;
 
+    private string createLink(string path, TRow row)
+    {
+        logger.LogDebug("DataGrid, createLink");    
+
+        return path + "/" + row!.GetType().GetProperty(keyColumnName)!.GetValue(row, null).ToString();
+    }
 }

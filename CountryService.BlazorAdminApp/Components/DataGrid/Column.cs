@@ -2,8 +2,8 @@
 
 public record Column
 {
-    public string Name { get; set; }
-    public string HeaderText { get; set; }
+    public required string Name { get; set; }
+    public required string HeaderText { get; set; }
     public int? Width { get; set; }
     //public bool IsVisible { get; set; } = true;
     //public bool IsSortable { get; set; } = true;

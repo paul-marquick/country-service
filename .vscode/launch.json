@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch WebApi",
+            "name": "launch web api",
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceFolder}/CountryService.WebApi/bin/Debug/net9.0/CountryService.WebApi.dll",
             "args": [],
-            "preLaunchTask": "build",
+            "preLaunchTask": "build web api",
             "cwd": "${workspaceFolder}/CountryService.WebApi",
             "stopAtEntry": false,
             "env": {
@@ -18,16 +18,28 @@
             }
         },       
         {
-            "name": "Launch Blazor App",
+            "name": "launch blazor",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/CountryService.BlazorAdminApp/CountryService.BlazorAdminApp.csproj",
+            "preLaunchTask": "build blazor"
+        },       
+        {
+            "name": "debug blazor",
             "type": "blazorwasm",
             "request": "launch",
-            "cwd": "${workspaceFolder}/CountryService.BlazorAdminApp"
+            "cwd": "${workspaceFolder}/CountryService.BlazorAdminApp",
+            "preLaunchTask": "build blazor"
         }
     ],
     "compounds": [
         {
             "name": "launch multi",
-            "configurations": ["Launch WebApi", "Launch Blazor App"]
+            "configurations": ["launch web api", "launch blazor"]
+        },
+        {
+            "name": "debug multi",
+            "configurations": ["launch web api", "debug blazor"]
         }
     ]
 }

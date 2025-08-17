@@ -1,0 +1,45 @@
+@using CountryService.BlazorAdminApp.HttpClients
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@inherits ErrorBoundary
+@inject ILogger<CustomErrorBoundary> Logger
+@inject ILogHttpClient logHttpClient
+@inject IWebAssemblyHostEnvironment webAssemblyHostEnvironment
+@inject IJSRuntime jsRuntime
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else if (ErrorContent is not null)
+{
+    @ErrorContent(CurrentException)
+}
+
+@code {
+    protected override async Task OnErrorAsync(Exception ex)
+    {        
+        Logger.LogError(ex, "😈 A rotten gremlin got us. Sorry!");
+
+        string details = "BaseAddress: " + webAssemblyHostEnvironment.BaseAddress + 
+            ", Environment: " + webAssemblyHostEnvironment.Environment +
+            ", IsProduction: " + webAssemblyHostEnvironment.IsProduction() + 
+            ", IsDevelopment: " + webAssemblyHostEnvironment.IsDevelopment() + 
+            ", IsStaging: " + webAssemblyHostEnvironment.IsStaging() + 
+            ", ClientProperties: " + await getClientPropertiesAsync() + 
+            ". ";
+        
+        await logHttpClient.PostLogAsync(
+            new Models.LogEntry 
+            { 
+                Message = "Blazor admin app error. " + details + ex.Message 
+            }
+        );
+    }
+
+    private async Task<string> getClientPropertiesAsync() 
+    {
+        return await jsRuntime.InvokeAsync<string>("getClientProperties");
+    }
+}
