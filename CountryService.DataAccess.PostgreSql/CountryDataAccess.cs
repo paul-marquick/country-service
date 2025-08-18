@@ -17,9 +17,98 @@ public class CountryDataAccess : ICountryDataAccess
         this.logger = logger;
     }    
 
-    public Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    
+    public async Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction dbTransaction)
     {
-        throw new NotImplementedException();
+        logger.LogDebug("CountryQueryAsync");
+
+        string filterSql = CreateQueryWhereClauseSql(query.Filters);
+
+        // Query for total.
+        string totalSql = $"SELECT COUNT(1) FROM \"country\" {filterSql};";
+
+        await using NpgsqlCommand totalDbCommand = new NpgsqlCommand(totalSql, (NpgsqlConnection) dbConnection, (NpgsqlTransaction) dbTransaction);
+        AddQueryWhereClauseParameters(totalDbCommand, query.Filters);
+        await using NpgsqlDataReader totalDbDataReader = await totalDbCommand.ExecuteReaderAsync();
+
+        totalDbDataReader.Read();
+        int total = totalDbDataReader.GetInt32(0);
+       
+        // Query for a paged list.
+
+        string querySql = $"SELECT {selectColumns} FROM \"country\" {filterSql} ";
+
+        await using NpgsqlCommand queryDbCommand = new NpgsqlCommand(querySql, (NpgsqlConnection) dbConnection, (NpgsqlTransaction) dbTransaction);
+        AddQueryWhereClauseParameters(queryDbCommand, query.Filters);
+        await using NpgsqlDataReader queryDbDataReader = await queryDbCommand.ExecuteReaderAsync();
+
+        List<Country> countries = new List<Country>();
+
+        while (queryDbDataReader.Read())
+        {
+            countries.Add(ReadData(queryDbDataReader));
+        }
+
+        return (total, countries);
+    }
+
+    private string CreateQueryWhereClauseSql(List<Filter>? filters)
+    {
+        if (filters == null)
+        {
+            return string.Empty;
+        }
+        else
+        {
+            string result = "WHERE ";
+
+            for (int i = 0; filters.Count > i; i++)
+            {
+                result += $"\"{GetColumnName(filters[i].PropertyName)}\" {ComparisonOperatorConverter.GetComparisonOperator(filters[i].ComparisonOperator)} @{filters[i].Value} ";
+
+                if (i < filters.Count)
+                {
+                    result += "AND ";
+                }
+            }
+
+            return result;
+        }
+    }
+
+    private void AddQueryWhereClauseParameters(NpgsqlCommand dbCommand, List<Filter>? filters)
+    {
+        if (filters != null)
+        {
+            foreach (Filter filter in filters)
+            {
+                dbCommand.Parameters.AddWithValue(filter.PropertyName, filter.Value);
+            }
+        }
+    }
+
+    private string GetColumnName(string propertyName)
+    {
+        switch (propertyName)
+        {
+            case "Iso2":
+                return "iso_2";
+
+            case "Iso3":
+                return "iso_3";
+
+            case "IsoNumber":
+                return "iso_number";
+
+            case "Name":
+                return "name";
+
+            case "CallingCode":
+                return "calling_code";
+
+            default:
+                throw new ArgumentException($"Unknown country property name: {propertyName}");
+        }
     }
     
     public async Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
