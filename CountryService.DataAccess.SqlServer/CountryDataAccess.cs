@@ -1,4 +1,5 @@
 ﻿using CountryService.DataAccess.Exceptions;
+using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.Models.Country;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -16,47 +17,141 @@ public class CountryDataAccess : ICountryDataAccess
         this.logger = logger;
     }
 
+    public async Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction dbTransaction)
+    {
+        logger.LogDebug("CountryQueryAsync");
+
+        string filterSql = CreateQueryWhereClauseSql(query.Filters);
+
+        // Query for total.
+        string totalSql = $"SELECT COUNT(1) FROM \"Country\" {filterSql};";
+
+        await using SqlCommand totalDbCommand = new SqlCommand(totalSql, (SqlConnection) dbConnection, (SqlTransaction) dbTransaction);
+        AddQueryWhereClauseParameters(totalDbCommand, query.Filters);
+        await using SqlDataReader totalDbDataReader = await totalDbCommand.ExecuteReaderAsync();
+
+        totalDbDataReader.Read();
+        int total = totalDbDataReader.GetInt32(0);
+       
+        // Query for a paged list.
+
+        string querySql = $"SELECT {selectColumns} FROM \"Country\" {filterSql} ";
+
+        await using SqlCommand queryDbCommand = new SqlCommand(querySql, (SqlConnection) dbConnection, (SqlTransaction) dbTransaction);
+        AddQueryWhereClauseParameters(queryDbCommand, query.Filters);
+        await using SqlDataReader queryDbDataReader = await queryDbCommand.ExecuteReaderAsync();
+
+        List<Country> countries = new List<Country>();
+
+        while (queryDbDataReader.Read())
+        {
+            countries.Add(ReadData(queryDbDataReader));
+        }
+
+        return (total, countries);
+    }
+
+    private string CreateQueryWhereClauseSql(List<Filter>? filters)
+    {
+        if (filters == null)
+        {
+            return string.Empty;
+        }
+        else
+        {
+            string result = "WHERE ";
+
+            for (int i = 0; filters.Count > i; i++)
+            {
+                result += $"\"{filters[i].PropertyName}\" {ComparisonOperatorConverter.GetComparisonOperator(filters[i].ComparisonOperator)} @{filters[i].Value} ";
+
+                if (i < filters.Count)
+                {
+                    result += "AND ";
+                }
+            }
+
+            return result;
+        }
+    }
+
+    private void AddQueryWhereClauseParameters(SqlCommand dbCommand, List<Filter>? filters)
+    {
+        if (filters != null)
+        {
+            foreach (Filter filter in filters)
+            {
+                dbCommand.Parameters.AddWithValue(filter.PropertyName, filter.Value);
+            }
+        }
+    }
+
+    // for pg and mysql.
+    private string GetColumnName(string propertyName)
+    {
+        switch (propertyName)
+        {
+            case "Iso2":
+                return "iso_2";
+
+            case "Iso3":
+                return "iso_3";
+
+            case "IsoNumber":
+                return "iso_number";
+
+            case "Name":
+                return "name";
+
+            case "CallingCode":
+                return "calling_code";
+
+            default:
+                throw new ArgumentException($"Unknown country property name: {propertyName}");
+        }
+    }
+
     public async Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug("SelectListAsync");
+        logger.LogDebug("SelectCountriesAsync");
 
         string sql = $"SELECT {selectColumns} FROM \"Country\" ORDER BY \"Name\" ASC";
 
-        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection) dbConnection, (SqlTransaction?) dbTransaction);
+        await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
         await using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
 
-        List<Country> countryList = new List<Country>();
+        List<Country> countries = new List<Country>();
 
         while (dbDataReader.Read())
         {
-            countryList.Add(ReadData(dbDataReader));
+            countries.Add(ReadData(dbDataReader));
         }
 
-        return countryList;
+        return countries;
     }
 
     public async Task<List<CountryLookup>> SelectCountryLookupsAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug("SelectLookupListAsync");
+        logger.LogDebug("SelectCountryLookupsAsync");
 
         string sql = "SELECT \"Iso2\", \"Name\" FROM \"Country\" ORDER BY \"Name\" ASC";
 
         await using SqlCommand dbCommand = new SqlCommand(sql, (SqlConnection)dbConnection, (SqlTransaction?)dbTransaction);
         await using SqlDataReader dbDataReader = await dbCommand.ExecuteReaderAsync();
 
-        List<CountryLookup> countryLookupList = new List<CountryLookup>();
+        List<CountryLookup> countryLookups = new List<CountryLookup>();
 
         while (dbDataReader.Read())
         {
-            countryLookupList.Add(new CountryLookup(dbDataReader.GetString(0), dbDataReader.GetString(1)));
+            countryLookups.Add(new CountryLookup(dbDataReader.GetString(0), dbDataReader.GetString(1)));
         }
 
-        return countryLookupList;
+        return countryLookups;
     }
 
     public async Task<Country> SelectCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"SelectByIso2Async, iso2: {iso2}");
+        logger.LogDebug($"SelectCountryByIso2Async, iso2: {iso2}");
 
         string sql = $"SELECT {selectColumns} FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 
@@ -77,7 +172,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> InsertCountryAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"InsertAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+        logger.LogDebug($"InsertCountryAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
         try
         {
@@ -132,7 +227,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> UpdateCountryByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"UpdateByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+        logger.LogDebug($"UpdateCountryByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
         try
         {
@@ -188,7 +283,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> PartialUpdateCountryByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"PartialUpdateByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+        logger.LogDebug($"PartialUpdateCountryByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
         try
         {
@@ -279,7 +374,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> DeleteCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");
+        logger.LogDebug($"DeleteCountryByIso2Async, iso2: {iso2}");
 
         string sql = "DELETE FROM \"Country\" WHERE \"Iso2\" = @Iso2";
 

@@ -1,4 +1,5 @@
 ﻿using CountryService.DataAccess.Exceptions;
+using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.Models.Country;
 using System.Data.Common;
 
@@ -6,8 +7,29 @@ namespace CountryService.DataAccess;
 
 public interface ICountryDataAccess
 {
+    /// <summary>
+    /// Gets a paged list of countries.
+    /// </summary>
+    /// <param name="query"></param>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
+    /// <returns>Total in query and a list of Country.</returns>
+    Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction dbTransaction);
+
+    /// <summary>
+    /// Gets a basic list of countries.
+    /// </summary>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
+    /// <returns>List of Country</returns>
     Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
+    /// <summary>
+    /// Gets a lookup list of countries with Iso2 and Name.
+    /// </summary>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
+    /// <returns>List of CountryLookup</returns>
     Task<List<CountryLookup>> SelectCountryLookupsAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
     /// <summary>
@@ -64,7 +86,22 @@ public interface ICountryDataAccess
     /// <returns>Number of affected rows.</returns>
     Task<int> PartialUpdateCountryByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
+    /// <summary>
+    /// Deletes a country from the database.
+    /// </summary>
+    /// <param name="iso2"></param>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
+    /// <returns>Number of affected rows.</returns>
     Task<int> DeleteCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 
+    /// <summary>
+    /// Checks if the country name is already in the database.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="iso2"></param>
+    /// <param name="dbConnection"></param>
+    /// <param name="dbTransaction"></param>
+    /// <returns>bool</returns>
     Task<bool> DoesCountryNameExistAsync(string name, string? iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null);
 }

@@ -1,4 +1,5 @@
 ﻿using CountryService.DataAccess.Exceptions;
+using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.Models.Country;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
@@ -16,47 +17,52 @@ public class CountryDataAccess : ICountryDataAccess
         this.logger = logger;
     }
 
+    public Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug("SelectListAsync");
+        logger.LogDebug("SelectCountriesAsync");
 
         string sql = $"SELECT {selectColumns} FROM `country` ORDER BY `name` ASC";
 
         await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
         await using MySqlDataReader dbDataReader = dbCommand.ExecuteReader();
 
-        List<Country> countryList = new List<Country>();
+        List<Country> countries = new List<Country>();
 
         while (dbDataReader.Read())
         {
-            countryList.Add(ReadData(dbDataReader));
+            countries.Add(ReadData(dbDataReader));
         }
 
-        return countryList;
+        return countries;
     }
 
     public async Task<List<CountryLookup>> SelectCountryLookupsAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug("SelectLookupListAsync");
+        logger.LogDebug("SelectCountryLookupsAsync");
 
         string sql = "SELECT `iso_2`, `name` FROM `country` ORDER BY `name` ASC";
 
         await using MySqlCommand dbCommand = new MySqlCommand(sql, (MySqlConnection)dbConnection, (MySqlTransaction?)dbTransaction);
         await using MySqlDataReader dbDataReader = dbCommand.ExecuteReader();
 
-        List<CountryLookup> countryLookupList = new List<CountryLookup>();
+        List<CountryLookup> countryLookups = new List<CountryLookup>();
 
         while (dbDataReader.Read())
         {
-            countryLookupList.Add(new CountryLookup(dbDataReader.GetString(0), dbDataReader.GetString(1)));
+            countryLookups.Add(new CountryLookup(dbDataReader.GetString(0), dbDataReader.GetString(1)));
         }
 
-        return countryLookupList;
+        return countryLookups;
     }
 
     public async Task<Country> SelectCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"SelectByIso2Async, iso2: {iso2}");
+        logger.LogDebug($"SelectCountryByIso2Async, iso2: {iso2}");
 
         string sql = $"SELECT {selectColumns} FROM `country` WHERE `iso_2` = @Iso2";
 
@@ -77,7 +83,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> InsertCountryAsync(Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"InsertAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+        logger.LogDebug($"InsertCountryAsync, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
         try
         {
@@ -134,7 +140,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> UpdateCountryByIso2Async(string iso2, Country country, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"UpdateByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+        logger.LogDebug($"UpdateCountryByIso2Async, iso2: {iso2},  country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
         try
         {
@@ -192,7 +198,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> PartialUpdateCountryByIso2Async(string iso2, Country country, List<string> dirtyColumns, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"PartialUpdateByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
+        logger.LogDebug($"PartialUpdateCountryByIso2Async, iso2: {iso2}, dirtyColumns: {dirtyColumns}, country: Iso2: {country.Iso2}, Iso3: {country.Iso3}, IsoNumber: {country.IsoNumber}, Name: {country.Name}, CallingCode: {country.CallingCode}.");
 
         try
         {
@@ -285,7 +291,7 @@ public class CountryDataAccess : ICountryDataAccess
 
     public async Task<int> DeleteCountryByIso2Async(string iso2, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
-        logger.LogDebug($"DeleteByIso2Async, iso2: {iso2}");
+        logger.LogDebug($"DeleteCountryByIso2Async, iso2: {iso2}");
 
         string sql = "DELETE FROM `country` WHERE `iso_2` = @Iso2";
 

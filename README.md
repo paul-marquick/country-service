@@ -2,10 +2,11 @@
 C# country web api with angular admin app.
 
 Data access projects
-- Interface and several implementations for different DBS such as PostgreSql, MySql, Sql Server.
+- Interface and implementations for Sql Server, PostgreSql, MySql.
+- Dynamic SQL for patch so that only 'dirty' columns are updated.
 - Unit tests for data access projects.    
 
-.NET web api
+.Web Api
 - Problem details (with added context), for general exceptions, validation failures and returned error object results such as BadRequest(...).
 - Serilog with added request context, e.g. correlation id.
 - IOptions to use configuration from the appsettings file in code. 
@@ -19,14 +20,9 @@ Data access projects
 Blazor web app
 - Bootstrap css.
 - Basic crud operations.
+- Errors are sent to the server to be logged.
+
 
 Razor pages website
 - Bootstrap css.
 - Some UI components
-
-
-Angular web app - removed atm
-- Basic crud operations. 
-- Custom sync validator.
-- Custom async validator.
-- Environment config files.

@@ -56,9 +56,9 @@
                     @if (showDeleteColumn)
                     {
                         <td class="text-center">
-                            <NavLink href="country/delete/aa">
+                            <a href="@createLink("country/delete", row)">
                                 <i class="bi bi-trash text-danger"></i>
-                            </NavLink>
+                            </a>
                         </td>
                     }
                 </tr>

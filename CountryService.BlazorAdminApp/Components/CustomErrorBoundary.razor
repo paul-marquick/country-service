@@ -18,9 +18,11 @@ else if (ErrorContent is not null)
 }
 
 @code {
+
+    // Sends error details to the server. 
     protected override async Task OnErrorAsync(Exception ex)
     {        
-        Logger.LogError(ex, "😈 A rotten gremlin got us. Sorry!");
+        Logger.LogError("An error has occurred. The Administrator has been notified.");
 
         string details = "BaseAddress: " + webAssemblyHostEnvironment.BaseAddress + 
             ", Environment: " + webAssemblyHostEnvironment.Environment +
@@ -38,6 +40,7 @@ else if (ErrorContent is not null)
         );
     }
 
+    // Gets some client properties from JavaScript. 
     private async Task<string> getClientPropertiesAsync() 
     {
         return await jsRuntime.InvokeAsync<string>("getClientProperties");

@@ -1,4 +1,5 @@
 
+/** Gets some client properties. */
 function getClientProperties() {
     
     return "userAgent: " + window.navigator.userAgent + 
