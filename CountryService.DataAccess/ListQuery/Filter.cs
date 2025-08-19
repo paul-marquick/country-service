@@ -2,7 +2,7 @@ namespace CountryService.DataAccess.ListQuery;
 
 public record Filter
 {
-    public Filter(string propertyName, ComparisonOperator comparisonOperator, object value)
+    public Filter(string propertyName, string comparisonOperator, object value)
     {
         PropertyName = propertyName;
         ComparisonOperator = comparisonOperator;
@@ -10,6 +10,6 @@ public record Filter
     }
 
     public string PropertyName { get; set; }
-    public ComparisonOperator ComparisonOperator { get; set; }
+    public string ComparisonOperator { get; set; }
     public object Value { get; set; }
 }

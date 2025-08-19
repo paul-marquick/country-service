@@ -23,21 +23,28 @@ public class CountryDataAccess : ICountryDataAccess
 
         string filterSql = CreateQueryWhereClauseSql(query.Filters);
 
+        logger.LogDebug($"filterSql: {filterSql}");
+
         // Query for total.
         string totalSql = $"SELECT COUNT(1) FROM \"Country\" {filterSql};";
+                
+        logger.LogDebug($"totalSql: {totalSql}");
 
-        await using SqlCommand totalDbCommand = new SqlCommand(totalSql, (SqlConnection) dbConnection, (SqlTransaction) dbTransaction);
+        await using SqlCommand totalDbCommand = new SqlCommand(totalSql, (SqlConnection)dbConnection, (SqlTransaction)dbTransaction);
         AddQueryWhereClauseParameters(totalDbCommand, query.Filters);
         await using SqlDataReader totalDbDataReader = await totalDbCommand.ExecuteReaderAsync();
 
         totalDbDataReader.Read();
         int total = totalDbDataReader.GetInt32(0);
-       
+
         // Query for a paged list.
+        string orderByClause = CreateQueryOrderByClauseSql(query.Sorts);
 
-        string querySql = $"SELECT {selectColumns} FROM \"Country\" {filterSql} ";
+        string querySql = $"SELECT {selectColumns} FROM \"Country\" {filterSql} {orderByClause} OFFSET {query.OffSet} ROWS FETCH NEXT {query.Limit} ROWS ONLY;";
 
-        await using SqlCommand queryDbCommand = new SqlCommand(querySql, (SqlConnection) dbConnection, (SqlTransaction) dbTransaction);
+        logger.LogDebug($"querySql: {querySql}");
+        
+        await using SqlCommand queryDbCommand = new SqlCommand(querySql, (SqlConnection)dbConnection, (SqlTransaction)dbTransaction);
         AddQueryWhereClauseParameters(queryDbCommand, query.Filters);
         await using SqlDataReader queryDbDataReader = await queryDbCommand.ExecuteReaderAsync();
 
@@ -51,7 +58,7 @@ public class CountryDataAccess : ICountryDataAccess
         return (total, countries);
     }
 
-    private string CreateQueryWhereClauseSql(List<Filter>? filters)
+    private static string CreateQueryWhereClauseSql(List<Filter>? filters)
     {
         if (filters == null)
         {
@@ -63,10 +70,11 @@ public class CountryDataAccess : ICountryDataAccess
 
             for (int i = 0; filters.Count > i; i++)
             {
-                result += $"\"{filters[i].PropertyName}\" {ComparisonOperatorConverter.GetComparisonOperator(filters[i].ComparisonOperator)} @{filters[i].Value} ";
+                result += $"\"{filters[i].PropertyName}\" {ComparisonOperatorConverter.GetComparisonOperatorSql(filters[i].ComparisonOperator)} @{filters[i].PropertyName} ";
 
-                if (i < filters.Count)
+                if (i < filters.Count - 1)
                 {
+                    // Add logical operator, Only AND is currently supported.
                     result += "AND ";
                 }
             }
@@ -75,7 +83,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    private void AddQueryWhereClauseParameters(SqlCommand dbCommand, List<Filter>? filters)
+    private static void AddQueryWhereClauseParameters(SqlCommand dbCommand, List<Filter>? filters)
     {
         if (filters != null)
         {
@@ -86,29 +94,21 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    // for pg and mysql.
-    private string GetColumnName(string propertyName)
+    private static string CreateQueryOrderByClauseSql(List<Sort> sorts)
     {
-        switch (propertyName)
+        string result = "ORDER BY ";
+
+        for (int i = 0; sorts.Count > i; i++)
         {
-            case "Iso2":
-                return "iso_2";
+            result += $"\"{sorts[i].PropertyName}\" {SortDirectionConverter.GetSortDirectionSql(sorts[i].SortDirection)} ";
 
-            case "Iso3":
-                return "iso_3";
-
-            case "IsoNumber":
-                return "iso_number";
-
-            case "Name":
-                return "name";
-
-            case "CallingCode":
-                return "calling_code";
-
-            default:
-                throw new ArgumentException($"Unknown country property name: {propertyName}");
+            if (i < sorts.Count - 1)
+            {
+                result += ", ";
+            }
         }
+
+        return result;
     }
 
     public async Task<List<Country>> SelectCountriesAsync(DbConnection dbConnection, DbTransaction? dbTransaction = null)

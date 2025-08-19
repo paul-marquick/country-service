@@ -6,14 +6,15 @@ public record Query
     {
         OffSet = offset;
         Limit = limit;
+        Sorts = new List<Sort>();        
     }
 
     public int OffSet { get; set; }
     public int Limit { get; set; }
     public List<Filter>? Filters { get; set; }
-    public List<Sort>? Sorts { get; set; }
+    public List<Sort> Sorts { get; set; }
 
-    public void AddFilter(string propertyName, ComparisonOperator comparisonOperator, object value)
+    public void AddFilter(string propertyName, string comparisonOperator, object value)
     {
         if (Filters == null)
         {
@@ -23,13 +24,8 @@ public record Query
         Filters.Add(new Filter(propertyName, comparisonOperator, value));
     }
 
-    public void AddSort(string propertyName, SortDirection sortDirection)
+    public void AddSort(string propertyName, string sortDirection)
     {
-        if (Sorts == null)
-        {
-            Sorts = new List<Sort>();
-        }
-
         Sorts.Add(new Sort(propertyName, sortDirection));
     }
 }

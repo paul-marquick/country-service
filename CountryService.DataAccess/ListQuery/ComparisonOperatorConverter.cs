@@ -2,7 +2,7 @@ namespace CountryService.DataAccess.ListQuery;
 
 public static class ComparisonOperatorConverter
 {
-    public static string GetComparisonOperator(ComparisonOperator comparisonOperator)
+    public static string GetComparisonOperatorSql(string comparisonOperator)
     {
         switch (comparisonOperator)
         {
@@ -23,6 +23,9 @@ public static class ComparisonOperatorConverter
 
             case ComparisonOperator.LessThanOrEqualTo:
                 return "<=";
+
+            case ComparisonOperator.Like:
+                return "LIKE";
 
             default:
                 throw new ArgumentException($"Unknown comparison operator: {comparisonOperator}.");

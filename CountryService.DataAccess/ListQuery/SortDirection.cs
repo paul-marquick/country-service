@@ -1,7 +1,7 @@
 namespace CountryService.DataAccess.ListQuery;
 
-public enum SortDirection
+public static class SortDirection
 {
-    Ascending,
-    Descending    
+    public const string Ascending = "asc";
+    public const string Descending = "desc";
 }

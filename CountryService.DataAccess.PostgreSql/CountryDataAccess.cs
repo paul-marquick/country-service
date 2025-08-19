@@ -52,7 +52,7 @@ public class CountryDataAccess : ICountryDataAccess
         return (total, countries);
     }
 
-    private string CreateQueryWhereClauseSql(List<Filter>? filters)
+    private static string CreateQueryWhereClauseSql(List<Filter>? filters)
     {
         if (filters == null)
         {
@@ -64,7 +64,7 @@ public class CountryDataAccess : ICountryDataAccess
 
             for (int i = 0; filters.Count > i; i++)
             {
-                result += $"\"{GetColumnName(filters[i].PropertyName)}\" {ComparisonOperatorConverter.GetComparisonOperator(filters[i].ComparisonOperator)} @{filters[i].Value} ";
+                result += $"\"{GetColumnName(filters[i].PropertyName)}\" {ComparisonOperatorConverter.GetComparisonOperatorSql(filters[i].ComparisonOperator)} @{filters[i].PropertyName} ";
 
                 if (i < filters.Count)
                 {
@@ -76,7 +76,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    private void AddQueryWhereClauseParameters(NpgsqlCommand dbCommand, List<Filter>? filters)
+    private static void AddQueryWhereClauseParameters(NpgsqlCommand dbCommand, List<Filter>? filters)
     {
         if (filters != null)
         {
@@ -87,7 +87,7 @@ public class CountryDataAccess : ICountryDataAccess
         }
     }
 
-    private string GetColumnName(string propertyName)
+    private static string GetColumnName(string propertyName)
     {
         switch (propertyName)
         {
