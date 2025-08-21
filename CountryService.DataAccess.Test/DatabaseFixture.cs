@@ -8,7 +8,9 @@ public class DatabaseFixture
     public DatabaseFixture()
     {
         // Sql Server.
-        SqlServerCountryDataAccess = new SqlServer.CountryDataAccess(Mock.Of<ILogger<SqlServer.CountryDataAccess>>());
+        SqlServerCountryDataAccess = new SqlServer.CountryDataAccess(
+            Mock.Of<ILogger<SqlServer.CountryDataAccess>>(), 
+            Mock.Of<SqlServer.ListQuery.SqlCreator>());
 
         // PostgreSql.
         PostgreSqlCountryDataAccess = new PostgreSql.CountryDataAccess(Mock.Of<ILogger<PostgreSql.CountryDataAccess>>());

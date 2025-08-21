@@ -7,15 +7,8 @@ namespace CountryService.WebApi.Middleware;
 /// especially useful in distributed systems for tracing the request's path and troubleshooting issues.
 /// </summary>
 /// <see cref="https://microsoft.github.io/code-with-engineering-playbook/observability/correlation-id/"/>
-public class CorrelationIdMiddleware
+public class CorrelationIdMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public CorrelationIdMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public async Task InvokeAsync(HttpContext httpContext)
     {
         // If we haven't received a correlation ID in the request headers, generate a new one.

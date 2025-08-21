@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Logging;
+
 namespace CountryService.DataAccess.ListQuery;
 
-public static class ComparisonOperatorDbType
+public class ComparisonOperatorDbType(ILogger<ComparisonOperatorDbType> logger)
 {
-    public static bool IsComparisonOperatorForDataType(string comparisonOperator, DataType dataType)
+    public bool IsComparisonOperatorForDataType(string comparisonOperator, DataType dataType)
     {
+        logger.LogDebug($"IsComparisonOperatorForDataType, comparisonOperator: {comparisonOperator}, dataType: {dataType}.");
+
         switch (comparisonOperator.ToLower())
         {
             case ComparisonOperator.EqualTo:

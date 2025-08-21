@@ -1,20 +1,23 @@
 ﻿using CountryService.DataAccess.ListQuery;
+using Microsoft.Extensions.Logging;
 
 namespace CountryService.DataAccess.Models.Country;
 
-public static class CountryMetaData
+public class CountryMetaData(ILogger<CountryMetaData> logger)
 {
-    public static DataType GetDataType(string propertyName)
+    public DataType GetDataType(string propertyName)
     {
-        switch (propertyName)
+        logger.LogDebug($"GetDataType, propertyName: {propertyName}.");
+
+        switch (propertyName.ToLower())
         {
-            case "Iso2":
-            case "Iso3":
-            case "Name":
-            case "CallingCode":
+            case "iso2":
+            case "iso3":
+            case "name":
+            case "callingcode":
                 return DataType.Text;
 
-            case "IsoNumber":
+            case "isonumber":
                 return DataType.Numeric;
 
             default:
@@ -24,5 +27,8 @@ public static class CountryMetaData
 
     public static readonly string[] SortableProperties = ["Iso2", "Iso3", "IsoNumber", "Name"];
 
-    public static readonly string[] FilterableProperties = ["Iso2", "Iso3", "IsoNumber", "Name", "CallingCode"];     
+    public static readonly string[] FilterableProperties = ["Iso2", "Iso3", "IsoNumber", "Name", "CallingCode"];
+
+    public const string DefaultSortPropertyName = "Name";
+    public const string DefaultSortDirection = SortDirection.Ascending;   
 }

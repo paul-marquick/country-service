@@ -1,6 +1,10 @@
 using CountryService.DataAccess;
+using CountryService.DataAccess.ListQuery;
+using CountryService.DataAccess.Models.Country;
+using CountryService.DataAccess.SqlServer.ListQuery;
 using CountryService.Shared;
 using CountryService.WebApi.Configuration;
+using CountryService.WebApi.ListQuery;
 using CountryService.WebApi.Middleware;
 using CountryService.WebApi.Patching;
 using CountryService.WebApi.Problems;
@@ -70,6 +74,13 @@ internal class Program
 
         // Code.
         builder.Services.AddSingleton<ProblemDetailsCreator>();
+        builder.Services.AddSingleton<QueryValidator>();
+        builder.Services.AddSingleton<QueryReader>();
+        builder.Services.AddSingleton<ComparisonOperatorConverter>();
+        builder.Services.AddSingleton<ComparisonOperatorDbType>();
+        builder.Services.AddSingleton<SortDirectionConverter>();
+        builder.Services.AddSingleton<CountryMetaData>();
+        builder.Services.AddSingleton<SqlCreator>();
 
         // Data access.
         // Can simply switch between different database systems by editing the appsettings.json file.
@@ -121,7 +132,9 @@ internal class Program
         {
             options.InvalidModelStateResponseFactory = context =>
             {
-                return new ModelStateToValidationProblemDetails(context.HttpContext.RequestServices.GetRequiredService<ILogger<ModelStateToValidationProblemDetails>>());
+                return new ModelStateToValidationProblemDetails(
+                    context.HttpContext.RequestServices.GetRequiredService<ILogger<ModelStateToValidationProblemDetails>>(), 
+                    context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsCreator>());
             };
         }).AddNewtonsoftJson();
 

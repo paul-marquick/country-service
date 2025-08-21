@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Logging;
+
 namespace CountryService.DataAccess.ListQuery;
 
-public static class SortDirectionConverter
+public class SortDirectionConverter(ILogger<SortDirectionConverter> logger)
 {
-    public static string GetSortDirectionSql(string sortDirection)
+    public string GetSortDirectionSql(string sortDirection)
     {
+        logger.LogDebug($"GetSortDirectionSql, sortDirection: {sortDirection}.");
+
         switch (sortDirection)
         {
             case SortDirection.Ascending:

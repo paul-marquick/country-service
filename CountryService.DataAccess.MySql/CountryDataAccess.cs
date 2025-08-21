@@ -7,16 +7,10 @@ using System.Data.Common;
 
 namespace CountryService.DataAccess.MySql;
 
-public class CountryDataAccess : ICountryDataAccess
+public class CountryDataAccess(ILogger<CountryDataAccess> logger) : ICountryDataAccess
 {
     private const string selectColumns = "`iso_2`, `iso_3`, `iso_number`, `name`, `calling_code`";
-    private readonly ILogger<CountryDataAccess> logger;
-
-    public CountryDataAccess(ILogger<CountryDataAccess> logger)
-    {
-        this.logger = logger;
-    }
-
+    
     public Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction? dbTransaction = null)
     {
         throw new NotImplementedException();

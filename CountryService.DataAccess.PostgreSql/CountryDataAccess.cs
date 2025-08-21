@@ -7,84 +7,13 @@ using CountryService.DataAccess.ListQuery;
 
 namespace CountryService.DataAccess.PostgreSql;
 
-public class CountryDataAccess : ICountryDataAccess
+public class CountryDataAccess(ILogger<CountryDataAccess> logger) : ICountryDataAccess
 {
     private const string selectColumns = "\"iso_2\", \"iso_3\", \"iso_number\", \"name\", \"calling_code\"";
-    private readonly ILogger<CountryDataAccess> logger;
-
-    public CountryDataAccess(ILogger<CountryDataAccess> logger)
-    {
-        this.logger = logger;
-    }    
-
     
     public async Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction dbTransaction)
     {
-        logger.LogDebug("CountryQueryAsync");
-
-        string filterSql = CreateQueryWhereClauseSql(query.Filters);
-
-        // Query for total.
-        string totalSql = $"SELECT COUNT(1) FROM \"country\" {filterSql};";
-
-        await using NpgsqlCommand totalDbCommand = new NpgsqlCommand(totalSql, (NpgsqlConnection) dbConnection, (NpgsqlTransaction) dbTransaction);
-        AddQueryWhereClauseParameters(totalDbCommand, query.Filters);
-        await using NpgsqlDataReader totalDbDataReader = await totalDbCommand.ExecuteReaderAsync();
-
-        totalDbDataReader.Read();
-        int total = totalDbDataReader.GetInt32(0);
-       
-        // Query for a paged list.
-
-        string querySql = $"SELECT {selectColumns} FROM \"country\" {filterSql} ";
-
-        await using NpgsqlCommand queryDbCommand = new NpgsqlCommand(querySql, (NpgsqlConnection) dbConnection, (NpgsqlTransaction) dbTransaction);
-        AddQueryWhereClauseParameters(queryDbCommand, query.Filters);
-        await using NpgsqlDataReader queryDbDataReader = await queryDbCommand.ExecuteReaderAsync();
-
-        List<Country> countries = new List<Country>();
-
-        while (queryDbDataReader.Read())
-        {
-            countries.Add(ReadData(queryDbDataReader));
-        }
-
-        return (total, countries);
-    }
-
-    private static string CreateQueryWhereClauseSql(List<Filter>? filters)
-    {
-        if (filters == null)
-        {
-            return string.Empty;
-        }
-        else
-        {
-            string result = "WHERE ";
-
-            for (int i = 0; filters.Count > i; i++)
-            {
-                result += $"\"{GetColumnName(filters[i].PropertyName)}\" {ComparisonOperatorConverter.GetComparisonOperatorSql(filters[i].ComparisonOperator)} @{filters[i].PropertyName} ";
-
-                if (i < filters.Count)
-                {
-                    result += "AND ";
-                }
-            }
-
-            return result;
-        }
-    }
-
-    private static void AddQueryWhereClauseParameters(NpgsqlCommand dbCommand, List<Filter>? filters)
-    {
-        if (filters != null)
-        {
-            foreach (Filter filter in filters)
-            {
-                dbCommand.Parameters.AddWithValue(filter.PropertyName, filter.Value);
-            }
-        }
+        throw new NotImplementedException();
     }
 
     private static string GetColumnName(string propertyName)

@@ -3,11 +3,11 @@ using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.Models.Country;
 using CountryService.Shared;
+using CountryService.WebApi.ListQuery;
 using CountryService.WebApi.Problems;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Common;
-using System.Reflection.Metadata;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Controllers;
@@ -18,7 +18,9 @@ public class CountryController(
     ILogger<CountryController> logger, 
     IDbConnectionFactory dbConnectionFactory, 
     ICountryDataAccess countryDataAccess, 
-    ProblemDetailsCreator problemDetailsCreator) : ControllerBase
+    ProblemDetailsCreator problemDetailsCreator, 
+    QueryValidator queryValidator, 
+    QueryReader queryReader) : ControllerBase
 {
     [HttpOptions]
     public void Options()
@@ -43,11 +45,11 @@ public class CountryController(
 
     // /country?offset=0&limit=10&filters=name:like:engla&filters=isonumber:lessthan:1000&sorts=iso2:desc&sorts=name:asc
 
-    [HttpHead("query")]
-    [HttpGet("query")]
+    [HttpHead]
+    [HttpGet]
     public async Task<ActionResult<List<Country>>> QueryCountriesAsync(
-        [FromQuery] int offset = 0, 
-        [FromQuery] int limit = 10, 
+        [FromQuery] int offset = Constants.DefaultOffset, 
+        [FromQuery] int limit = Constants.DefaultLimit, 
         [FromQuery] string[]? filters = null, 
         [FromQuery] string[]? sorts = null)
     {
@@ -76,27 +78,15 @@ public class CountryController(
             }
         }
 
-        if (offset < 0)
-        {
-            ModelState.AddModelError("offset", "offset must be greater or equal to 0.");
-        }
-
-        if (!Constants.ValidLimits.Contains(limit))
-        {
-            ModelState.AddModelError("limit", "limit must be 10, 20, 50 or 100.");
-        }
-
-        ValidateQueryFilters(filters);
-        ValidateQuerySorts(sorts);
-
+        queryValidator.Validate(ModelState, offset, limit, filters, sorts);
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(problemDetailsCreator.CreateValidationProblemDetails(HttpContext, ModelState));
         }
 
         Query query = new Query(offset, limit);
-        query.AddSort("Name", SortDirection.Ascending);
-        query.AddFilter("IsoNumber", ComparisonOperator.LessThan, 1000);
+        queryReader.GetFilters(query, filters);
+        queryReader.GetSorts(query, sorts, CountryMetaData.DefaultSortPropertyName, CountryMetaData.DefaultSortDirection);
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
@@ -105,7 +95,7 @@ public class CountryController(
 
         (int, List<Country>) queryCountriesResult = await countryDataAccess.CountryQueryAsync(query, dbConnection, dbTransaction);
 
-        Response.Headers["Total"] = queryCountriesResult.Item1.ToString();
+        Response.Headers[AdditionalHeaderNames.TotalInQuery] = queryCountriesResult.Item1.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
@@ -120,99 +110,31 @@ public class CountryController(
         }
     }
 
-    private void ValidateQueryFilters(string[]? filters)
-    {
-        if (filters != null && filters.Length > 0)
-        {
-            foreach (string f in filters)
-            {
-                // Example filter - name:like:fred
-
-                // Split on colon.
-                string[] filterParts = f.Split(':');
-                string propertyName = filterParts[0];
-                string comparisonOperator = filterParts[1];
-                string value = string.Join(':', filterParts, 2, filterParts.Length - 1);
-
-                // Check the property name is filterable.
-                if (!CountryMetaData.FilterableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
-                {
-                    ModelState.AddModelError("filters", "Property is invalid.");
-                }
-
-                // Check the comparison operator is valid.
-                if (!comparisonOperator.Equals(ComparisonOperator.EqualTo, StringComparison.OrdinalIgnoreCase) &&
-                    !comparisonOperator.Equals(ComparisonOperator.NotEqualTo, StringComparison.OrdinalIgnoreCase) &&
-                    !comparisonOperator.Equals(ComparisonOperator.GreaterThan, StringComparison.OrdinalIgnoreCase) &&
-                    !comparisonOperator.Equals(ComparisonOperator.LessThan, StringComparison.OrdinalIgnoreCase) &&
-                    !comparisonOperator.Equals(ComparisonOperator.GreaterThanOrEqualTo, StringComparison.OrdinalIgnoreCase) &&
-                    !comparisonOperator.Equals(ComparisonOperator.LessThanOrEqualTo, StringComparison.OrdinalIgnoreCase) &&
-                    !comparisonOperator.Equals(ComparisonOperator.Like, StringComparison.OrdinalIgnoreCase))
-                {
-                    ModelState.AddModelError("filters", "Comparison operator is invalid.");
-                }
-
-                // Check the property data type and comparison operator are compatible.
-                if (!ComparisonOperatorDbType.IsComparisonOperatorForDataType(comparisonOperator, CountryMetaData.GetDataType(propertyName)))
-                {
-                    ModelState.AddModelError("filters", "Comparison operator is not compatible with the data type of the specified property.");
-                }
-            }
-        }
-    }
-
-    private void ValidateQuerySorts(string[]? sorts)
-    {
-        if (sorts != null && sorts.Length > 0)
-        {
-            foreach (string s in sorts)
-            {
-                // Example: iso2:desc
-
-                // Split on colon.
-                string[] sortParts = s.Split(':');
-                string propertyName = sortParts[0];
-                string sortDirection = sortParts[1];
-
-                // Check the property name is sortable.
-                if (!CountryMetaData.SortableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
-                {
-                    ModelState.AddModelError("sorts", "Property is invalid.");
-                }
-
-                // Check the sort direction is valid.
-                if (!sortDirection.Equals(SortDirection.Ascending, StringComparison.OrdinalIgnoreCase) &&
-                    !sortDirection.Equals(SortDirection.Descending, StringComparison.OrdinalIgnoreCase))
-                {
-                    ModelState.AddModelError("sorts", "Sort direction is invalid.");
-                }
-            }
-        }
-    }
-
-    [HttpHead]
-    [HttpGet]
-    public async Task<ActionResult<List<Country>>> GetCountriesAsync()
+    [HttpHead("lookup")]
+    [HttpGet("lookup")]
+    public async Task<ActionResult<List<CountryLookup>>> GetCountryLookupsAsync()
     {
         string method = HttpContext.Request.Method;
 
-        logger.LogDebug($"GetCountriesAsync, method: {method}");
+        logger.LogDebug($"GetCountryLookupsAsync, method: {method}");
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
-        List<Country> countries = await countryDataAccess.SelectCountriesAsync(dbConnection);
+        List<CountryLookup> countryLookups = await countryDataAccess.SelectCountryLookupsAsync(dbConnection);
+
+        Response.Headers[AdditionalHeaderNames.Total] = countryLookups.Count.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
             Response.Headers.ContentType = Application.Json;
-            Response.Headers.ContentLength = countries.ToString()!.Length;
+            Response.Headers.ContentLength = countryLookups.ToString()!.Length;
 
             return new EmptyResult();
         }
         else
         {
-            return Ok(countries);
+            return Ok(countryLookups);
         }
     }
 
