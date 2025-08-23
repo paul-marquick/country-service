@@ -24,22 +24,22 @@
             "projectPath": "${workspaceFolder}/CountryService.BlazorAdminApp/CountryService.BlazorAdminApp.csproj",
             "preLaunchTask": "build blazor"
         },       
-        {
-            "name": "debug blazor",
-            "type": "blazorwasm",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/CountryService.BlazorAdminApp",
-            "preLaunchTask": "build blazor"
-        }
+        // {
+        //     "name": "debug blazor",
+        //     "type": "blazorwasm",
+        //     "request": "launch",
+        //     "cwd": "${workspaceFolder}/CountryService.BlazorAdminApp",
+        //     "preLaunchTask": "build blazor"
+        // }
     ],
     "compounds": [
         {
             "name": "launch multi",
             "configurations": ["launch web api", "launch blazor"]
         },
-        {
-            "name": "debug multi",
-            "configurations": ["launch web api", "debug blazor"]
-        }
+        // {
+        //     "name": "debug multi",
+        //     "configurations": ["launch web api", "debug blazor"]
+        // }
     ]
 }
