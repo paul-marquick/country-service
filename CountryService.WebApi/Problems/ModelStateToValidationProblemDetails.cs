@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Problems;
@@ -22,14 +21,19 @@ public class ModelStateToValidationProblemDetails(
         context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         context.HttpContext.Response.ContentType = Application.ProblemJson;
 
-        JsonSerializerOptions jsonSerializerOptions = new()
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
+        //TODO: Remove, when tested that global is working. 
 
-        string validationProblemDetailsJsonString = JsonSerializer.Serialize(validationProblemDetails, jsonSerializerOptions);
+        // JsonSerializerOptions jsonSerializerOptions = new()
+        // {
+        //     PropertyNameCaseInsensitive = true,
+        //     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        //     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        // };
+
+        // string validationProblemDetailsJsonString = JsonSerializer.Serialize(validationProblemDetails, jsonSerializerOptions);
+
+        string validationProblemDetailsJsonString = JsonSerializer.Serialize(validationProblemDetails);
+
         byte[] validationProblemDetailsJsonBytes = Encoding.UTF8.GetBytes(validationProblemDetailsJsonString);
         context.HttpContext.Response.Body.WriteAsync(validationProblemDetailsJsonBytes);
 

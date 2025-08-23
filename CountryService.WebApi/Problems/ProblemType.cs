@@ -18,18 +18,4 @@ public static class ProblemType
     public const string CountryIso3Duplicated = "country-iso3-duplicated";
     public const string CountryIsoNumberDuplicated = "country-isoNumber-duplicated";
     public const string CountryNameDuplicated = "country-name-duplicated";
-
-    // Added some extra possible problem types as examples.
-    public const string UserNotFound = "user-not-found";
-    public const string UsernameDuplicated = "username-duplicated";
-    public const string EmailAddressDuplicated = "email-address-duplicated";
-    public const string PasswordInvalid = "password-invalid";
-    public const string UserLockedOut = "user-locked-out";
-    public const string UserTemporarilyLockedOut = "user-temporarily-locked-out";
-    public const string ScopeForbidden = "scope-forbidden";
-    public const string ScopeConfidentialClientOnly = "scope-confidential-client-only";
-    public const string ResponseTypeInvalid = "response-type-invalid";
-    public const string ScopeInvalid = "scope-invalid";
-    public const string CodeChallengeEmpty = "code-challenge-empty";
-    public const string UserEmailAddressNotVerified = "user-email-address-not-verified";
 }

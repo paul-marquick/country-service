@@ -29,25 +29,12 @@ public class CountryController(
         Response.ContentLength = 0;
     }
 
-    [HttpGet("throw")]
-    public IActionResult Throw()
-    {
-        // Just to show how to get the correlation id in code.
-        Request.Headers.TryGetValue("x-correlation-id", out var correlationId);
-        logger.LogDebug($"correlationId: {correlationId}");
-
-        // Could store the correlation ID in an event table in the database, for example.
-
-        throw new Exception("Sample exception.");
-    }
-
     // Example
-
-    // /country?offset=0&limit=10&filters=name:like:engla&filters=isonumber:lessthan:1000&sorts=iso2:desc&sorts=name:asc
+    // /country?offset=0&limit=10&filters=name:like:unite&filters=isonumber:l:1000&sorts=iso2:desc&sorts=name:asc
 
     [HttpHead]
     [HttpGet]
-    public async Task<ActionResult<List<Country>>> QueryCountriesAsync(
+    public async Task<ActionResult<List<Country>>> SelectCountriesAsync(
         [FromQuery] int offset = Constants.DefaultOffset, 
         [FromQuery] int limit = Constants.DefaultLimit, 
         [FromQuery] string[]? filters = null, 
@@ -57,7 +44,7 @@ public class CountryController(
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
-            logger.LogDebug($"method: {method}, offset: {offset}, limit: {limit}.");
+            logger.LogDebug($"CountryController.SelectCountriesAsync, method: {method}, offset: {offset}, limit: {limit}.");
 
             if (filters == null)
             {
@@ -95,7 +82,7 @@ public class CountryController(
 
         (int, List<Country>) queryCountriesResult = await countryDataAccess.CountryQueryAsync(query, dbConnection, dbTransaction);
 
-        Response.Headers[AdditionalHeaderNames.TotalInQuery] = queryCountriesResult.Item1.ToString();
+        Response.Headers[AdditionalHeaderNames.Total] = queryCountriesResult.Item1.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
@@ -123,7 +110,7 @@ public class CountryController(
 
         List<CountryLookup> countryLookups = await countryDataAccess.SelectCountryLookupsAsync(dbConnection);
 
-        Response.Headers[AdditionalHeaderNames.Total] = countryLookups.Count.ToString();
+        Response.Headers[AdditionalHeaderNames.Count] = countryLookups.Count.ToString();
 
         if (method == HttpMethod.Head.Method)
         {

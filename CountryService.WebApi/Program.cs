@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CountryService.DataAccess;
 using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.Models.Country;
@@ -127,6 +129,12 @@ internal class Program
 
             // Example: how to add a filter to the request processing pipeline.
             // options.Filters.Add<ProblemDetailsExceptionFilter>();
+        })
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;           
+            options.JsonSerializerOptions.PropertyNamingPolicy=JsonNamingPolicy.CamelCase;
         })
         .ConfigureApiBehaviorOptions(options =>
         {

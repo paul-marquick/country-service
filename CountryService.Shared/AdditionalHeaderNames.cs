@@ -2,6 +2,6 @@
 
 public static class AdditionalHeaderNames
 {
-    public const string Total = "Total";  
-    public const string TotalInQuery = "Total-In-Query";    
+    public const string Count = "Count";  
+    public const string Total = "Total";    
 }

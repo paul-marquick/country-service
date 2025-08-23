@@ -1,4 +1,4 @@
-﻿namespace CountryService.Shared;
+﻿namespace CountryService.WebApi.Configuration;
 
 public static class DatabaseSystem
 {
