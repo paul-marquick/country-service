@@ -1,5 +1,5 @@
 ﻿using System.Net.Http;
-using CountryService.WebApi.Models;
+using CountryService.Models.Log;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -17,11 +17,11 @@ public class LogController(ILogger<ServiceInfoController> logger) : ControllerBa
     }
 
     [HttpPost]
-    public ActionResult PostLogEntry([FromBody] LogEntry logEntry)
+    public ActionResult PostLogEntry([FromBody] Log log)
     {
         logger.LogDebug($"PostLogEntryAsync");
 
-        logger.LogError(logEntry.Message);
+        logger.LogError(log.Message);
 
         return Ok();
     }
