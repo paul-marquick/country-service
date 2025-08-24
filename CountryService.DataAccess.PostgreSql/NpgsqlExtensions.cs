@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using System;
+using Npgsql;
 
 namespace CountryService.DataAccess.PostgreSql;
 

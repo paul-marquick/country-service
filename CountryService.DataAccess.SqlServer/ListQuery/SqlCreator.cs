@@ -1,4 +1,5 @@
-﻿using CountryService.DataAccess.ListQuery;
+﻿using System.Collections.Generic;
+using CountryService.DataAccess.ListQuery;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 

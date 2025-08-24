@@ -4,6 +4,10 @@ using Npgsql;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using CountryService.DataAccess.ListQuery;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace CountryService.DataAccess.PostgreSql;
 

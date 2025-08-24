@@ -1,5 +1,7 @@
-﻿using CountryService.WebApi.Models;
+﻿using System.Net.Http;
+using CountryService.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.Controllers;
 

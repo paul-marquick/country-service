@@ -1,4 +1,5 @@
 using CountryService.DataAccess.ListQuery;
+using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.ListQuery;
 

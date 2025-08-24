@@ -1,4 +1,8 @@
-﻿namespace CountryService.WebApi.Configuration;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace CountryService.WebApi.Configuration;
 
 public static class WebApplicationBuilderConfigExtension
 {

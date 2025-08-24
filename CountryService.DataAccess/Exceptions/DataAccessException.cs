@@ -1,4 +1,6 @@
-﻿namespace CountryService.DataAccess.Exceptions;
+﻿using System;
+
+namespace CountryService.DataAccess.Exceptions;
 
 public class DataAccessException : Exception
 {

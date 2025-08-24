@@ -1,5 +1,8 @@
-﻿using CountryService.WebApi.Configuration;
+﻿using System;
+using System.Net.Http;
+using CountryService.WebApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static System.Net.Mime.MediaTypeNames;
 

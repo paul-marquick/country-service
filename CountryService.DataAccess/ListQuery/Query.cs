@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace CountryService.DataAccess.ListQuery;
 
 public record Query

@@ -1,4 +1,6 @@
-﻿namespace CountryService.DataAccess.Test;
+﻿using System.Threading.Tasks;
+
+namespace CountryService.DataAccess.Test;
 
 [Collection("Database collection")]
 public class MySqlCountryDataAccessTest(DatabaseFixture databaseFixture) : CountryDataAccessTestBase

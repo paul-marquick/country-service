@@ -1,4 +1,6 @@
-﻿namespace CountryService.WebApi.Middleware;
+﻿using Microsoft.AspNetCore.Builder;
+
+namespace CountryService.WebApi.Middleware;
 
 /// <summary>
 /// Extension method used to add the middleware to the HTTP request pipeline.
