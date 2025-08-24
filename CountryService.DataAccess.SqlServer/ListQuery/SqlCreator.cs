@@ -91,7 +91,7 @@ public class SqlCreator(
 
         string result = "ORDER BY ";
 
-        for (int i = 0; sorts.Count > i; i++)
+        for (int i = 0; sorts!.Count > i; i++)
         {
             result += $"\"{sorts[i].PropertyName}\" {sortDirectionConverter.GetSortDirectionSql(sorts[i].SortDirection)} ";
 

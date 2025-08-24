@@ -1,20 +1,27 @@
 using CountryService.DataAccess.ListQuery;
-using CountryService.DataAccess.Models.Country;
 using CountryService.Shared;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CountryService.WebApi.ListQuery;
 
-public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData countryMetaData, ComparisonOperatorDbType comparisonOperatorDbType)
+public class QueryValidator(ILogger<QueryValidator> logger, ComparisonOperatorDbType comparisonOperatorDbType)
 {
-    public void Validate(ModelStateDictionary modelState, int offset, int limit, string[]? filters, string[]? sorts)
+    public void Validate(
+        ModelStateDictionary modelState,
+        string[] filterableProperties,
+        string[] SortableProperties,
+        Func<string, DataType> getDataType,
+        int offset,
+        int limit,
+        string[]? filters,
+        string[]? sorts)
     {
         logger.LogDebug("ValidateQuery");
 
         ValidateOffset(modelState, offset);
         ValidateLimit(modelState, limit);
-        ValidateFilters(modelState, filters);
-        ValidateSorts(modelState, sorts);
+        ValidateFilters(modelState, filterableProperties, getDataType, filters);
+        ValidateSorts(modelState, SortableProperties, sorts);
     }
 
     private void ValidateOffset(ModelStateDictionary modelState, int offset)
@@ -36,8 +43,12 @@ public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData coun
             modelState.AddModelError(PropertyNames.Limit, "limit must be 10, 20, 50 or 100.");
         }
     }
-
-    private void ValidateFilters(ModelStateDictionary modelState, string[]? filters)
+    
+    private void ValidateFilters(
+        ModelStateDictionary modelState,
+        string[] filterableProperties, 
+        Func<string, DataType> getDataType,
+        string[]? filters)
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {
@@ -52,7 +63,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData coun
                 logger.LogDebug($"filters: {string.Join(", ", filters)}");
             }
         }
-        
+
         if (filters != null && filters.Length > 0)
         {
             foreach (string f in filters)
@@ -65,7 +76,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData coun
                 string comparisonOperator = filterParts[1];
 
                 // Check the property name is filterable.
-                if (!CountryMetaData.FilterableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
+                if (!filterableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
                 {
                     modelState.AddModelError(PropertyNames.Filters, "Property is invalid.");
                 }
@@ -84,7 +95,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData coun
                 else
                 {
                     // Check the property data type and comparison operator are compatible.
-                    if (!comparisonOperatorDbType.IsComparisonOperatorForDataType(comparisonOperator, countryMetaData.GetDataType(propertyName)))
+                    if (!comparisonOperatorDbType.IsComparisonOperatorForDataType(comparisonOperator, getDataType(propertyName)))
                     {
                         modelState.AddModelError(PropertyNames.Filters, "Comparison operator is not compatible with the data type of the specified property.");
                     }
@@ -93,7 +104,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData coun
         }
     }
 
-    private void ValidateSorts(ModelStateDictionary modelState, string[]? sorts)
+    private void ValidateSorts(ModelStateDictionary modelState, string[] sortableProperties, string[]? sorts)
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {
@@ -121,7 +132,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, CountryMetaData coun
                 string sortDirection = sortParts[1];
 
                 // Check the property name is sortable.
-                if (!CountryMetaData.SortableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
+                if (!sortableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
                 {
                     modelState.AddModelError(PropertyNames.Sorts, "Property is invalid.");
                 }

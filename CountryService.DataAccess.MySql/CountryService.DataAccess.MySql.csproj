@@ -5,14 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\CountryService.Models\CountryService.Models.csproj" />
+        <ProjectReference Include="..\CountryService.DataAccess\CountryService.DataAccess.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
         <PackageReference Include="MySql.Data" Version="9.4.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\CountryService.DataAccess\CountryService.DataAccess.csproj" />
     </ItemGroup>
 
 </Project>

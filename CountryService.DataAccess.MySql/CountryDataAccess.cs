@@ -1,6 +1,6 @@
 ﻿using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.ListQuery;
-using CountryService.DataAccess.Models.Country;
+using CountryService.Models.Country;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
@@ -11,7 +11,7 @@ public class CountryDataAccess(ILogger<CountryDataAccess> logger) : ICountryData
 {
     private const string selectColumns = "`iso_2`, `iso_3`, `iso_number`, `name`, `calling_code`";
     
-    public Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction? dbTransaction = null)
+    public Task<(int, List<Country>)> CountryQueryAsync(Query query, DbConnection dbConnection, DbTransaction dbTransaction)
     {
         throw new NotImplementedException();
     }

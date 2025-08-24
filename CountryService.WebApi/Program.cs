@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using CountryService.DataAccess;
 using CountryService.DataAccess.ListQuery;
-using CountryService.DataAccess.Models.Country;
 using CountryService.DataAccess.SqlServer.ListQuery;
 using CountryService.Shared;
 using CountryService.WebApi.Configuration;
@@ -81,7 +80,6 @@ internal class Program
         builder.Services.AddSingleton<ComparisonOperatorConverter>();
         builder.Services.AddSingleton<ComparisonOperatorDbType>();
         builder.Services.AddSingleton<SortDirectionConverter>();
-        builder.Services.AddSingleton<CountryMetaData>();
         builder.Services.AddSingleton<SqlCreator>();
 
         // Data access.

@@ -1,6 +1,6 @@
 ﻿using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.ListQuery;
-using CountryService.DataAccess.Models.Country;
+using CountryService.Models.Country;
 using CountryService.DataAccess.SqlServer.ListQuery;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;

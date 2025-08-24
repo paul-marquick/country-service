@@ -1,5 +1,5 @@
 ﻿using CountryService.DataAccess.Exceptions;
-using CountryService.DataAccess.Models.Country;
+using CountryService.Models.Country;
 using System.Data.Common;
 
 namespace CountryService.DataAccess.Test;

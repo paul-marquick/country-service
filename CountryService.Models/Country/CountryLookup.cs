@@ -1,3 +1,3 @@
-﻿namespace CountryService.DataAccess.Models.Country;
+﻿namespace CountryService.Models.Country;
 
 public record CountryLookup(string Iso2, string Name) { }

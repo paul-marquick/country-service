@@ -1,7 +1,7 @@
 ﻿using CountryService.DataAccess;
 using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.ListQuery;
-using CountryService.DataAccess.Models.Country;
+using CountryService.Models.Country;
 using CountryService.Shared;
 using CountryService.WebApi.ListQuery;
 using CountryService.WebApi.Problems;
@@ -15,11 +15,11 @@ namespace CountryService.WebApi.Controllers;
 [Route("[controller]")]
 [ApiController]
 public class CountryController(
-    ILogger<CountryController> logger, 
-    IDbConnectionFactory dbConnectionFactory, 
-    ICountryDataAccess countryDataAccess, 
-    ProblemDetailsCreator problemDetailsCreator, 
-    QueryValidator queryValidator, 
+    ILogger<CountryController> logger,
+    IDbConnectionFactory dbConnectionFactory,
+    ICountryDataAccess countryDataAccess,
+    ProblemDetailsCreator problemDetailsCreator,
+    QueryValidator queryValidator,
     QueryReader queryReader) : ControllerBase
 {
     [HttpOptions]
@@ -35,9 +35,9 @@ public class CountryController(
     [HttpHead]
     [HttpGet]
     public async Task<ActionResult<List<Country>>> SelectCountriesAsync(
-        [FromQuery] int offset = Constants.DefaultOffset, 
-        [FromQuery] int limit = Constants.DefaultLimit, 
-        [FromQuery] string[]? filters = null, 
+        [FromQuery] int offset = Constants.DefaultOffset,
+        [FromQuery] int limit = Constants.DefaultLimit,
+        [FromQuery] string[]? filters = null,
         [FromQuery] string[]? sorts = null)
     {
         string method = HttpContext.Request.Method;
@@ -65,7 +65,16 @@ public class CountryController(
             }
         }
 
-        queryValidator.Validate(ModelState, offset, limit, filters, sorts);
+        queryValidator.Validate(
+            ModelState,
+            FilterableProperties,
+            SortableProperties, 
+            GetDataType, 
+            offset,
+            limit,
+            filters,
+            sorts);
+
         if (!ModelState.IsValid)
         {
             return BadRequest(problemDetailsCreator.CreateValidationProblemDetails(HttpContext, ModelState));
@@ -73,7 +82,7 @@ public class CountryController(
 
         Query query = new Query(offset, limit);
         queryReader.GetFilters(query, filters);
-        queryReader.GetSorts(query, sorts, CountryMetaData.DefaultSortPropertyName, CountryMetaData.DefaultSortDirection);
+        queryReader.GetSorts(query, sorts, DefaultSortPropertyName, DefaultSortDirection);
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
@@ -256,7 +265,7 @@ public class CountryController(
         DbTransaction dbTransaction = await dbConnection.BeginTransactionAsync();
 
         try
-        {         
+        {
             // Check row exists.
             await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection, dbTransaction);
 
@@ -465,4 +474,31 @@ public class CountryController(
 
         return Ok(exists);
     }
+    
+    private DataType GetDataType(string propertyName)
+    {
+        logger.LogDebug($"Country.GetDataType, propertyName: {propertyName}.");
+
+        switch (propertyName.ToLower())
+        {
+            case "iso2":
+            case "iso3":
+            case "name":
+            case "callingcode":
+                return DataType.Text;
+
+            case "isonumber":
+                return DataType.Numeric;
+
+            default:
+                throw new ArgumentException($"Unknown property name: {propertyName}.");
+        }
+    }
+
+    public static readonly string[] SortableProperties = ["Iso2", "Iso3", "IsoNumber", "Name"];
+
+    public static readonly string[] FilterableProperties = ["Iso2", "Iso3", "IsoNumber", "Name", "CallingCode"];
+
+    public const string DefaultSortPropertyName = "Name";
+    public const string DefaultSortDirection = SortDirection.Ascending;
 }
