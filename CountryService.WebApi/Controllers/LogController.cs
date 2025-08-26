@@ -1,5 +1,5 @@
 ﻿using System.Net.Http;
-using CountryService.Models.Log;
+using CountryService.Dtos.Log;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

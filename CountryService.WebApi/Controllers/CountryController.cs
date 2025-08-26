@@ -1,6 +1,7 @@
 ﻿using CountryService.DataAccess;
 using CountryService.DataAccess.Exceptions;
 using CountryService.DataAccess.ListQuery;
+using CountryService.Mappers.Country;
 using CountryService.Models.Country;
 using CountryService.Shared;
 using CountryService.WebApi.ListQuery;
@@ -25,6 +26,8 @@ public class CountryController(
     ILogger<CountryController> logger,
     IDbConnectionFactory dbConnectionFactory,
     ICountryDataAccess countryDataAccess,
+    ICountryMapper countryMapper,
+    ICountryLookupMapper countryLookupMapper,
     ProblemDetailsCreator problemDetailsCreator,
     QueryValidator queryValidator,
     QueryReader queryReader) : ControllerBase
@@ -41,7 +44,7 @@ public class CountryController(
 
     [HttpHead]
     [HttpGet]
-    public async Task<ActionResult<List<Country>>> SelectCountriesAsync(
+    public async Task<ActionResult<List<Dtos.Country.Country>>> SelectCountriesAsync(
         [FromQuery] int offset = Constants.DefaultOffset,
         [FromQuery] int limit = Constants.DefaultLimit,
         [FromQuery] string[]? filters = null,
@@ -98,24 +101,26 @@ public class CountryController(
 
         (int, List<Country>) queryCountriesResult = await countryDataAccess.CountryQueryAsync(query, dbConnection, dbTransaction);
 
+        List<Dtos.Country.Country> countryDtos = countryMapper.MapModelListToDtoList(queryCountriesResult.Item2);
+
         Response.Headers[AdditionalHeaderNames.Total] = queryCountriesResult.Item1.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
             Response.Headers.ContentType = Application.Json;
-            Response.Headers.ContentLength = queryCountriesResult.Item2.ToString()!.Length;
+            Response.Headers.ContentLength = countryDtos.ToString()!.Length;
 
             return new EmptyResult();
         }
         else
         {
-            return Ok(queryCountriesResult.Item2);
+            return Ok(countryDtos);
         }
     }
 
     [HttpHead("lookup")]
     [HttpGet("lookup")]
-    public async Task<ActionResult<List<CountryLookup>>> GetCountryLookupsAsync()
+    public async Task<ActionResult<List<Dtos.Country.CountryLookup>>> GetCountryLookupsAsync()
     {
         string method = HttpContext.Request.Method;
 
@@ -126,7 +131,9 @@ public class CountryController(
 
         List<CountryLookup> countryLookups = await countryDataAccess.SelectCountryLookupsAsync(dbConnection);
 
-        Response.Headers[AdditionalHeaderNames.Count] = countryLookups.Count.ToString();
+        List<Dtos.Country.CountryLookup> countryLookupDtos = countryLookupMapper.MapModelListToDtoList(countryLookups);
+
+        Response.Headers[AdditionalHeaderNames.Count] = countryLookupDtos.Count.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
@@ -137,13 +144,13 @@ public class CountryController(
         }
         else
         {
-            return Ok(countryLookups);
+            return Ok(countryLookupDtos);
         }
     }
 
     [HttpHead("{iso2}")]
     [HttpGet("{iso2}")]
-    public async Task<ActionResult<Country>> GetCountryByIso2Async(string iso2)
+    public async Task<ActionResult<Dtos.Country.Country>> GetCountryByIso2Async(string iso2)
     {
         string method = HttpContext.Request.Method;
 
@@ -161,16 +168,18 @@ public class CountryController(
         {
             Country country = await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection);
 
+            Dtos.Country.Country countryDto = countryMapper.MapModelToDto(country);
+
             if (method == HttpMethod.Head.Method)
             {
                 Response.Headers.ContentType = Application.Json;
-                Response.Headers.ContentLength = country.ToString()!.Length;
+                Response.Headers.ContentLength = countryDto.ToString()!.Length;
 
                 return new EmptyResult();
             }
             else
             {
-                return Ok(country);
+                return Ok(countryDto);
             }
         }
         catch (DataAccessException dataAccessException)
@@ -202,21 +211,42 @@ public class CountryController(
     }
 
     [HttpPost]
-    public async Task<ActionResult<Country>> PostCountryAsync([FromBody] Country country)
+    public async Task<ActionResult<Dtos.Country.Country>> PostCountryAsync([FromBody] Dtos.Country.Country countryDto)
     {
-        logger.LogDebug($"PostCountryAsync, country.Iso2: {country.Iso2}");
+        logger.LogDebug($"PostCountryAsync, countryDto.Iso2: {countryDto.Iso2}");
+
+        Country country = new()
+        {
+            Iso2 = countryDto.Iso2,
+            Iso3 = countryDto.Iso3,
+            IsoNumber = countryDto.IsoNumber,
+            Name = countryDto.Name,
+            CallingCode = countryDto.CallingCode
+        };
 
         using DbConnection dbConnection = dbConnectionFactory.CreateDbConnection();
         await dbConnection.OpenAsync();
 
+        DbTransaction dbTransaction = await dbConnection.BeginTransactionAsync();
+
         try
         {
-            await countryDataAccess.InsertCountryAsync(country, dbConnection);
+            await countryDataAccess.InsertCountryAsync(country, dbConnection, dbTransaction);
 
-            return Created($"https://api.example.com/country/{country.Iso2}", country);
+            Country newCountry = await countryDataAccess.SelectCountryByIso2Async(country.Iso2, dbConnection, dbTransaction);
+
+            await dbTransaction.CommitAsync();
+
+            Dtos.Country.Country newCountryDto = countryMapper.MapModelToDto(newCountry);
+
+            //TODO: URLs. 
+
+            return Created($"https://api.example.com/country/{country.Iso2}", newCountryDto);
         }
         catch (DataAccessException dataAccessException)
         {
+            await dbTransaction.RollbackAsync();
+
             switch (dataAccessException)
             {
                 case CountryIso2DuplicatedException countryIso2DuplicatedException:
@@ -262,7 +292,7 @@ public class CountryController(
     }
 
     [HttpPut("{iso2}")]
-    public async Task<ActionResult> PutCountryByIso2Async(string iso2, [FromBody] Country country)
+    public async Task<ActionResult> PutCountryByIso2Async(string iso2, [FromBody] Dtos.Country.Country countryDto)
     {
         logger.LogDebug($"PutCountryByIso2Async, iso2: {iso2}");
 
@@ -273,8 +303,10 @@ public class CountryController(
 
         try
         {
-            // Check row exists.
-            await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection, dbTransaction);
+            // This will throw if row doesn't exist.
+            Country country = await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection, dbTransaction);
+
+            countryMapper.UpdateModelWithDto(country, countryDto);
 
             await countryDataAccess.UpdateCountryByIso2Async(iso2, country, dbConnection, dbTransaction);
 
@@ -304,7 +336,7 @@ public class CountryController(
                             StatusCodes.Status400BadRequest,
                             ProblemType.CountryIso2Duplicated,
                             ProblemTitle.CountryIso2Duplicated,
-                            $"Country has iso2: '{country.Iso2}' duplicated."));
+                            $"Country has iso2: '{countryDto.Iso2}' duplicated."));
 
                 case CountryIso3DuplicatedException countryIso3DuplicatedException:
                     return BadRequest(
@@ -313,7 +345,7 @@ public class CountryController(
                             StatusCodes.Status400BadRequest,
                             ProblemType.CountryIso3Duplicated,
                             ProblemTitle.CountryIso3Duplicated,
-                            $"Country has iso3: '{country.Iso3}' duplicated."));
+                            $"Country has iso3: '{countryDto.Iso3}' duplicated."));
 
                 case CountryIsoNumberDuplicatedException countryIsoNumberDuplicatedException:
                     return BadRequest(
@@ -322,7 +354,7 @@ public class CountryController(
                             StatusCodes.Status400BadRequest,
                             ProblemType.CountryIsoNumberDuplicated,
                             ProblemTitle.CountryIsoNumberDuplicated,
-                            $"Country has isoNumber: '{country.IsoNumber}' duplicated."));
+                            $"Country has isoNumber: '{countryDto.IsoNumber}' duplicated."));
 
                 case CountryNameDuplicatedException countryNameDuplicatedException:
                     return BadRequest(
@@ -331,7 +363,7 @@ public class CountryController(
                             StatusCodes.Status400BadRequest,
                             ProblemType.CountryNameDuplicated,
                             ProblemTitle.CountryNameDuplicated,
-                            $"Country has name: '{country.Name}' duplicated."));
+                            $"Country has name: '{countryDto.Name}' duplicated."));
 
                 default:
                     throw;
@@ -339,15 +371,13 @@ public class CountryController(
         }
     }
 
-    //TODO: Validation of the patch document, needs thorough testing. Not sure it is being validated.
-
     [HttpPatch("{iso2}")]
-    public async Task<ActionResult> PatchCountryByIso2Async([FromRoute] string iso2, [FromBody] JsonPatchDocument<Country> countryPatch)
+    public async Task<ActionResult> PatchCountryByIso2Async([FromRoute] string iso2, [FromBody] JsonPatchDocument<Dtos.Country.Country> countryDtoPatch)
     {
         logger.LogDebug($"PatchCountryByIso2Async, iso2: {iso2}");
 
         // Currently only supports replace operations.
-        if (countryPatch.Operations.Any(x => x.OperationType != Microsoft.AspNetCore.JsonPatch.Operations.OperationType.Replace))
+        if (countryDtoPatch.Operations.Any(x => x.OperationType != Microsoft.AspNetCore.JsonPatch.Operations.OperationType.Replace))
         {
             return BadRequest(
                 problemDetailsCreator.CreateProblemDetails(
@@ -368,17 +398,21 @@ public class CountryController(
             // Check row exists, will throw if not found.
             Country country = await countryDataAccess.SelectCountryByIso2Async(iso2, dbConnection, dbTransaction);
 
-            // Apply the patch.
-            countryPatch.ApplyTo(country, ModelState);
+            Dtos.Country.Country countryDto = countryMapper.MapModelToDto(country);
 
+            // Apply the patch.
+            countryDtoPatch.ApplyTo(countryDto, ModelState);
+            
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(problemDetailsCreator.CreateValidationProblemDetails(HttpContext, ModelState));
             }
 
-            List<string> dirtyColumns = countryPatch.Operations.Select(x => x.path).ToList();
+            List<string> dirtyColumns = countryDtoPatch.Operations.Select(x => x.path).ToList();
 
             logger.LogDebug($"PatchByIso2Async, dirtyColumns: {dirtyColumns}");
+
+            countryMapper.UpdateModelWithDto(country, countryDto);
 
             try
             {

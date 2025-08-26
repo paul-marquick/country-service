@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using CountryService.DataAccess;
 using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.SqlServer.ListQuery;
+using CountryService.Mappers.Country;
 using CountryService.Shared;
 using CountryService.WebApi.Configuration;
 using CountryService.WebApi.ListQuery;
@@ -79,7 +80,7 @@ internal class Program
         // Add the Open API document generation services.
         builder.Services.AddOpenApi();
 
-        // Code.
+        // Add code dependencies.
         builder.Services.AddSingleton<ProblemDetailsCreator>();
         builder.Services.AddSingleton<QueryValidator>();
         builder.Services.AddSingleton<QueryReader>();
@@ -87,6 +88,7 @@ internal class Program
         builder.Services.AddSingleton<ComparisonOperatorDbType>();
         builder.Services.AddSingleton<SortDirectionConverter>();
         builder.Services.AddSingleton<SqlCreator>();
+        builder.Services.AddSingleton<CountryMapper>();
 
         // Data access.
         // Can simply switch between different database systems by editing the appsettings.json file.

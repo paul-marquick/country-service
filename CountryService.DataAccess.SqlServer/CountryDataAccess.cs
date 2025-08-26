@@ -89,7 +89,13 @@ public class CountryDataAccess(ILogger<CountryDataAccess> logger, SqlCreator sql
 
         while (dbDataReader.Read())
         {
-            countryLookups.Add(new CountryLookup(dbDataReader.GetString(0), dbDataReader.GetString(1)));
+            countryLookups.Add(
+                new CountryLookup()
+                {
+                    Iso2 = dbDataReader.GetString(0),
+                    Name = dbDataReader.GetString(1)
+                }
+            );
         }
 
         return countryLookups;

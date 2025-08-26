@@ -11,7 +11,9 @@
         <ProjectReference Include="..\CountryService.DataAccess.SqlServer\CountryService.DataAccess.SqlServer.csproj" />
         <ProjectReference Include="..\CountryService.DataAccess\CountryService.DataAccess.csproj" />
         <ProjectReference Include="..\CountryService.Shared\CountryService.Shared.csproj" />
+        <ProjectReference Include="..\CountryService.Dtos\CountryService.Dtos.csproj" />
         <ProjectReference Include="..\CountryService.Models\CountryService.Models.csproj" />
+        <ProjectReference Include="..\CountryService.Mappers\CountryService.Mappers.csproj" />
     </ItemGroup>
 
     <ItemGroup>

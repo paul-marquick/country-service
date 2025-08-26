@@ -1,4 +1,4 @@
-﻿namespace CountryService.Models.Country;
+﻿namespace CountryService.Dtos.Country;
 
 public record CountryLookup
 {
