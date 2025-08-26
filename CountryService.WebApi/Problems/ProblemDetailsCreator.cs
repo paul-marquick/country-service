@@ -6,14 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.Problems;
 
-/// <summary>
-/// Provides functionality to create <see cref="ProblemDetails"/> instances for HTTP responses.
-/// </summary>
-/// <remarks>This class is designed to generate <see cref="ProblemDetails"/> objects that conform to the RFC 7807
-/// specification for problem details in HTTP APIs. It includes additional metadata,  such as request identifiers and
-/// correlation IDs, to aid in debugging and tracing.</remarks>
-/// <param name="logger"></param>
-public class ProblemDetailsCreator(ILogger<ProblemDetailsCreator> logger)
+public class ProblemDetailsCreator(ILogger<ProblemDetailsCreator> logger) : IProblemDetailsCreator
 {
     public ProblemDetails CreateProblemDetails(
         HttpContext httpContext,

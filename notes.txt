@@ -1,9 +1,13 @@
 web service needs
+    query with paging, sorting, and filtering etc. - Done but needs UI.
 
+blazor
 
-    query with paging, sorting, and filtering etc.
+    country edit, add pages finished with problem details shown / used.
 
-     
+    use bootstrap template from ang app. 
+
+    
 
 angular needs
 

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.ListQuery;
 
-public class QueryValidator(ILogger<QueryValidator> logger, ComparisonOperatorDbType comparisonOperatorDbType)
+public class QueryValidator(ILogger<QueryValidator> logger, IComparisonOperatorDbType comparisonOperatorDbType) : IQueryValidator
 {
     public void Validate(
         ModelStateDictionary modelState,

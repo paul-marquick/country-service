@@ -32,6 +32,8 @@ else if (ErrorContent is not null)
             ", IsStaging: " + webAssemblyHostEnvironment.IsStaging() + 
             ", ClientProperties: " + await getClientPropertiesAsync() + 
             ". ";
+
+        Logger.LogDebug(details + ex.Message);
         
         await logHttpClient.PostLogAsync(
             new Log 

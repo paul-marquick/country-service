@@ -81,14 +81,14 @@ internal class Program
         builder.Services.AddOpenApi();
 
         // Add code dependencies.
-        builder.Services.AddSingleton<ProblemDetailsCreator>();
-        builder.Services.AddSingleton<QueryValidator>();
-        builder.Services.AddSingleton<QueryReader>();
-        builder.Services.AddSingleton<ComparisonOperatorConverter>();
-        builder.Services.AddSingleton<ComparisonOperatorDbType>();
-        builder.Services.AddSingleton<SortDirectionConverter>();
-        builder.Services.AddSingleton<SqlCreator>();
-        builder.Services.AddSingleton<CountryMapper>();
+        builder.Services.AddSingleton<IProblemDetailsCreator, ProblemDetailsCreator>();
+        builder.Services.AddSingleton<IQueryValidator, QueryValidator>();
+        builder.Services.AddSingleton<IQueryReader, QueryReader>();
+        builder.Services.AddSingleton<IComparisonOperatorConverter, ComparisonOperatorConverter>();
+        builder.Services.AddSingleton<IComparisonOperatorDbType, ComparisonOperatorDbType>();
+        builder.Services.AddSingleton<ISortDirectionConverter, SortDirectionConverter>();
+        builder.Services.AddSingleton<ICountryMapper, CountryMapper>();
+        builder.Services.AddSingleton<ICountryLookupMapper, CountryLookupMapper>();
 
         // Data access.
         // Can simply switch between different database systems by editing the appsettings.json file.
@@ -99,6 +99,7 @@ internal class Program
                 Console.WriteLine("Using SQL Server database system.");
                 builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.SqlServer.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
                 builder.Services.AddSingleton<ICountryDataAccess, DataAccess.SqlServer.CountryDataAccess>();
+                builder.Services.AddSingleton<ISqlCreator, SqlCreator>();
                 break;
 
             case DatabaseSystem.PostgreSql:
@@ -148,7 +149,7 @@ internal class Program
             {
                 return new ModelStateToValidationProblemDetails(
                     context.HttpContext.RequestServices.GetRequiredService<ILogger<ModelStateToValidationProblemDetails>>(), 
-                    context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsCreator>());
+                    context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsCreator>());
             };
         }).AddNewtonsoftJson();
 

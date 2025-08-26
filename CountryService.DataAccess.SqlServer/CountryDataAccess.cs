@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace CountryService.DataAccess.SqlServer;
 
-public class CountryDataAccess(ILogger<CountryDataAccess> logger, SqlCreator sqlCreator) : ICountryDataAccess
+public class CountryDataAccess(ILogger<CountryDataAccess> logger, ISqlCreator sqlCreator) : ICountryDataAccess
 {
     private const string selectColumns = "\"Iso2\", \"Iso3\", \"IsoNumber\", \"Name\", \"CallingCode\"";
     

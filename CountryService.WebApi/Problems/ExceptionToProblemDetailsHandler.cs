@@ -15,7 +15,7 @@ namespace CountryService.WebApi.Problems;
 public class ExceptionToProblemDetailsHandler(
     ILogger<ExceptionToProblemDetailsHandler> logger,
     IProblemDetailsService problemDetailsService, 
-    ProblemDetailsCreator problemDetailsCreator) : Microsoft.AspNetCore.Diagnostics.IExceptionHandler
+    IProblemDetailsCreator problemDetailsCreator) : Microsoft.AspNetCore.Diagnostics.IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {

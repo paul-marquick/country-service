@@ -28,9 +28,9 @@ public class CountryController(
     ICountryDataAccess countryDataAccess,
     ICountryMapper countryMapper,
     ICountryLookupMapper countryLookupMapper,
-    ProblemDetailsCreator problemDetailsCreator,
-    QueryValidator queryValidator,
-    QueryReader queryReader) : ControllerBase
+    IProblemDetailsCreator problemDetailsCreator,
+    IQueryValidator queryValidator,
+    IQueryReader queryReader) : ControllerBase
 {
     [HttpOptions]
     public void Options()

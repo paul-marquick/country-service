@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.DataAccess.ListQuery;
 
-public class SortDirectionConverter(ILogger<SortDirectionConverter> logger)
+public class SortDirectionConverter(ILogger<SortDirectionConverter> logger) : ISortDirectionConverter
 {
     public string GetSortDirectionSql(string sortDirection)
     {

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.ListQuery;
 
-public class QueryReader(ILogger<QueryReader> logger)
+public class QueryReader(ILogger<QueryReader> logger) : IQueryReader
 {
     public void GetFilters(Query query, string[]? filters)
     {

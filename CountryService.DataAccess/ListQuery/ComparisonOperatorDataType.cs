@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.DataAccess.ListQuery;
 
-public class ComparisonOperatorDbType(ILogger<ComparisonOperatorDbType> logger)
+public class ComparisonOperatorDbType(ILogger<ComparisonOperatorDbType> logger) : IComparisonOperatorDbType
 {
     public bool IsComparisonOperatorForDataType(string comparisonOperator, DataType dataType)
     {

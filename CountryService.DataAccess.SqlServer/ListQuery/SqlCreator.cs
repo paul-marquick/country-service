@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.Common;
 using CountryService.DataAccess.ListQuery;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -7,8 +8,8 @@ namespace CountryService.DataAccess.SqlServer.ListQuery;
 
 public class SqlCreator(
     ILogger<SqlCreator> logger,
-    ComparisonOperatorConverter comparisonOperatorConverter,
-    SortDirectionConverter sortDirectionConverter)
+    IComparisonOperatorConverter comparisonOperatorConverter,
+    ISortDirectionConverter sortDirectionConverter) : ISqlCreator
 {
     public string CreateQueryWhereClauseSql(List<Filter>? filters)
     {
@@ -49,7 +50,7 @@ public class SqlCreator(
         }
     }
 
-    public void AddQueryWhereClauseParameters(SqlCommand dbCommand, List<Filter>? filters)
+    public void AddQueryWhereClauseParameters(DbCommand dbCommand, List<Filter>? filters)
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {
@@ -67,9 +68,11 @@ public class SqlCreator(
 
         if (filters != null)
         {
+            SqlCommand sqlCommand = (SqlCommand)dbCommand;
+
             foreach (Filter filter in filters)
             {
-                dbCommand.Parameters.AddWithValue(filter.PropertyName, filter.Value);
+                sqlCommand.Parameters.AddWithValue(filter.PropertyName, filter.Value);
             }
         }
     }

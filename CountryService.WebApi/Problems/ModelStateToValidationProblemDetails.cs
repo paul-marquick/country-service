@@ -13,7 +13,7 @@ namespace CountryService.WebApi.Problems;
 /// </summary>
 public class ModelStateToValidationProblemDetails(
     ILogger<ModelStateToValidationProblemDetails> logger,
-    ProblemDetailsCreator problemDetailsCreator) : ActionResult
+    IProblemDetailsCreator problemDetailsCreator) : ActionResult
 {
     public override Task ExecuteResultAsync(ActionContext context)
     {

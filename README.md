@@ -19,7 +19,7 @@ Web Api
 
 Dtos
 - Shared project between Web Api and Blazor app.
-- Data shape can be independent of the db models.
+- Data 'shape' is independent of the db models.
 
 Blazor web app
 - Bootstrap css.

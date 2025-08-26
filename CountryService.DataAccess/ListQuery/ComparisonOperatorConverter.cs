@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.DataAccess.ListQuery;
 
-public class ComparisonOperatorConverter(ILogger<ComparisonOperatorConverter> logger)
+public class ComparisonOperatorConverter(ILogger<ComparisonOperatorConverter> logger) : IComparisonOperatorConverter
 {
     public string GetComparisonOperatorSql(string comparisonOperator)
     {
