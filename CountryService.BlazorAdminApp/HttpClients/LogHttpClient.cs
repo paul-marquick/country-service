@@ -1,19 +1,18 @@
-﻿using CountryService.BlazorAdminApp.Models;
-using System;
-using System.Collections.Generic;
+﻿using CountryService.Dtos.Log;
+using CountryService.Shared;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace CountryService.BlazorAdminApp.HttpClients;
 
 public class LogHttpClient(HttpClient httpClient) : ILogHttpClient
 {
-    private const string path = "log";
-
-    public async Task PostLogAsync(LogEntry logEntry)
+    public async Task PostLogAsync(Log log)
     {
-       var response = await httpClient.PostAsJsonAsync($"{path}", logEntry);
-       //  response.EnsureSuccessStatusCode();
-    }
+        using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Paths.WebApi.Log.BasePath);
+        request.AddJsonData(log);
+
+        using HttpResponseMessage response = await httpClient.SendAsync(request);
+        await response.CheckStatusAsync();
+    }    
 }

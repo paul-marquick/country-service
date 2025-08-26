@@ -1,7 +1,7 @@
 ﻿@page "/country/edit/{iso2}"
 
 @using CountryService.BlazorAdminApp.HttpClients
-@using CountryService.BlazorAdminApp.Models
+@using CountryService.Dtos.Country    
 @using System.Threading
 
 @inject ICountryHttpClient countryHttpClient
@@ -10,7 +10,7 @@
 
 <h1>Edit Country</h1>
 
-@if (modeDataLoaded)
+@if (modelDataLoaded)
 {
     <EditForm Model="@country" OnValidSubmit="@SaveCountry">
 
@@ -67,7 +67,7 @@ else
 
 @code {
     private Country country;
-    private bool modeDataLoaded = false;
+    private bool modelDataLoaded = false;
 
     [Parameter]
     public string iso2 { get; set; }
@@ -82,7 +82,7 @@ else
 
         Console.WriteLine(country);
 
-        modeDataLoaded = true;
+        modelDataLoaded = true;
 
         StateHasChanged();
     }

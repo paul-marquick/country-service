@@ -28,6 +28,11 @@ public class Program
             client.BaseAddress = new Uri("http://localhost:5581");
         });
 
+        builder.Services.AddHttpClient<IServiceInfoHttpClient, ServiceInfoHttpClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://localhost:5581");
+        });
+
         await builder.Build().RunAsync();
     }
 }

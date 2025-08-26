@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CountryService.Shared\CountryService.Shared.csproj" />
+    <ProjectReference Include="..\CountryService.Dtos\CountryService.Dtos.csproj" />
   </ItemGroup>
 
   <ItemGroup>

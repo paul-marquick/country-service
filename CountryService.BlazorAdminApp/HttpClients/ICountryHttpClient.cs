@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CountryService.BlazorAdminApp.Models;
+using CountryService.Dtos.Country;
 
 namespace CountryService.BlazorAdminApp.HttpClients;
 
@@ -8,7 +8,8 @@ public interface ICountryHttpClient
 {
     Task<List<Country>> GetCountriesAsync();
     Task<Country> GetCountryByIso2Async(string iso2);
-//    Task<Country> PostCountryAsync(Country country);
-//    Task PutCountryByIso2Async(string iso2, Country country);
- //   Task DeleteCountryByIso2Async(string iso2);
+    Task<Country> PostCountryAsync(Country country);
+    Task PutCountryByIso2Async(string iso2, Country country);
+    Task DeleteCountryByIso2Async(string iso2);
+    Task<List<CountryLookup>> GetCountryLookupsAsync();
 }

@@ -120,7 +120,7 @@ internal class Program
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(name: allowAdminApp,
-                policy  =>
+                policy =>
                 {
                     policy.AllowAnyOrigin() // WithOrigins("http://localhost:4200")
                         .AllowAnyMethod()

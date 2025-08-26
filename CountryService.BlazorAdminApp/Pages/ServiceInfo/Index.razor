@@ -1,0 +1,64 @@
+﻿@page "/service-info"
+
+@using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.Dtos.ServiceInfo  
+
+@inject IServiceInfoHttpClient serviceInfoHttpClient
+
+<PageTitle>Service Info</PageTitle>
+
+<h1>Service Info</h1>
+
+@if (modelDataLoaded)
+{
+    <dl class="row">
+        <dt class="col-sm-3">Database System</dt>
+        <dd class="col-sm-9">@serviceInfo.DatabaseSystem</dd> 
+        <dt class="col-sm-3">Service Name</dt>
+        <dd class="col-sm-9">@serviceInfo.ServiceName</dd>    
+        <dt class="col-sm-3">Version</dt>   
+        <dd class="col-sm-9">@serviceInfo.Version</dd>    
+        <dt class="col-sm-3">Environment</dt>   
+        <dd class="col-sm-9">@serviceInfo.Environment</dd>    
+        <dt class="col-sm-3">Machine Name</dt>   
+        <dd class="col-sm-9">@serviceInfo.MachineName</dd>    
+        <dt class="col-sm-3">Operating System Version</dt>   
+        <dd class="col-sm-9">@serviceInfo.OSVersion</dd>   
+        <dt class="col-sm-3">Is Debug Log Level Enabled</dt>   
+        <dd class="col-sm-9">@serviceInfo.IsDebugLogLevelEnabled</dd>   
+        <dt class="col-sm-3">ProcessId</dt>   
+        <dd class="col-sm-9">@serviceInfo.ProcessId</dd>   
+        <dt class="col-sm-3">Uptime</dt>   
+        <dd class="col-sm-9">@serviceInfo.Uptime</dd> 
+    </dl>
+}
+else
+{
+    <p>Loading data...</p>
+}
+
+@code {
+    private ServiceInfo serviceInfo;
+    private bool modelDataLoaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        serviceInfo = await serviceInfoHttpClient.GetServiceInfoAsync();
+
+        Console.WriteLine(serviceInfo);
+
+        modelDataLoaded = true;
+
+        StateHasChanged();
+    }
+
+    // private void ShowLoading()
+    // {
+    //     loading = true;
+    // }
+
+    // private void HideLoading()
+    // {
+    //     loading = false;
+    // }
+}

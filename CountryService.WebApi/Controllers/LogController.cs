@@ -1,11 +1,11 @@
 ﻿using System.Net.Http;
-using CountryService.Dtos.Log;
+using CountryService.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.Controllers;
 
-[Route("log")]
+[Route(Paths.WebApi.Log.BasePath)]
 [ApiController]
 public class LogController(ILogger<ServiceInfoController> logger) : ControllerBase
 {
@@ -17,7 +17,7 @@ public class LogController(ILogger<ServiceInfoController> logger) : ControllerBa
     }
 
     [HttpPost]
-    public ActionResult PostLogEntry([FromBody] Log log)
+    public ActionResult PostLogEntry([FromBody] Dtos.Log.Log log)
     {
         logger.LogDebug($"PostLogEntryAsync");
 

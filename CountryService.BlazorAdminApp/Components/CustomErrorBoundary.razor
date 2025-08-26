@@ -1,4 +1,5 @@
 @using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.Dtos.Log
 @using Microsoft.AspNetCore.Components.WebAssembly.Hosting
 @using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
@@ -33,7 +34,7 @@ else if (ErrorContent is not null)
             ". ";
         
         await logHttpClient.PostLogAsync(
-            new Models.LogEntry 
+            new Log 
             { 
                 Message = "Blazor admin app error. " + details + ex.Message 
             }

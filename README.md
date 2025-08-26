@@ -6,7 +6,7 @@ Data access projects
 - Dynamic SQL for patch so that only 'dirty' columns are updated.
 - Unit tests for data access projects.    
 
-.Web Api
+Web Api
 - Problem details (with added context), for general exceptions, validation failures and returned error object results such as BadRequest(...).
 - Serilog with added request context, e.g. correlation id.
 - IOptions to use configuration from the appsettings file in code. 
@@ -17,12 +17,13 @@ Data access projects
 - OpenApi at /scalar endpoint. 
 - Method handlers for Options, Head, Get, Post, Put, Patch and Delete HTTP methods.
 
+Dtos
+- Shared project between Web Api and Blazor app.
+- Data shape can be independent of the db models.
+
 Blazor web app
 - Bootstrap css.
 - Basic crud operations.
 - Errors are sent to the server to be logged.
 
-
 Razor pages website
-- Bootstrap css.
-- Some UI components

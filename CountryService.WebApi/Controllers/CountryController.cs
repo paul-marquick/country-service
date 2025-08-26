@@ -20,7 +20,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Controllers;
 
-[Route("[controller]")]
+[Route(Paths.WebApi.Country.BasePath)]
 [ApiController]
 public class CountryController(
     ILogger<CountryController> logger,
@@ -118,8 +118,8 @@ public class CountryController(
         }
     }
 
-    [HttpHead("lookup")]
-    [HttpGet("lookup")]
+    [HttpHead(Paths.WebApi.Country.Lookup)]
+    [HttpGet(Paths.WebApi.Country.Lookup)]
     public async Task<ActionResult<List<Dtos.Country.CountryLookup>>> GetCountryLookupsAsync()
     {
         string method = HttpContext.Request.Method;
@@ -502,8 +502,8 @@ public class CountryController(
     }
 
     [HttpGet]
-    [Route("does-country-name-exist/{name}/{iso2}")]
-    [Route("does-country-name-exist/{name}")]
+    [Route(Paths.WebApi.Country.DoesCountryNameExist + "/{name}/{iso2}")]
+    [Route(Paths.WebApi.Country.DoesCountryNameExist + "/{name}")]
     public async Task<ActionResult<bool>> DoesCountryNameExistAsync(string name, string? iso2)
     {
         logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");

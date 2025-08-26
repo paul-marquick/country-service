@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using CountryService.Shared;
 using CountryService.WebApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace CountryService.WebApi.Controllers;
 
-[Route("service-info")]
+[Route(Paths.WebApi.ServiceInfo.BasePath)]
 [ApiController]
 public class ServiceInfoController(
     ILogger<ServiceInfoController> logger,
@@ -23,13 +24,13 @@ public class ServiceInfoController(
 
     [HttpHead]
     [HttpGet]
-    public ActionResult<Config> Get()
+    public ActionResult<Dtos.ServiceInfo.ServiceInfo> Get()
     {
         string method = HttpContext.Request.Method;
 
         logger.LogDebug($"Get, method: {method}");
 
-        var sysInfo = new
+        Dtos.ServiceInfo.ServiceInfo serviceInfo = new()
         {
             DatabaseSystem = optionsMonitorConfig.CurrentValue.DatabaseSystem,
             ServiceName = "CountryService",
@@ -38,8 +39,6 @@ public class ServiceInfoController(
             MachineName = Environment.MachineName,
             OSVersion = Environment.OSVersion.ToString(),
             IsDebugLogLevelEnabled = logger.IsEnabled(LogLevel.Debug),
-            FrameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
-            RuntimeIdentifier = System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier,
             ProcessId = Environment.ProcessId,
             Uptime = DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime()
         };
@@ -47,13 +46,13 @@ public class ServiceInfoController(
         if (method == HttpMethod.Head.Method)
         {
             Response.Headers.ContentType = Application.Json;
-            Response.Headers.ContentLength = sysInfo.ToString()!.Length;
+            Response.Headers.ContentLength = serviceInfo.ToString()!.Length;
 
             return new EmptyResult();
         }
         else
         {
-            return Ok(sysInfo);
+            return Ok(serviceInfo);
         }
     }
 }
