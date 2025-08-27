@@ -37,10 +37,10 @@ public class CountryMapper(ILogger<CountryMapper> logger) : ICountryMapper
     {
         logger.LogDebug("CountryMapper.UpdateModelWithDto.");
 
-        country.Iso2 = countryDto.Iso2;
-        country.Iso3 = countryDto.Iso3;
-        country.IsoNumber = countryDto.IsoNumber;
-        country.Name = countryDto.Name;
+        country.Iso2 = countryDto.Iso2!;
+        country.Iso3 = countryDto.Iso3!;
+        country.IsoNumber = countryDto.IsoNumber!.Value;
+        country.Name = countryDto.Name!;
         country.CallingCode = countryDto.CallingCode;
     }
 }

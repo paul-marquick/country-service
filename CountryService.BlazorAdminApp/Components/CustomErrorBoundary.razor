@@ -33,8 +33,11 @@ else if (ErrorContent is not null)
             ", ClientProperties: " + await getClientPropertiesAsync() + 
             ". ";
 
-        Logger.LogDebug(details + ex.Message);
-        
+        if (webAssemblyHostEnvironment.IsDevelopment())
+        {
+            Logger.LogError(details + ex.Message);
+        }
+
         await logHttpClient.PostLogAsync(
             new Log 
             { 

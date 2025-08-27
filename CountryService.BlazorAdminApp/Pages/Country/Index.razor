@@ -11,10 +11,10 @@
 
 <h1>Countries</h1>
 
-<button class="btn btn-primary" @onclick="AddCountry">
+<a class="btn btn-primary" href="/country/add">
     <i class="bi bi-plus"></i>
     Add Country
-</button>
+</a>
 
 @* <Loading Visible="@loading">
 
@@ -91,11 +91,6 @@
         StateHasChanged();
 
         hasData = true;
-    }
-
-    private void AddCountry()
-    {
-        
     }
 
     private void ShowLoading()

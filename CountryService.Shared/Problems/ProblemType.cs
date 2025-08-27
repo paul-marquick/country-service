@@ -1,4 +1,4 @@
-﻿namespace CountryService.WebApi.Problems;
+﻿namespace CountryService.Shared.Problems;
 
 /// <summary>
 /// The "type" member is a JSON string containing a URI reference that identifies the problem type

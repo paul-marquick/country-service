@@ -29,7 +29,7 @@ public class ExceptionToProblemDetailsHandler(
         ProblemDetails problemDetails = problemDetailsCreator.CreateProblemDetails(
             httpContext,
             StatusCodes.Status500InternalServerError,
-            ProblemType.InternalServerError,
+            Shared.Problems.ProblemType.InternalServerError,
             ProblemTitle.InternalServerError,
             "An error has occurred. The Administrator has been notified.");
         

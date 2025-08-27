@@ -48,7 +48,7 @@ public class ProblemDetailsCreator(ILogger<ProblemDetailsCreator> logger) : IPro
 
         return new(modelState)
         {
-            Type = ProblemType.FailedValidation,
+            Type = Shared.Problems.ProblemType.FailedValidation,
             Title = ProblemTitle.FailedValidation,
             Detail = "Invalid input.",
             Status = StatusCodes.Status400BadRequest,

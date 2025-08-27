@@ -198,7 +198,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status404NotFound,
-                            ProblemType.CountryNotFound,
+                            Shared.Problems.ProblemType.CountryNotFound,
                             ProblemTitle.CountryNotFound,
                             $"Country with iso2: '{iso2}' not found."));
                 }
@@ -217,10 +217,10 @@ public class CountryController(
 
         Country country = new()
         {
-            Iso2 = countryDto.Iso2,
-            Iso3 = countryDto.Iso3,
-            IsoNumber = countryDto.IsoNumber,
-            Name = countryDto.Name,
+            Iso2 = countryDto.Iso2!,
+            Iso3 = countryDto.Iso3!,
+            IsoNumber = countryDto.IsoNumber!.Value,
+            Name = countryDto.Name!,
             CallingCode = countryDto.CallingCode
         };
 
@@ -254,7 +254,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryIso2Duplicated,
+                            Shared.Problems.ProblemType.CountryIso2Duplicated,
                             ProblemTitle.CountryIso2Duplicated,
                             $"Country has iso2: '{country.Iso2}' duplicated."));
 
@@ -263,7 +263,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryIso3Duplicated,
+                            Shared.Problems.ProblemType.CountryIso3Duplicated,
                             ProblemTitle.CountryIso3Duplicated,
                             $"Country has iso3: '{country.Iso3}' duplicated."));
 
@@ -272,7 +272,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryIsoNumberDuplicated,
+                            Shared.Problems.ProblemType.CountryIsoNumberDuplicated,
                             ProblemTitle.CountryIsoNumberDuplicated,
                             $"Country has isoNumber: '{country.IsoNumber}' duplicated."));
 
@@ -281,7 +281,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryNameDuplicated,
+                            Shared.Problems.ProblemType.CountryNameDuplicated,
                             ProblemTitle.CountryNameDuplicated,
                             $"Country has name: '{country.Name}' duplicated."));
 
@@ -325,7 +325,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status404NotFound,
-                            ProblemType.CountryNotFound,
+                            Shared.Problems.ProblemType.CountryNotFound,
                             ProblemTitle.CountryNotFound,
                             $"Country with iso2: '{iso2}' not found."));
 
@@ -334,7 +334,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryIso2Duplicated,
+                            Shared.Problems.ProblemType.CountryIso2Duplicated,
                             ProblemTitle.CountryIso2Duplicated,
                             $"Country has iso2: '{countryDto.Iso2}' duplicated."));
 
@@ -343,7 +343,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryIso3Duplicated,
+                            Shared.Problems.ProblemType.CountryIso3Duplicated,
                             ProblemTitle.CountryIso3Duplicated,
                             $"Country has iso3: '{countryDto.Iso3}' duplicated."));
 
@@ -352,7 +352,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryIsoNumberDuplicated,
+                            Shared.Problems.ProblemType.CountryIsoNumberDuplicated,
                             ProblemTitle.CountryIsoNumberDuplicated,
                             $"Country has isoNumber: '{countryDto.IsoNumber}' duplicated."));
 
@@ -361,7 +361,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status400BadRequest,
-                            ProblemType.CountryNameDuplicated,
+                            Shared.Problems.ProblemType.CountryNameDuplicated,
                             ProblemTitle.CountryNameDuplicated,
                             $"Country has name: '{countryDto.Name}' duplicated."));
 
@@ -383,7 +383,7 @@ public class CountryController(
                 problemDetailsCreator.CreateProblemDetails(
                     HttpContext,
                     StatusCodes.Status400BadRequest,
-                    ProblemType.UnsupportedPatchOperation,
+                    Shared.Problems.ProblemType.UnsupportedPatchOperation,
                     ProblemTitle.UnsupportedPatchOperation,
                     $"Unsupported patch operation, currently only replace is supported."));
         }
@@ -433,7 +433,7 @@ public class CountryController(
                             problemDetailsCreator.CreateProblemDetails(
                                 HttpContext,
                                 StatusCodes.Status400BadRequest,
-                                ProblemType.CountryIso2Duplicated,
+                                Shared.Problems.ProblemType.CountryIso2Duplicated,
                                 ProblemTitle.CountryIso2Duplicated,
                                 $"Country has iso2: '{country.Iso2}' duplicated."));
 
@@ -442,7 +442,7 @@ public class CountryController(
                             problemDetailsCreator.CreateProblemDetails(
                                 HttpContext,
                                 StatusCodes.Status400BadRequest,
-                                ProblemType.CountryIso3Duplicated,
+                                Shared.Problems.ProblemType.CountryIso3Duplicated,
                                 ProblemTitle.CountryIso3Duplicated,
                                 $"Country has iso3: '{country.Iso3}' duplicated."));
 
@@ -451,7 +451,7 @@ public class CountryController(
                             problemDetailsCreator.CreateProblemDetails(
                                 HttpContext,
                                 StatusCodes.Status400BadRequest,
-                                ProblemType.CountryIsoNumberDuplicated,
+                                Shared.Problems.ProblemType.CountryIsoNumberDuplicated,
                                 ProblemTitle.CountryIsoNumberDuplicated,
                                 $"Country has isoNumber: '{country.IsoNumber}' duplicated."));
 
@@ -460,7 +460,7 @@ public class CountryController(
                             problemDetailsCreator.CreateProblemDetails(
                                 HttpContext,
                                 StatusCodes.Status400BadRequest,
-                                ProblemType.CountryNameDuplicated,
+                                Shared.Problems.ProblemType.CountryNameDuplicated,
                                 ProblemTitle.CountryNameDuplicated,
                                 $"Country has name: '{country.Name}' duplicated."));
 
@@ -478,7 +478,7 @@ public class CountryController(
                         problemDetailsCreator.CreateProblemDetails(
                             HttpContext,
                             StatusCodes.Status404NotFound,
-                            ProblemType.CountryNotFound,
+                            Shared.Problems.ProblemType.CountryNotFound,
                             ProblemTitle.CountryNotFound,
                             $"Country with iso2: '{iso2}' not found."));
 

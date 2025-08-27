@@ -1,7 +1,6 @@
 web service needs
 
-    query with paging, sorting, and filtering etc. - Done but needs UI.
-
+    query with paging, sorting, and filtering etc. - Done but needs UI (blazor).
 
     user secrets / azure secrets.
 
@@ -9,16 +8,16 @@ web service needs
 
     data import for all real countries.
 
+    unit testing needs tidying up.
+
+    config needs URLs. 
 
 
 blazor
 
     country edit, add pages finished with problem details shown / used.
     
-    grid needs responsive / small screen version.
-
-    use bootstrap template from ang app. 
-
     csrf
 
 
+    grid needs responsive / small screen version.

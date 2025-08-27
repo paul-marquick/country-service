@@ -1,0 +1,162 @@
+﻿@page "/country/add"
+
+@using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.Dtos.Country    
+@using System.Threading
+@using Microsoft.Extensions.Logging
+@implements IDisposable
+@inject ICountryHttpClient countryHttpClient
+@inject ILogger<Add> logger
+@inject NavigationManager navigationManager
+
+<PageTitle>Add Country</PageTitle>
+
+<h1>Add Country</h1>
+
+<EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit" FormName="AddCountry">
+
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="@Model.Iso2" class="form-label">@Resource.Iso2</label>
+        <InputText class="form-control" @bind-Value="@Model.Iso2" />
+        <ValidationMessage For="() => Model!.Iso2" />
+    </div>
+
+    <div class="mb-3">
+        <label for="@Model.Iso3" class="form-label">@Resource.Iso3</label>
+        <InputText class="form-control" @bind-Value="@Model.Iso3" />
+        <ValidationMessage For="() => Model!.Iso3" />
+    </div>
+
+    <div class="mb-3">
+        <label for="@Model.IsoNumber" class="form-label">@Resource.IsoNumber</label>
+        <InputNumber class="form-control" @bind-Value="@Model.IsoNumber" />
+        <ValidationMessage For="() => Model!.IsoNumber" />
+    </div>
+
+    <div class="mb-3">
+        <label for="@Model.Name" class="form-label">@Resource.Name</label>
+        <InputText class="form-control" @bind-Value="@Model.Name" />
+        <ValidationMessage For="() => Model!.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label for="@Model.CallingCode" class="form-label">@Resource.CallingCode</label>
+        <InputText class="form-control" @bind-Value="@Model.CallingCode" />
+    </div>
+
+    <div class="btn-group">
+
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-floppy"></i>
+            Save
+        </button>
+
+        <a class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
+
+    </div>
+
+</EditForm>
+
+<div>@outputMessage</div>
+
+@code {
+    private EditContext editContext = default!;
+    private Country Model = new(); 
+    private ValidationMessageStore validationMessageStore = default!;
+    private string outputMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        editContext = new(Model);
+    //    editContext.OnValidationRequested += HandleValidationRequested;
+        validationMessageStore = new(editContext);
+    }
+
+    @* private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        validationMessageStore.Clear();
+
+        // Custom validation logic
+        if (Model!.Iso2 == "ab")
+        {
+            validationMessageStore?.Add(() => Model.Iso2, "Select at least one.");
+        }
+    } *@
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await countryHttpClient.PostCountryAsync(Model);
+
+            outputMessage = "Saved";
+            StateHasChanged();            
+
+            await Task.Delay(1500);
+
+            navigationManager.NavigateTo("country");
+        }
+        catch (ValidationProblemDetailsException validationProblemDetailsException)
+        {
+            Console.WriteLine(validationProblemDetailsException.ValidationProblemDetails);
+
+            if (validationProblemDetailsException.ValidationProblemDetails.Type == Shared.Problems.ProblemType.FailedValidation)
+            {
+                if (validationProblemDetailsException.ValidationProblemDetails.Errors != null && 
+                    validationProblemDetailsException.ValidationProblemDetails.Errors.Count > 0)
+                {
+                    foreach (KeyValuePair<string, string[]> error in validationProblemDetailsException.ValidationProblemDetails.Errors)
+                    {
+                        foreach (string message in error.Value)
+                        {
+                            validationMessageStore.Add(() => error.Key, message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                outputMessage = validationProblemDetailsException.ValidationProblemDetails.Title;
+            }
+        }
+    }
+
+    @* private async Task<bool> Validate()
+    {
+        // run the standard Validation
+        var valid = editContext.Validate();
+
+        // clear our custom store
+        validationMessageStore.Clear();
+        
+        // Fake a database async call to check if the user exists
+        await Task.Delay(100);
+
+        //Just for Testing trip validation
+        if (true)
+        {
+            // log message to store and notify the edit context
+
+            validationMessageStore.Add(() => Model.Iso2!, "Not Complex Enough");
+
+            editContext.NotifyValidationStateChanged();
+
+            valid = false;
+        }
+
+        return valid;
+    } *@
+
+    public void Dispose()
+    {
+        @* if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        } *@
+    }
+}

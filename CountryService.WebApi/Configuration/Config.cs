@@ -2,5 +2,5 @@
 
 public record Config
 {
-    public string DatabaseSystem { get; set; }
+    public required string DatabaseSystem { get; set; }
 }
