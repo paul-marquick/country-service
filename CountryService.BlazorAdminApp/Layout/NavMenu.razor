@@ -1,41 +1,63 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Country Service</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+
+        <a href="" class="navbar-brand">
+            <i class="bi bi-globe-europe-africa"></i>
+            Country Service
+        </a>
+
+        <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
-    </div>
-</div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <a class="nav-link" href="">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </a>
+        <div class="@NavMenuCssClass">
+
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+
+                <li class="nav-item"> 
+                    <a href="" class="nav-link">
+                        <i class="bi bi-house"></i>
+                        Home
+                    </a> 
+                </li>
+
+                <li class="nav-item"> 
+                    <a href="country" class="nav-link">
+                        <i class="bi bi-geo-alt"></i>
+                        Countries
+                    </a> 
+                </li>
+
+                <li class="nav-item"> 
+                    <a href="service-info" class="nav-link">
+                        <i class="bi bi-info"></i>
+                        Service Info
+                    </a> 
+                </li>
+
+            </ul>
+
+            <ul class="navbar-nav ml-auto mb-2 mb-md-0">
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="https://github.com/paul-marquick/country-service" target="_blank">
+                        <i class="bi bi-github" title="GitHub"></i>
+                    </a>
+                </li>
+
+            </ul>
+
         </div>
-        <div class="nav-item px-3">
-            <a class="nav-link" href="country">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Countries
-            </a>
-        </div>
-        <div class="nav-item px-3">
-            <a class="nav-link" href="service-info">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Service Info
-            </a>
-        </div>
-        <div class="nav-item px-3">
-            <a class="nav-link" href="counter">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Counter
-            </a>
-        </div>
-    </nav>
-</div>
+
+    </div>
+
+</nav>
 
 @code {
     private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    string baseMenuClass = "navbar-collapse collapse";
+    private string NavMenuCssClass => baseMenuClass + (collapseNavMenu ? "" : " show");
 
     private void ToggleNavMenu()
     {

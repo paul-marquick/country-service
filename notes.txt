@@ -1,26 +1,24 @@
 web service needs
+
     query with paging, sorting, and filtering etc. - Done but needs UI.
+
+
+    user secrets / azure secrets.
+
+    tidy up program class with extensions.
+
+    data import for all real countries.
+
+
 
 blazor
 
     country edit, add pages finished with problem details shown / used.
+    
+    grid needs responsive / small screen version.
 
     use bootstrap template from ang app. 
 
-    
+    csrf
 
-angular needs
 
-    display server errors after submit
-
-    get spinner working
-
-    add country component
-
-    delete country component
-
-    Create grid component with child row component.
-
-    csrf 
-
-Create a blazor app to match angular app.
