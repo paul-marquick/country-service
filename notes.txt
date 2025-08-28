@@ -1,23 +1,17 @@
 web service needs
 
-    query with paging, sorting, and filtering etc. - Done but needs UI (blazor).
-
     user secrets / azure secrets.
+    config needs URLs. 
+    data import for all real countries.
+    unit testing needs tidying up.
+
+    query with paging, sorting, and filtering etc. - Done but needs UI (blazor).
 
     tidy up program class with extensions.
 
-    data import for all real countries.
-
-    unit testing needs tidying up.
-
-    config needs URLs. 
-
 
 blazor
-
-    country edit, add pages finished with problem details shown / used.
     
     csrf
-
 
     grid needs responsive / small screen version.
