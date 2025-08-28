@@ -16,64 +16,10 @@
     Add Country
 </a>
 
-@* <Loading Visible="@loading">
-
-    <table class='table'>
-        <thead>
-            <tr>
-                <th>Iso2</th>
-                <th>Iso3</th>
-                <th>IsoNumber</th>
-                <th>Name</th>
-                <th>CallingCode</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @if (hasData)
-            {
-                foreach (Country country in countries!)
-                {
-                    <tr>
-                        <td>@country.Iso2</td>
-                        <td>@country.Iso3</td>
-                        <td>@country.IsoNumber</td>
-                        <td>@country.Name</td>
-                        <td>@country.CallingCode</td>
-                    </tr>
-                }
-            }
-            else
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                }
-            }
-            
-        </tbody>
-    </table>
-
-</Loading>
-
-<button class="btn btn-primary" @onclick="ShowLoading">Show loading</button>
-<button class="btn btn-primary" @onclick="HideLoading">Hide loading</button>
-
-<br /><br /> *@
-
-
 <DataGrid columns="columns" TRow="Country" rows="countries" keyColumnName="Iso2" showEditColumn="true" showDeleteColumn="true" />
 
 @code {
     private List<Country>? countries;
-    private bool loading = true;
-    private bool hasData = false;
     private List<Column> columns = new()
     {
         new Column { Name = "Iso2", HeaderText = "ISO 2" },
@@ -86,20 +32,6 @@
     {
         countries = await countryHttpClient.GetCountriesAsync();
 
-        Thread.Sleep(2000);
-
         StateHasChanged();
-
-        hasData = true;
-    }
-
-    private void ShowLoading()
-    {
-        loading = true;
-    }
-
-    private void HideLoading()
-    {
-        loading = false;
     }
 }
