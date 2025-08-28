@@ -3,6 +3,7 @@
 @using Microsoft.Extensions.Logging
 
 @inject ILogger<Home> logger
+@inject ToastService ToastService
 
 <PageTitle>Home</PageTitle>
 
@@ -13,6 +14,8 @@ Welcome to your new app.
 <br />
 
 <button type="button" onclick="@testLogging">test logging</button>
+
+<button type="button" onclick="@showSuccess">test toast</button>
 
 @code
 {
@@ -31,5 +34,10 @@ Welcome to your new app.
         logger.LogWarning("Warning log statement.");
         logger.LogError("Error log statement.");
         logger.LogCritical("Critical log statement.");
+    }
+
+    private void showSuccess()
+    {
+        ToastService.Notify(new(ToastType.Success, $"Employee details saved successfully."));
     }
 }

@@ -4,10 +4,10 @@
 @using CountryService.Dtos.Country    
 @using System.Threading
 @using Microsoft.Extensions.Logging
-@implements IDisposable
 @inject ICountryHttpClient countryHttpClient
 @inject ILogger<Add> logger
 @inject NavigationManager navigationManager
+@inject ToastService toastService
 
 <PageTitle>Add Country</PageTitle>
 
@@ -62,31 +62,16 @@
 
 </EditForm>
 
-<div>@outputMessage</div>
-
 @code {
     private EditContext editContext = default!;
     private Country Model = new(); 
     private ValidationMessageStore validationMessageStore = default!;
-    private string outputMessage = string.Empty;
 
     protected override void OnInitialized()
     {
         editContext = new(Model);
-    //    editContext.OnValidationRequested += HandleValidationRequested;
         validationMessageStore = new(editContext);
     }
-
-    @* private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
-    {
-        validationMessageStore.Clear();
-
-        // Custom validation logic
-        if (Model!.Iso2 == "ab")
-        {
-            validationMessageStore?.Add(() => Model.Iso2, "Select at least one.");
-        }
-    } *@
 
     private async Task HandleValidSubmit()
     {
@@ -94,17 +79,12 @@
         {
             await countryHttpClient.PostCountryAsync(Model);
 
-            outputMessage = "Saved";
-            StateHasChanged();            
-
-            await Task.Delay(1500);
+            toastService.Notify(new(ToastType.Success, "Country saved."));
 
             navigationManager.NavigateTo("country");
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            Console.WriteLine(validationProblemDetailsException.ValidationProblemDetails);
-
             if (validationProblemDetailsException.ValidationProblemDetails.Type == Shared.Problems.ProblemType.FailedValidation)
             {
                 if (validationProblemDetailsException.ValidationProblemDetails.Errors != null && 
@@ -120,43 +100,9 @@
                 }
             }
             else
-            {
-                outputMessage = validationProblemDetailsException.ValidationProblemDetails.Title;
+            {                
+                toastService.Notify(new(ToastType.Danger, validationProblemDetailsException.ValidationProblemDetails.Title));
             }
         }
-    }
-
-    @* private async Task<bool> Validate()
-    {
-        // run the standard Validation
-        var valid = editContext.Validate();
-
-        // clear our custom store
-        validationMessageStore.Clear();
-        
-        // Fake a database async call to check if the user exists
-        await Task.Delay(100);
-
-        //Just for Testing trip validation
-        if (true)
-        {
-            // log message to store and notify the edit context
-
-            validationMessageStore.Add(() => Model.Iso2!, "Not Complex Enough");
-
-            editContext.NotifyValidationStateChanged();
-
-            valid = false;
-        }
-
-        return valid;
-    } *@
-
-    public void Dispose()
-    {
-        @* if (editContext is not null)
-        {
-            editContext.OnValidationRequested -= HandleValidationRequested;
-        } *@
     }
 }

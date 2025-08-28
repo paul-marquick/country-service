@@ -29,6 +29,8 @@ public class Program
             client.BaseAddress = new Uri("http://localhost:5581");
         });
 
+        builder.Services.AddBlazorBootstrap();
+
         await builder.Build().RunAsync();
     }
 }
