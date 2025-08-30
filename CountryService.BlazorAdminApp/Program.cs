@@ -14,6 +14,10 @@ internal static class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
+
+        //TODO: add web api url to appsettings.json in wwwroot.
+
+
         builder.AddCountryServiceHttpClients("http://localhost:5581");
 
         builder.Services.AddBlazorBootstrap();

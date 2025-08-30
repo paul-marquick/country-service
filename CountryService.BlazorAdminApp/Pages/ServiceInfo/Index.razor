@@ -12,13 +12,13 @@
 @if (modelDataLoaded)
 {
     <dl class="row">
-        <dt class="col-sm-3">URL</dt>
+        <dt class="col-sm-3">Api URL</dt>
         <dd class="col-sm-9">@serviceInfo.URL</dd>
 
-        <dt class="col-sm-3">Health check</dt>
+        <dt class="col-sm-3">Api health check</dt>
         <dd class="col-sm-9"><a href="@serviceInfo.URL/healthz" target="_blank">@serviceInfo.URL/healthz</a></dd>
 
-        <dt class="col-sm-3">Scalar</dt>
+        <dt class="col-sm-3">Api Documentation</dt>
         <dd class="col-sm-9"><a href="@serviceInfo.URL/scalar" target="_blank">@serviceInfo.URL/scalar</a></dd>
 
         <dt class="col-sm-3">Database system</dt>

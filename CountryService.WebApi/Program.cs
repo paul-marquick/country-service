@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using CountryService.DataAccess;
 using CountryService.DataAccess.ListQuery;
 using CountryService.DataAccess.SqlServer.ListQuery;
@@ -84,6 +86,21 @@ internal class Program
 
         // Add custom code.
         builder.AddCode();
+
+        string connectionString = default!;
+
+        if (IsAzure())
+        {
+            Console.WriteLine("Running in Azure.");
+            // Get connection string from Azure key vault.
+            connectionString = GetAzureKeyVaultValue(builder, "db-conn");
+        }
+        else
+        {
+            Console.WriteLine("Running locally.");
+            // Get connection string from appsettings.json.
+            connectionString = builder.Configuration.GetConnectionString("CountryServiceConnectionString")!;
+        }
 
         // Add data access.
         //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
@@ -178,5 +195,22 @@ internal class Program
         app.MapPrometheusScrapingEndpoint();
 
         app.Run();
+    }
+
+    private static string GetAzureKeyVaultValue(WebApplicationBuilder builder, string secretName)
+    {
+        const string keyVaultName = "pm-key-vault";
+
+        Uri keyVaultEndpoint = new Uri($"https://{keyVaultName}.vault.azure.net/");
+        SecretClient secretClient = new SecretClient(keyVaultEndpoint, new DefaultAzureCredential());
+
+        KeyVaultSecret kvs = secretClient.GetSecret(secretName);
+        return kvs.Value;
+    }
+
+    private static bool IsAzure()
+    {
+        return !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID")) &&
+            !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
     }
 }
