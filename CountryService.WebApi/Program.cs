@@ -48,6 +48,25 @@ internal class Program
         builder.AddConfig();
         Config config = builder.GetConfig();
 
+        string connectionString = default!;
+
+        if (IsAzure())
+        {
+            Console.WriteLine("Running in Azure.");
+            // Get connection string from Azure key vault.
+            connectionString = GetAzureKeyVaultValue(builder, "db-conn");
+        }
+        else
+        {
+            Console.WriteLine("Running locally.");
+            // Get connection string from appsettings.json.
+            connectionString = builder.Configuration.GetConnectionString("CountryServiceConnectionString")!;
+        }
+
+        // Add data access.
+        //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
+        builder.AddDataAccess(config.DatabaseSystem, connectionString);
+
         // Basic health probe. (See below for endpoint)
         builder.Services.AddHealthChecks();
 
@@ -86,25 +105,6 @@ internal class Program
 
         // Add custom code.
         builder.AddCode();
-
-        string connectionString = default!;
-
-        if (IsAzure())
-        {
-            Console.WriteLine("Running in Azure.");
-            // Get connection string from Azure key vault.
-            connectionString = GetAzureKeyVaultValue(builder, "db-conn");
-        }
-        else
-        {
-            Console.WriteLine("Running locally.");
-            // Get connection string from appsettings.json.
-            connectionString = builder.Configuration.GetConnectionString("CountryServiceConnectionString")!;
-        }
-
-        // Add data access.
-        //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
-        builder.AddDataAccess(config.DatabaseSystem, builder.Configuration["ConnectionString"]!);
 
         builder.Services.AddCors(options =>
         {
