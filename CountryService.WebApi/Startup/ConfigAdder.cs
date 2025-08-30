@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CountryService.WebApi.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CountryService.WebApi.Configuration;
+namespace CountryService.WebApi.Startup;
 
-public static class WebApplicationBuilderConfigExtension
+public static class ConfigAdder
 {
-    public static void AddAppSettings(this WebApplicationBuilder builder)
+    public static void AddConfig(this WebApplicationBuilder builder)
     {
         const string appSettingsFilename = "appsettings";
 

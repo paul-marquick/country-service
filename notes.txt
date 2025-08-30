@@ -15,3 +15,16 @@ blazor
     csrf
 
     grid needs responsive / small screen version.
+
+
+URLs
+
+    web api - api.teapothub.com
+
+    blazor - admin-blazor.teapothub.com
+
+    angular - admin-angular.teapothub.com
+
+    main site - www.teapothub.com (redirect teapothub.com to www.teapothub.com)
+
+

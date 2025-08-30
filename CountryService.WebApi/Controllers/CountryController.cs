@@ -4,12 +4,14 @@ using CountryService.DataAccess.ListQuery;
 using CountryService.Mappers.Country;
 using CountryService.Models.Country;
 using CountryService.Shared;
+using CountryService.WebApi.Configuration;
 using CountryService.WebApi.ListQuery;
 using CountryService.WebApi.Problems;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -25,6 +27,7 @@ namespace CountryService.WebApi.Controllers;
 public class CountryController(
     ILogger<CountryController> logger,
     IDbConnectionFactory dbConnectionFactory,
+    IOptionsMonitor<Config> optionsMonitorConfig,
     ICountryDataAccess countryDataAccess,
     ICountryMapper countryMapper,
     ICountryLookupMapper countryLookupMapper,
@@ -239,9 +242,7 @@ public class CountryController(
 
             Dtos.Country.Country newCountryDto = countryMapper.MapModelToDto(newCountry);
 
-            //TODO: URLs. 
-
-            return Created($"https://api.example.com/country/{country.Iso2}", newCountryDto);
+            return Created($"{optionsMonitorConfig.CurrentValue.WebApiUrl}/country/{country.Iso2}", newCountryDto);
         }
         catch (DataAccessException dataAccessException)
         {

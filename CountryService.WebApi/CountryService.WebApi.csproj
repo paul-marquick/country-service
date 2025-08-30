@@ -3,7 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
+      <UserSecretsId>32a5e739-e19f-4fe2-a248-418f40de5a0a</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\CountryService.DataAccess.MySql\CountryService.DataAccess.MySql.csproj" />

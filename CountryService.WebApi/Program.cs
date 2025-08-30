@@ -11,6 +11,8 @@ using CountryService.WebApi.ListQuery;
 using CountryService.WebApi.Middleware;
 using CountryService.WebApi.Patching;
 using CountryService.WebApi.Problems;
+using CountryService.WebApi.Startup;
+using CountryService.WebApi.Startup.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +43,7 @@ internal class Program
 
         // The options pattern uses classes to provide strongly typed access to groups of related settings.
         builder.Services.AddOptions();
-        builder.AddAppSettings();
+        builder.AddConfig();
         Config config = builder.GetConfig();
 
         // Basic health probe. (See below for endpoint)
@@ -80,50 +82,19 @@ internal class Program
         // Add the Open API document generation services.
         builder.Services.AddOpenApi();
 
-        // Add code dependencies.
-        builder.Services.AddSingleton<IProblemDetailsCreator, ProblemDetailsCreator>();
-        builder.Services.AddSingleton<IQueryValidator, QueryValidator>();
-        builder.Services.AddSingleton<IQueryReader, QueryReader>();
-        builder.Services.AddSingleton<IComparisonOperatorConverter, ComparisonOperatorConverter>();
-        builder.Services.AddSingleton<IComparisonOperatorDbType, ComparisonOperatorDbType>();
-        builder.Services.AddSingleton<ISortDirectionConverter, SortDirectionConverter>();
-        builder.Services.AddSingleton<ICountryMapper, CountryMapper>();
-        builder.Services.AddSingleton<ICountryLookupMapper, CountryLookupMapper>();
+        // Add custom code.
+        builder.AddCode();
 
-        // Data access.
-        // Can simply switch between different database systems by editing the appsettings.json file.
-        // Need to change the database system value and the database connection string.
-        switch (config.DatabaseSystem)
-        {
-            case DatabaseSystem.SqlServer:
-                Console.WriteLine("Using SQL Server database system.");
-                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.SqlServer.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
-                builder.Services.AddSingleton<ICountryDataAccess, DataAccess.SqlServer.CountryDataAccess>();
-                builder.Services.AddSingleton<ISqlCreator, SqlCreator>();
-                break;
-
-            case DatabaseSystem.PostgreSql:
-                Console.WriteLine("Using PostgreSQL database system.");
-                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.PostgreSql.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
-                builder.Services.AddSingleton<ICountryDataAccess, DataAccess.PostgreSql.CountryDataAccess>();
-                break;
-
-            case DatabaseSystem.MySql:
-                Console.WriteLine("Using MySQL database system.");
-                builder.Services.AddSingleton<IDbConnectionFactory>(new DataAccess.MySql.DbConnectionFactory(builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!));
-                builder.Services.AddSingleton<ICountryDataAccess, DataAccess.MySql.CountryDataAccess>();
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException($"Start up exception: Unknown database system, specified in the appsettings, '{config.DatabaseSystem}'.");
-        }        
+        // Add data access.
+        //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
+        builder.AddDataAccess(config.DatabaseSystem, builder.Configuration["ConnectionString"]!);
 
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(name: allowAdminApp,
                 policy =>
                 {
-                    policy.AllowAnyOrigin() // WithOrigins("http://localhost:4200")
+                    policy.AllowAnyOrigin() // WithOrigins("http://localhost:4200") // Implement ICorsPolicyProvider.
                         .AllowAnyMethod()
                         .AllowAnyHeader();
                 });
