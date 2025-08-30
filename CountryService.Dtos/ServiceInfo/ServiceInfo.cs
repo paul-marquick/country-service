@@ -4,6 +4,7 @@ namespace CountryService.Dtos.ServiceInfo;
 
 public record ServiceInfo
 {
+    public required string URL { get; set; }
     public required string DatabaseSystem { get; set; }
     public required string ServiceName { get; set; }
     public required string Version { get; set; }

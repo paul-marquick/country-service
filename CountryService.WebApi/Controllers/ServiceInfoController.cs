@@ -32,6 +32,7 @@ public class ServiceInfoController(
 
         Dtos.ServiceInfo.ServiceInfo serviceInfo = new()
         {
+            URL = optionsMonitorConfig.CurrentValue.WebApiUrl,
             DatabaseSystem = optionsMonitorConfig.CurrentValue.DatabaseSystem,
             ServiceName = "CountryService",
             Version = "1.0.0",

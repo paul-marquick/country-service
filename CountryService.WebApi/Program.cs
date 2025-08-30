@@ -143,8 +143,10 @@ internal class Program
         // the request in an alternate pipeline. The request will not be re-executed if the response has already started.
         app.UseExceptionHandler();
 
-        if (app.Environment.IsDevelopment())
-        {
+        // WARNING: Using OpenAPI and Scalar in ALL environments.
+        //    if (app.Environment.IsDevelopment())
+        //    {
+
             // OpenAPI document generation.
             app.MapOpenApi();
 
@@ -159,7 +161,7 @@ internal class Program
                     .WithTheme(ScalarTheme.Purple)
                     .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios);
             });
-        }
+    //    }
 
         // Adds a middleware that collect headers to be propagated to a HttpClient
         // E.g. correlation id.
