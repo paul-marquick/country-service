@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\lib\**" />
+    <Content Remove="wwwroot\lib\**" />
+    <EmbeddedResource Remove="wwwroot\lib\**" />
+    <None Remove="wwwroot\lib\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CountryService.Shared\CountryService.Shared.csproj" />
     <ProjectReference Include="..\CountryService.Dtos\CountryService.Dtos.csproj" />
   </ItemGroup>
@@ -17,10 +24,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="9.0.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\lib\bootstrap-icons\fonts\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,12 +1,12 @@
-using System;
-using System.Threading.Tasks;
-using CountryService.BlazorAdminApp.HttpClients;
+using CountryService.BlazorAdminApp.Startup;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace CountryService.BlazorAdminApp;
-public class Program
+
+internal static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -14,20 +14,7 @@ public class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        builder.Services.AddHttpClient<ILogHttpClient, LogHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://localhost:5581");
-        });
-
-        builder.Services.AddHttpClient<ICountryHttpClient, CountryHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://localhost:5581");
-        });
-
-        builder.Services.AddHttpClient<IServiceInfoHttpClient, ServiceInfoHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://localhost:5581");
-        });
+        builder.AddCountryServiceHttpClients("http://localhost:5581");
 
         builder.Services.AddBlazorBootstrap();
 
