@@ -24,10 +24,10 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Build with dotnet
-        run: dotnet build /CountryService.WebApi --configuration Release
+        run: dotnet build ./CountryService.WebApi/CountryService.WebApi.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish CountryService.WebApi -c Release -o "${{env.DOTNET_ROOT}}/WebApi"
+        run: dotnet publish ./CountryService.WebApi/CountryService.WebApi.csproj -c Release -o "${{env.DOTNET_ROOT}}/WebApi"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -64,3 +64,4 @@ jobs:
           package: .
 
           
+
