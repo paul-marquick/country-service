@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - country-service
+name: Build and deploy ASP.Net Core app to Azure Web App - country-service-web-api
 
 on:
   push:
@@ -27,13 +27,13 @@ jobs:
         run: dotnet build ./CountryService.WebApi/CountryService.WebApi.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ./CountryService.WebApi/CountryService.WebApi.csproj -c Release -o "${{env.DOTNET_ROOT}}/WebApi"
+        run: dotnet publish ./CountryService.WebApi/CountryService.WebApi.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-api
-          path: ${{env.DOTNET_ROOT}}/WebApi
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -46,22 +46,21 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-api
+          name: .net-app
       
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A8B4B8D4CC8E4C5195309914AB9CAC2A }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_023D20A6ADF24F7FB90183DAF5DA6706 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FB440741B3CD4AE296EE56805A34AFDB }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_73EFFF539D124ADC8A89E541B6EDE788 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A513613BEF0D4FD5867CA739E95B2FEA }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_56AEB5A28EA94D05974F0CDB6158086E }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'country-service'
+          app-name: 'country-service-web-api'
           slot-name: 'Production'
           package: .
 
           
-
