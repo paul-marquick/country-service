@@ -37,47 +37,58 @@ internal class Program
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    //    builder.Host.UseSerilog((ctx, lc) => lc
-    //        .WriteTo.Console(outputTemplate: "level={Level:w} {Properties} msg={Message:lj} {NewLine}{Exception}")
-    //        .Enrich.FromLogContext()
-    //        .Enrich.WithProperty("Application_name", "CountryService.ApiService")
-    //        .ReadFrom.Configuration(builder.Configuration)
-    //    );
+        //    builder.Host.UseSerilog((ctx, lc) => lc
+        //        .WriteTo.Console(outputTemplate: "level={Level:w} {Properties} msg={Message:lj} {NewLine}{Exception}")
+        //        .Enrich.FromLogContext()
+        //        .Enrich.WithProperty("Application_name", "CountryService.ApiService")
+        //        .ReadFrom.Configuration(builder.Configuration)
+        //    );
 
-    //    builder.Logging.AddAzureWebAppDiagnostics();
-    //    builder.Services.Configure<AzureFileLoggerOptions>(options =>
-    //    {
-    //        options.FileName = "logs-"; // Log file name prefix
-    //        options.FileSizeLimit = 50 * 1024 * 1024; // 50 MB
-    //        options.RetainedFileCountLimit = 5; // Keep last 5 log files
-    //    });
+        builder.Logging.AddAzureWebAppDiagnostics();
+        builder.Services.Configure<AzureFileLoggerOptions>(options =>
+        {
+            options.FileName = "logs-"; // Log file name prefix
+            options.FileSizeLimit = 50 * 1024 * 1024; // 50 MB
+            options.RetainedFileCountLimit = 5; // Keep last 5 log files
+        });
 
-    //    // The options pattern uses classes to provide strongly typed access to groups of related settings.
-    //    builder.Services.AddOptions();
-    //    builder.AddConfig();
-    //    Config config = builder.GetConfig();
+        try
+        {
+            string dbConn = GetAzureKeyVaultValue(builder, "db-conn");
 
-    //    string connectionString = default!;
+            Console.WriteLine($"dbConn from Key Vault: {dbConn}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception getting db-conn from Key Vault: {ex.Message}");
+        }
 
-    //    if (IsAzure())
-    //    {
-    //        Console.WriteLine("Running in Azure.");
-    //        // Get connection string from Azure key vault.
-    //        connectionString = GetAzureKeyVaultValue(builder, "db-conn");
-    //    }
-    //    else
-    //    {
-    //        Console.WriteLine("Running locally.");
-    //        // Get connection string from appsettings.json.
-    //        connectionString = builder.Configuration["ConnectionString"]!;
-    //    }
+            //    // The options pattern uses classes to provide strongly typed access to groups of related settings.
+            //    builder.Services.AddOptions();
+            //    builder.AddConfig();
+            //    Config config = builder.GetConfig();
 
-    //    // Add data access.
-    //    //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
-    //    builder.AddDataAccess(config.DatabaseSystem, connectionString);
+        //    string connectionString = default!;
 
-    //    // Basic health probe. (See below for endpoint)
-        builder.Services.AddHealthChecks();
+        //    if (IsAzure())
+        //    {
+        //        Console.WriteLine("Running in Azure.");
+        //        // Get connection string from Azure key vault.
+        //        connectionString = GetAzureKeyVaultValue(builder, "db-conn");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Running locally.");
+        //        // Get connection string from appsettings.json.
+        //        connectionString = builder.Configuration["ConnectionString"]!;
+        //    }
+
+        //    // Add data access.
+        //    //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
+        //    builder.AddDataAccess(config.DatabaseSystem, connectionString);
+
+        //    // Basic health probe. (See below for endpoint)
+            builder.Services.AddHealthChecks();
 
     //    // Prometheus metrics.
     //    builder.Services.AddOpenTelemetry()
@@ -152,7 +163,7 @@ internal class Program
 
         WebApplication app = builder.Build();
 
-    //    app.Logger.LogInformation("WebApplication Build().");
+        app.Logger.LogInformation("WebApplication Build().");
 
 
     //    // Example: how to add middleware into the request processing pipeline.       
