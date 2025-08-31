@@ -77,7 +77,7 @@ internal class Program
     //    builder.AddDataAccess(config.DatabaseSystem, connectionString);
 
     //    // Basic health probe. (See below for endpoint)
-    //    builder.Services.AddHealthChecks();
+        builder.Services.AddHealthChecks();
 
     //    // Prometheus metrics.
     //    builder.Services.AddOpenTelemetry()
@@ -162,7 +162,7 @@ internal class Program
     //    app.UseCorrelationId();
 
     //    // Map health check endpoint.
-    //    app.MapHealthChecks("/healthz");
+        app.MapHealthChecks("/healthz");
 
     //    // Adds a StatusCodePages middleware with a default response handler that checks for
     //    // responses with status codes between 400 and 599 that do not have a body.
