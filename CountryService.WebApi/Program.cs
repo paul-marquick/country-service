@@ -35,13 +35,13 @@ internal class Program
             .ReadFrom.Configuration(builder.Configuration)
         );
 
-        builder.Logging.AddAzureWebAppDiagnostics();
-        builder.Services.Configure<AzureFileLoggerOptions>(options =>
-        {
-            options.FileName = "logs-"; // Log file name prefix
-            options.FileSizeLimit = 50 * 1024 * 1024; // 50 MB
-            options.RetainedFileCountLimit = 5; // Keep last 5 log files
-        });
+        //builder.Logging.AddAzureWebAppDiagnostics();
+        //builder.Services.Configure<AzureFileLoggerOptions>(options =>
+        //{
+        //    options.FileName = "logs-"; // Log file name prefix
+        //    options.FileSizeLimit = 50 * 1024 * 1024; // 50 MB
+        //    options.RetainedFileCountLimit = 5; // Keep last 5 log files
+        //});
 
         // The options pattern uses classes to provide strongly typed access to groups of related settings.
         builder.Services.AddOptions();
