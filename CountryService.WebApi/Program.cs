@@ -63,6 +63,8 @@ internal class Program
             connectionString = builder.Configuration["ConnectionString"]!;
         }
 
+        Console.WriteLine($"connectionString: {connectionString}.");
+
         // Add data access.
         //    builder.AddDataAccess(config.DatabaseSystem, builder.Configuration.GetConnectionString(Constants.CountryServiceConnectionStringName)!);
         builder.AddDataAccess(config.DatabaseSystem, connectionString);
