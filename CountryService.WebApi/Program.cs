@@ -45,7 +45,6 @@ internal class Program
 
         // The options pattern uses classes to provide strongly typed access to groups of related settings.
         builder.Services.AddOptions();
-        builder.AddConfig();
         Config config = builder.GetConfig();
 
         string connectionString = default!;

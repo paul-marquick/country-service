@@ -10,16 +10,13 @@ internal static class Program
 {
     public static async Task Main(string[] args)
     {
-        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
+        Configuration.Config config = builder.GetConfig();
 
-        //TODO: add web api url to appsettings.json in wwwroot.
-
-
-        builder.AddCountryServiceHttpClients("http://localhost:5581");
-
+        builder.AddCountryServiceHttpClients(config.WebApiUrl);
         builder.Services.AddBlazorBootstrap();
 
         await builder.Build().RunAsync();

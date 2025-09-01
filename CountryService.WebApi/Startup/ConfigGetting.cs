@@ -5,16 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CountryService.WebApi.Startup;
 
-public static class ConfigAdder
+public static class ConfigGetting
 {
-    public static void AddConfig(this WebApplicationBuilder builder)
-    {
-        const string appSettingsFilename = "appsettings";
-
-        builder.Configuration.AddJsonFile($"{appSettingsFilename}.json", false, true);
-        builder.Configuration.AddJsonFile($"{appSettingsFilename}.{builder.Environment.EnvironmentName}.json", true, true);
-    }
-
     public static Config GetConfig(this WebApplicationBuilder builder)
     {
         const string configSectionName = "Config";

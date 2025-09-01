@@ -1,13 +1,9 @@
 web service needs
 
-    user secrets / azure secrets.
-    config needs URLs. 
     data import for all real countries.
     unit testing needs tidying up.
 
     query with paging, sorting, and filtering etc. - Done but needs UI (blazor).
-
-    tidy up program class with extensions.
 
 
 blazor
@@ -26,5 +22,3 @@ URLs
     angular - admin-angular.teapothub.com
 
     main site - www.teapothub.com (redirect teapothub.com to www.teapothub.com)
-
-
