@@ -28,6 +28,7 @@
         new Column { Name = "Name", HeaderText = "Name" },
         new Column { Name = "CallingCode", HeaderText = "Calling Code" }
     };
+
     protected override async Task OnInitializedAsync()
     {
         countries = await countryHttpClient.GetCountriesAsync();

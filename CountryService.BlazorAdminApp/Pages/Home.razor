@@ -10,3 +10,48 @@ Source code:
 <a href="https://github.com/paul-marquick/country-service" target="_blank">
     <i class="bi bi-github" title="GitHub"></i>
 </a>
+<br />
+<br />
+
+<h4>Data access projects</h4>
+<ul>
+    <li>Interface and implementations for Sql Server, PostgreSql, MySql.</li>
+    <li>Dynamic SQL for patch so that only 'dirty' columns are updated.</li>
+    <li>Unit tests for data access projects.</li>
+</ul>
+
+<h4>Web api project</h4>
+<ul>
+    <li>Problem details (with added context), for general exceptions, validation failures and logical errors such as duplication.</li>
+    <li>Serilog with added request context, e.g. correlation id.</li>
+    <li>IOptionsMonitor to use configuration from the appsettings file in code.</li>
+    <li>Middleware that checks for a correlation id, if none, it creates a correlation id, passed on by header propagation.</li>
+    <li>CORS.</li>
+    <li>Health check at /healthz endpoint.</li>
+    <li>Prometheus metrics at /metrics endpoint.</li>
+    <li>OpenApi at /scalar endpoint.</li>
+    <li>Request handlers for OPTIONS, HEAD, GET, POST, PUT, PATCH and DELETE HTTP methods.</li>
+</ul>
+
+<h4>Dtos, models and mappers projects</h4>
+<ul>
+    <li>Dtos give independence from the Database table design, shared project between Web Api and Blazor app.</li>
+    <li>Models hold database data.</li>
+    <li>Mapper map between Dtos and Models.</li>
+</ul>
+
+<h4>Shared project</h4>
+<ul>
+    <li>Code shared project between Web Api and Blazor app.</li>
+</ul>
+
+<h4>Blazor web app project</h4>
+<ul>
+    <li>Bootstrap css.</li>
+    <li>CRUD operations.</li>
+    <li>Client side validation with Data annotations.</li>
+    <li>Toast notifications.</li>
+    <li>Custom grid component with paging, sorting and filtering.</li>
+    <li>Uses BlazorBootstrap component library.</li>
+    <li>Errors are sent to the server to be logged.</li>
+</ul>

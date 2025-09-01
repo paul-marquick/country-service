@@ -3,53 +3,76 @@
 @using CountryService.BlazorAdminApp.HttpClients
 @using CountryService.Dtos.Country    
 @using System.Threading
-
 @inject ICountryHttpClient countryHttpClient
+@inject NavigationManager navigationManager
+@inject ToastService toastService
 
 <PageTitle>Edit Country</PageTitle>
 
 <h1>Edit Country</h1>
 
-@if (modelDataLoaded)
+@if (loadComplete)
 {
-    <EditForm Model="@country" OnValidSubmit="@SaveCountry">
+    @if (success)
+    {
+        <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit" FormName="EditCountry">
 
-        <div class="mb-3">
-            <label for="@country.Iso2" class="form-label">@Resource.Iso2</label>
-            <InputText class="form-control" @bind-Value="@country.Iso2" />
-        </div>
+            <DataAnnotationsValidator />
 
-        <div class="mb-3">
-            <label for="@country.Iso3" class="form-label">@Resource.Iso3</label>
-            <InputText class="form-control" @bind-Value="@country.Iso3" />
-        </div>
+            <div class="mb-3 col-md-6">
+                <label for="@Model.Iso2" class="form-label">@Resource.Iso2</label>
+                <InputText class="form-control" @bind-Value="@Model.Iso2" />
+                <ValidationMessage For="() => Model!.Iso2" />
+            </div>
 
-        <div class="mb-3">
-            <label for="@country.IsoNumber" class="form-label">@Resource.IsoNumber</label>
-            <InputNumber class="form-control" @bind-Value="@country.IsoNumber" />
-        </div>
+            <div class="mb-3 col-md-6">
+                <label for="@Model.Iso3" class="form-label">@Resource.Iso3</label>
+                <InputText class="form-control" @bind-Value="@Model.Iso3" />
+                <ValidationMessage For="() => Model!.Iso3" />
+            </div>
 
-        <div class="mb-3">
-            <label for="@country.Name" class="form-label">@Resource.Name</label>
-            <InputText class="form-control" @bind-Value="@country.Name" />
-        </div>
+            <div class="mb-3 col-md-6">
+                <label for="@Model.IsoNumber" class="form-label">@Resource.IsoNumber</label>
+                <InputNumber class="form-control" @bind-Value="@Model.IsoNumber" />
+                <ValidationMessage For="() => Model!.IsoNumber" />
+            </div>
 
-        <div class="mb-3">
-            <label for="@country.CallingCode" class="form-label">@Resource.CallingCode</label>
-            <InputText class="form-control" @bind-Value="@country.CallingCode" />
-        </div>
+            <div class="mb-3 col-md-6">
+                <label for="@Model.Name" class="form-label">@Resource.Name</label>
+                <InputText class="form-control" @bind-Value="@Model.Name" />
+                <ValidationMessage For="() => Model!.Name" />
+            </div>
 
+            <div class="mb-3 col-md-6">
+                <label for="@Model.CallingCode" class="form-label">@Resource.CallingCode</label>
+                <InputText class="form-control" @bind-Value="@Model.CallingCode" />
+            </div>
+
+            <div class="btn-group">
+
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-floppy"></i>
+                    Save
+                </button>
+
+                <a class="btn btn-danger" href="country/delete/@iso2" disabled>
+                    <i class="bi bi-trash"></i>
+                    Delete
+                </a>
+
+                <a class="btn btn-secondary" onclick="history.back();">
+                    <i class="bi bi-arrow-left"></i>
+                    Back
+                </a>
+
+            </div>
+
+        </EditForm>
+    }
+    else
+    {
+        <br /><br />
         <div class="btn-group">
-
-            <button type="submit" class="btn btn-success" @onclick="SaveCountry" disabled>
-                <i class="bi bi-floppy"></i>
-                Save
-            </button>
-
-            <a class="btn btn-danger" href="country/delete/@iso2" disabled>
-                <i class="bi bi-trash"></i>
-                Delete
-            </a>
 
             <a class="btn btn-secondary" onclick="history.back();">
                 <i class="bi bi-arrow-left"></i>
@@ -57,8 +80,7 @@
             </a>
 
         </div>
-
-    </EditForm>
+    }
 }
 else
 {
@@ -66,35 +88,64 @@ else
 }
 
 @code {
-    private Country country;
-    private bool modelDataLoaded = false;
+    private EditContext editContext = default!;
+    private Country Model = new(); 
+    private ValidationMessageStore validationMessageStore = default!;
+    private bool loadComplete = false;
+    private bool success = false;
 
     [Parameter]
     public string iso2 { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        country = await countryHttpClient.GetCountryByIso2Async(iso2);
+        try
+        {
+            Model = await countryHttpClient.GetCountryByIso2Async(iso2);
+            editContext = new(Model);
+            validationMessageStore = new(editContext);
+            success = true;
+        }
+        catch (ValidationProblemDetailsException validationProblemDetailsException)
+        {
+            toastService.Notify(new(ToastType.Warning, validationProblemDetailsException.ValidationProblemDetails.Title));
+            success = false;
+        }
 
-        modelDataLoaded = true;
-
+        loadComplete = true;
         StateHasChanged();
     }
 
-    // private void ShowLoading()
-    // {
-    //     loading = true;
-    // }
-
-    // private void HideLoading()
-    // {
-    //     loading = false;
-    // }
-
-    private Task SaveCountry()
+    private async Task HandleValidSubmit()
     {
-        Console.WriteLine("country/edit, SaveCountry.");
+        try
+        {
+            await countryHttpClient.PutCountryByIso2Async(iso2, Model);
 
-        throw new NotImplementedException();
+            toastService.Notify(new(ToastType.Success, "Country saved."));
+
+            navigationManager.NavigateTo("country");
+        }
+        catch (ValidationProblemDetailsException validationProblemDetailsException)
+        {
+            if (validationProblemDetailsException.ValidationProblemDetails.Type == Shared.Problems.ProblemType.FailedValidation)
+            {
+                if (validationProblemDetailsException.ValidationProblemDetails.Errors != null &&
+                    validationProblemDetailsException.ValidationProblemDetails.Errors.Count > 0)
+                {
+                    foreach (KeyValuePair<string, string[]> error in validationProblemDetailsException.ValidationProblemDetails.Errors)
+                    {
+                        foreach (string message in error.Value)
+                        {
+                            validationMessageStore.Add(() => error.Key, message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                toastService.Notify(new(ToastType.Danger, validationProblemDetailsException.ValidationProblemDetails.Title));
+            }
+        }
     }
 }
