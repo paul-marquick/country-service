@@ -1,5 +1,5 @@
 # country-service
-C# country web api with angular admin app.
+C# country Web Api with Blazor admin app.
 
 Data access projects
 - Interface and implementations for Sql Server, PostgreSql, MySql.
@@ -7,19 +7,20 @@ Data access projects
 - Unit tests for data access projects.    
 
 Web Api
-- Problem details (with added context), for general exceptions, validation failures and returned error object results such as BadRequest(...).
+- Problem details (with added context), for general exceptions, validation failures and logical errors such as duplication.
 - Serilog with added request context, e.g. correlation id.
-- IOptions to use configuration from the appsettings file in code. 
+- IOptionsMonitor to use configuration from the appsettings file in code. 
 - Middleware that checks for a correlation id, if none, it creates a correlation id, passed on by header propagation.
 - CORS.
 - Health check at /healthz endpoint.
 - Prometheus metrics at /metrics endpoint.
 - OpenApi at /scalar endpoint. 
-- Method handlers for Options, Head, Get, Post, Put, Patch and Delete HTTP methods.
+- Request handlers for Options, Head, Get, Post, Put, Patch and Delete HTTP methods.
 
-Dtos
-- Shared project between Web Api and Blazor app.
-- Data 'shape' is independent of the db models.
+Dtos, Models and Mappers
+- Dtos give independence from the Database table design, shared project between Web Api and Blazor app. 
+- Models hold database data.
+- Mapper map between Dtos and Models. 
 
 Blazor web app
 - Bootstrap css.

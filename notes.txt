@@ -15,10 +15,13 @@ blazor
 
 URLs
 
-    web api - api.teapothub.com
+    web api - api.teapothub.com  / country-service-web-api...-azure...
 
-    blazor - admin-blazor.teapothub.com
+    blazor - admin-app-blazor.teapothub.com  /  country-service-admin-app-blazor...-azure...
 
-    angular - admin-angular.teapothub.com
+    angular - admin-app-angular.teapothub.com  /  country-service-admin-app-angular...-azure...
 
-    main site - www.teapothub.com (redirect teapothub.com to www.teapothub.com)
+    main site - www.teapothub.com  /  country-service-www...-azure...
+
+    (redirect teapothub.com to www.teapothub.com)
+
