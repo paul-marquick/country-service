@@ -2,6 +2,7 @@
 using System.Net.Http;
 using CountryService.Shared;
 using CountryService.WebApi.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,7 @@ public class ServiceInfoController(
     IOptionsMonitor<Config> optionsMonitorConfig) : ControllerBase
 {
     [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public void Options()
     {
         Response.Headers.Allow = $"{HttpMethod.Options}, {HttpMethod.Head}, {HttpMethod.Get}";
@@ -24,6 +26,7 @@ public class ServiceInfoController(
 
     [HttpHead]
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<Dtos.ServiceInfo.ServiceInfo> Get()
     {
         string method = HttpContext.Request.Method;

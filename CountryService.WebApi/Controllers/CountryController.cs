@@ -36,6 +36,7 @@ public class CountryController(
     IQueryReader queryReader) : ControllerBase
 {
     [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public void Options()
     {
         Response.Headers.Allow = $"{HttpMethod.Options}, {HttpMethod.Head}, {HttpMethod.Get}, {HttpMethod.Post}, {HttpMethod.Put}, {HttpMethod.Patch}, {HttpMethod.Delete}";
@@ -47,6 +48,8 @@ public class CountryController(
 
     [HttpHead]
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<Dtos.Country.Country>>> SelectCountriesAsync(
         [FromQuery] int offset = Constants.DefaultOffset,
         [FromQuery] int limit = Constants.DefaultLimit,
@@ -123,6 +126,7 @@ public class CountryController(
 
     [HttpHead(Paths.WebApi.Country.Lookup)]
     [HttpGet(Paths.WebApi.Country.Lookup)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<Dtos.Country.CountryLookup>>> GetCountryLookupsAsync()
     {
         string method = HttpContext.Request.Method;
@@ -153,6 +157,8 @@ public class CountryController(
 
     [HttpHead("{iso2}")]
     [HttpGet("{iso2}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Dtos.Country.Country>> GetCountryByIso2Async(string iso2)
     {
         string method = HttpContext.Request.Method;
@@ -214,6 +220,8 @@ public class CountryController(
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Dtos.Country.Country>> PostCountryAsync([FromBody] Dtos.Country.Country countryDto)
     {
         logger.LogDebug($"PostCountryAsync, countryDto.Iso2: {countryDto.Iso2}");
@@ -293,6 +301,9 @@ public class CountryController(
     }
 
     [HttpPut("{iso2}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> PutCountryByIso2Async(string iso2, [FromBody] Dtos.Country.Country countryDto)
     {
         logger.LogDebug($"PutCountryByIso2Async, iso2: {iso2}");
@@ -373,6 +384,9 @@ public class CountryController(
     }
 
     [HttpPatch("{iso2}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> PatchCountryByIso2Async([FromRoute] string iso2, [FromBody] JsonPatchDocument<Dtos.Country.Country> countryDtoPatch)
     {
         logger.LogDebug($"PatchCountryByIso2Async, iso2: {iso2}");
@@ -490,6 +504,7 @@ public class CountryController(
     }
 
     [HttpDelete("{iso2}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeleteCountryByIso2Async(string iso2)
     {
         logger.LogDebug($"DeleteCountryByIso2Async, iso2: {iso2}.");
@@ -505,6 +520,7 @@ public class CountryController(
     [HttpGet]
     [Route(Paths.WebApi.Country.DoesCountryNameExist + "/{name}/{iso2}")]
     [Route(Paths.WebApi.Country.DoesCountryNameExist + "/{name}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<bool>> DoesCountryNameExistAsync(string name, string? iso2)
     {
         logger.LogDebug($"DoesCountryNameExistAsync, name: {name}, iso2: {iso2}");
