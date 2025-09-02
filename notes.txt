@@ -3,7 +3,6 @@ web service needs
     data import for all real countries.
     unit testing needs tidying up.
 
-    query with paging, sorting, and filtering etc. - Done but needs UI (blazor).
 
 
 blazor
@@ -11,6 +10,7 @@ blazor
     csrf
 
     grid needs responsive / small screen version.
+    query with paging, sorting, and filtering etc.
 
 
 URLs

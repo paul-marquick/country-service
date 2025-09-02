@@ -10,6 +10,8 @@ namespace CountryService.WebApi.Controllers;
 [ApiController]
 public class LogController(ILogger<ServiceInfoController> logger) : ControllerBase
 {
+    [EndpointSummary("Allowed methods")]
+    [EndpointDescription("Allow response header, example value: 'GET,POST'.")]
     [HttpOptions]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public void Options()
@@ -18,6 +20,8 @@ public class LogController(ILogger<ServiceInfoController> logger) : ControllerBa
         Response.ContentLength = 0;
     }
 
+    [EndpointSummary("Post log")]
+    [EndpointDescription("Creates an error level log entry on the server.")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult PostLogEntry([FromBody] Dtos.Log.Log log)

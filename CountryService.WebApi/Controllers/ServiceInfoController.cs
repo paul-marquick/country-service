@@ -16,6 +16,8 @@ public class ServiceInfoController(
     ILogger<ServiceInfoController> logger,
     IOptionsMonitor<Config> optionsMonitorConfig) : ControllerBase
 {
+    [EndpointSummary("Allowed methods")]
+    [EndpointDescription("Allow response header, example value: 'GET,POST'.")]
     [HttpOptions]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public void Options()
@@ -24,6 +26,8 @@ public class ServiceInfoController(
         Response.ContentLength = 0;
     }
 
+    [EndpointSummary("Get service info")]
+    [EndpointDescription("Useful information about the service.")]
     [HttpHead]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]

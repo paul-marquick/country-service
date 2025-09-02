@@ -35,6 +35,8 @@ public class CountryController(
     IQueryValidator queryValidator,
     IQueryReader queryReader) : ControllerBase
 {
+    [EndpointSummary("Allowed methods")]
+    [EndpointDescription("Allow response header, example value: 'GET,POST'.")]
     [HttpOptions]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public void Options()
@@ -46,6 +48,11 @@ public class CountryController(
     // Example
     // /country?offset=0&limit=10&filters=name:like:unite&filters=isonumber:l:1000&sorts=iso2:desc&sorts=name:asc
 
+    /// <summary>
+    /// Paged list of countries.
+    /// </summary>
+    [EndpointSummary("Get countries")]
+    [EndpointDescription("Paged list of countries.")]
     [HttpHead]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -124,6 +131,8 @@ public class CountryController(
         }
     }
 
+    [EndpointSummary("Get country lookups")]
+    [EndpointDescription("List of country lookups with iso2 and name.")]
     [HttpHead(Paths.WebApi.Country.Lookup)]
     [HttpGet(Paths.WebApi.Country.Lookup)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -155,6 +164,8 @@ public class CountryController(
         }
     }
 
+    [EndpointSummary("Get country")]
+    [EndpointDescription("Get country by iso2.")]
     [HttpHead("{iso2}")]
     [HttpGet("{iso2}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -219,6 +230,8 @@ public class CountryController(
         }
     }
 
+    [EndpointSummary("Post country")]
+    [EndpointDescription("Add a new country to the database.")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -300,6 +313,8 @@ public class CountryController(
         }
     }
 
+    [EndpointSummary("Put country")]
+    [EndpointDescription("Update an existing country in the database.")]
     [HttpPut("{iso2}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -383,6 +398,8 @@ public class CountryController(
         }
     }
 
+    [EndpointSummary("Patch country")]
+    [EndpointDescription("Partially update an existing country in the database.")]
     [HttpPatch("{iso2}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -503,6 +520,8 @@ public class CountryController(
         }
     }
 
+    [EndpointSummary("Delete country")]
+    [EndpointDescription("Remove a country from the database.")]
     [HttpDelete("{iso2}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeleteCountryByIso2Async(string iso2)
@@ -517,6 +536,8 @@ public class CountryController(
         return NoContent();
     }
 
+    [EndpointSummary("Does country name exist?")]
+    [EndpointDescription("Check whether a country exists with the specified name. If an iso2 value is included then a row with the iso2 is ignored.")]
     [HttpGet]
     [Route(Paths.WebApi.Country.DoesCountryNameExist + "/{name}/{iso2}")]
     [Route(Paths.WebApi.Country.DoesCountryNameExist + "/{name}")]
