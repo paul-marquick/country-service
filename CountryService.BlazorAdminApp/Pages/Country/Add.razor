@@ -1,6 +1,7 @@
 ﻿@page "/country/add"
 
 @using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.BlazorAdminApp.Problems
 @using CountryService.Dtos.Country    
 @using System.Threading
 @using Microsoft.Extensions.Logging
@@ -85,24 +86,7 @@
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            if (validationProblemDetailsException.ValidationProblemDetails.Type == Shared.Problems.ProblemType.FailedValidation)
-            {
-                if (validationProblemDetailsException.ValidationProblemDetails.Errors != null && 
-                    validationProblemDetailsException.ValidationProblemDetails.Errors.Count > 0)
-                {
-                    foreach (KeyValuePair<string, string[]> error in validationProblemDetailsException.ValidationProblemDetails.Errors)
-                    {
-                        foreach (string message in error.Value)
-                        {
-                            validationMessageStore.Add(() => error.Key, message);
-                        }
-                    }
-                }
-            }
-            else
-            {                
-                toastService.Notify(new(ToastType.Danger, validationProblemDetailsException.ValidationProblemDetails.Title));
-            }
+            ValidationProblemDetailsExceptionHandler.HandleValidationProblemDetailsException(validationProblemDetailsException, validationMessageStore, toastService);
         }
     }
 }

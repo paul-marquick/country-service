@@ -1,4 +1,4 @@
-﻿@page "/country/edit/{iso2}"
+﻿@page "/country/delete/{iso2}"
 
 @using CountryService.BlazorAdminApp.HttpClients
 @using CountryService.BlazorAdminApp.Problems
@@ -8,58 +8,49 @@
 @inject NavigationManager navigationManager
 @inject ToastService toastService
 
-<PageTitle>Edit Country</PageTitle>
+<PageTitle>Delete Country</PageTitle>
 
-<h1>Edit Country</h1>
+<h1>Delete Country</h1>
 
 @if (loadComplete)
 {
     @if (success)
     {
-        <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit" FormName="EditCountry">
+        <ConfirmDialog @ref="dialog" />
 
-            <DataAnnotationsValidator />
+        <EditForm Model="Model" FormName="DeleteCountry">
 
             <div class="mb-3 col-md-6">
                 <label for="@Model.Iso2" class="form-label">@Resource.Iso2</label>
-                <InputText class="form-control" @bind-Value="@Model.Iso2" />
-                <ValidationMessage For="() => Model!.Iso2" />
+                <InputText class="form-control" @bind-Value="@Model.Iso2" disabled="true" />
             </div>
 
             <div class="mb-3 col-md-6">
                 <label for="@Model.Iso3" class="form-label">@Resource.Iso3</label>
-                <InputText class="form-control" @bind-Value="@Model.Iso3" />
-                <ValidationMessage For="() => Model!.Iso3" />
+                <InputText class="form-control" @bind-Value="@Model.Iso3" disabled="true" />
             </div>
 
             <div class="mb-3 col-md-6">
                 <label for="@Model.IsoNumber" class="form-label">@Resource.IsoNumber</label>
-                <InputNumber class="form-control" @bind-Value="@Model.IsoNumber" />
-                <ValidationMessage For="() => Model!.IsoNumber" />
+                <InputNumber class="form-control" @bind-Value="@Model.IsoNumber" disabled="true" />
             </div>
 
             <div class="mb-3 col-md-6">
                 <label for="@Model.Name" class="form-label">@Resource.Name</label>
-                <InputText class="form-control" @bind-Value="@Model.Name" />
-                <ValidationMessage For="() => Model!.Name" />
+                <InputText class="form-control" @bind-Value="@Model.Name" disabled="true" />
             </div>
 
             <div class="mb-3 col-md-6">
                 <label for="@Model.CallingCode" class="form-label">@Resource.CallingCode</label>
-                <InputText class="form-control" @bind-Value="@Model.CallingCode" />
+                <InputText class="form-control" @bind-Value="@Model.CallingCode" disabled="true" />
             </div>
 
             <div class="btn-group">
 
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-floppy"></i>
-                    Save
-                </button>
-
-                <a class="btn btn-danger" href="country/delete/@iso2">
+                <button type="button" class="btn btn-danger" @onclick="HandleDeleteAsync">
                     <i class="bi bi-trash"></i>
                     Delete
-                </a>
+                </button>
 
                 <a class="btn btn-secondary" onclick="history.back();">
                     <i class="bi bi-arrow-left"></i>
@@ -89,9 +80,8 @@ else
 }
 
 @code {
-    private EditContext editContext = default!;
+    private ConfirmDialog dialog = default!;
     private Country Model = new(); 
-    private ValidationMessageStore validationMessageStore = default!;
     private bool loadComplete = false;
     private bool success = false;
 
@@ -103,18 +93,11 @@ else
         try
         {
             Model = await countryHttpClient.GetCountryByIso2Async(iso2);
-            editContext = new(Model);
-            validationMessageStore = new(editContext);
             success = true;
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            ValidationProblemDetailsExceptionHandler.HandleValidationProblemDetailsException(
-                validationProblemDetailsException, 
-                validationMessageStore, 
-                toastService, 
-                ToastType.Warning);
-                
+            toastService.Notify(new(ToastType.Warning, validationProblemDetailsException.ValidationProblemDetails.Title));
             success = false;
         }
 
@@ -122,19 +105,19 @@ else
         StateHasChanged();
     }
 
-    private async Task HandleValidSubmit()
+    private async Task HandleDeleteAsync()
     {
-        try
-        {
-            await countryHttpClient.PutCountryByIso2Async(iso2, Model);
+         bool confirmation = await dialog.ShowAsync(
+            title: "Delete country", 
+            message1: "Are you sure?");
 
-            toastService.Notify(new(ToastType.Success, "Country saved."));
+        if (confirmation)
+        {
+            await countryHttpClient.DeleteCountryByIso2Async(iso2);
+
+            toastService.Notify(new(ToastType.Success, "Country deleted."));
 
             navigationManager.NavigateTo("country");
-        }
-        catch (ValidationProblemDetailsException validationProblemDetailsException)
-        {
-            ValidationProblemDetailsExceptionHandler.HandleValidationProblemDetailsException(validationProblemDetailsException, validationMessageStore, toastService);
         }
     }
 }
