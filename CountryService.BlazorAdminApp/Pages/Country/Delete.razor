@@ -97,7 +97,10 @@ else
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            toastService.Notify(new(ToastType.Warning, validationProblemDetailsException.ValidationProblemDetails.Title));
+            ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionToastOnly(
+                validationProblemDetailsException, 
+                toastService,
+                toastType: ToastType.Warning);
             success = false;
         }
 

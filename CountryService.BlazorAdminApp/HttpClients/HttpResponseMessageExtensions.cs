@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CountryService.Shared;
-using Microsoft.AspNetCore.Mvc;
+using CountryService.BlazorAdminApp.Problems;
 
 namespace CountryService.BlazorAdminApp.HttpClients;
 
@@ -16,14 +16,14 @@ public static class HttpResponseMessageExtensions
         return response.Headers.GetValues(HeaderNames.Allow).First();
     }
 
-    public static int GetCount(this HttpResponseMessage response)
+    public static int GetCountFromHeaders(this HttpResponseMessage response)
     {
         return int.Parse(response.Headers.GetValues(AdditionalHeaderNames.Count).First());
     }
 
-    public static long GetTotal(this HttpResponseMessage response)
+    public static int GetTotalFromHeaders(this HttpResponseMessage response)
     {
-        return long.Parse(response.Headers.GetValues(AdditionalHeaderNames.Total).First());
+        return int.Parse(response.Headers.GetValues(AdditionalHeaderNames.Total).First());
     }
 
     public static async Task<T> GetJsonDataAsync<T>(this HttpResponseMessage response)
@@ -41,7 +41,7 @@ public static class HttpResponseMessageExtensions
 
     private static async Task<ValidationProblemDetailsException> CreateValidationProblemDetailsExceptionAsync(HttpResponseMessage response)
     {
-        return new ValidationProblemDetailsException(await DeserializeJsonAsync<ValidationProblemDetails>(response));
+        return new ValidationProblemDetailsException(await DeserializeJsonAsync<ExtendedValidationProblemDetails>(response));
     }
 
     /// <summary>

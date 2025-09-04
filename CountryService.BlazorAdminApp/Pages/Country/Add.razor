@@ -14,7 +14,7 @@
 
 <h1>Add Country</h1>
 
-<EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit" FormName="AddCountry">
+<EditForm EditContext="editContext" OnSubmit="HandleValidSubmit" FormName="AddCountry">
 
     <DataAnnotationsValidator />
 
@@ -63,7 +63,14 @@
 
 </EditForm>
 
+<div class="alert alert-danger">
+    @((MarkupString)@alertContent)
+</div>
+
 @code {
+    
+    private string alertContent = "Default content."; 
+
     private EditContext editContext = default!;
     private Country Model = new(); 
     private ValidationMessageStore validationMessageStore = default!;
@@ -86,7 +93,14 @@
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            ValidationProblemDetailsExceptionHandler.HandleValidationProblemDetailsException(validationProblemDetailsException, validationMessageStore, toastService);
+            alertContent = ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionTEMP(validationProblemDetailsException);
+
+            @* ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionForForm(
+                validationProblemDetailsException, 
+                validationMessageStore, 
+                toastService); *@
         }
+
+        StateHasChanged();
     }
 }

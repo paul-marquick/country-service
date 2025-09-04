@@ -4,7 +4,6 @@ web service needs
     unit testing needs tidying up.
 
 
-
 blazor
     
     csrf
@@ -25,3 +24,5 @@ URLs
 
     (redirect teapothub.com to www.teapothub.com)
 
+
+Create an Azure function to reset the databases to a known state for testing.

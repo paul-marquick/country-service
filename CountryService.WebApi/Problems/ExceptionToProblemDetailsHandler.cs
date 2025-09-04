@@ -31,7 +31,7 @@ public class ExceptionToProblemDetailsHandler(
             StatusCodes.Status500InternalServerError,
             Shared.Problems.ProblemType.InternalServerError,
             ProblemTitle.InternalServerError,
-            "An error has occurred. The Administrator has been notified.");
+            "An error has occurred. The System Administrator has been notified.");
         
         logger.LogError(
             exception,

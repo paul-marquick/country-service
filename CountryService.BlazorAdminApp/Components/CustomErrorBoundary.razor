@@ -23,7 +23,7 @@ else if (ErrorContent is not null)
     // Sends error details to the server. 
     protected override async Task OnErrorAsync(Exception ex)
     {        
-        Logger.LogError("An error has occurred. The Administrator has been notified.");
+        Logger.LogError("An error has occurred. The System Administrator has been notified.");
 
         string details = "BaseAddress: " + webAssemblyHostEnvironment.BaseAddress + 
             ", Environment: " + webAssemblyHostEnvironment.Environment +

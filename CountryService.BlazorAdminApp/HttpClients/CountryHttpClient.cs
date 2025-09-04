@@ -8,14 +8,29 @@ namespace CountryService.BlazorAdminApp.HttpClients;
 
 public class CountryHttpClient(HttpClient httpClient) : ICountryHttpClient
 {
-    public async Task<List<Country>> GetCountriesAsync()
+    public async Task<(int, List<Country>)> GetCountriesAsync(int? offset = null, int? limit = null)
     {
-        using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Paths.WebApi.Country.BasePath);
+        string url = Paths.WebApi.Country.BasePath;
+
+        if (offset.HasValue && limit.HasValue)
+        {
+            url += $"?offset={offset.Value}&limit={limit.Value}";
+        }
+        else if (offset.HasValue)
+        {
+            url += $"?offset={offset.Value}";
+        }
+        else if (limit.HasValue)
+        {
+            url += $"?limit={limit.Value}";
+        }
+
+        using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
 
         using HttpResponseMessage response = await httpClient.SendAsync(request);
         await response.CheckStatusAsync();
 
-        return await response.GetJsonDataAsync<List<Country>>();
+        return (response.GetTotalFromHeaders(), await response.GetJsonDataAsync<List<Country>>());
     }
 
     public async Task<Country> GetCountryByIso2Async(string iso2)

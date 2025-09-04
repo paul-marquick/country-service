@@ -112,7 +112,8 @@ internal class Program
                 {
                     policy.AllowAnyOrigin() // WithOrigins("http://localhost:4200") // Implement ICorsPolicyProvider.
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .WithExposedHeaders("*"); 
                 });
         });
 

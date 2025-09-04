@@ -109,12 +109,10 @@ else
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            ValidationProblemDetailsExceptionHandler.HandleValidationProblemDetailsException(
+            ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionToastOnly(
                 validationProblemDetailsException, 
-                validationMessageStore, 
                 toastService, 
-                ToastType.Warning);
-                
+                toastType: ToastType.Warning);                
             success = false;
         }
 
@@ -134,7 +132,10 @@ else
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            ValidationProblemDetailsExceptionHandler.HandleValidationProblemDetailsException(validationProblemDetailsException, validationMessageStore, toastService);
+            ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionForForm(
+                validationProblemDetailsException, 
+                validationMessageStore, 
+                toastService);
         }
     }
 }
