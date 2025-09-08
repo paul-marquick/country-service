@@ -4,7 +4,6 @@
 @using CountryService.Dtos.Country
 @using CountryService.BlazorAdminApp.Components.DataGrid
 @using System.Threading
-
 @inject ICountryHttpClient countryHttpClient
 
 <PageTitle>Countries</PageTitle>
@@ -16,7 +15,7 @@
     Add Country
 </a>
 
-<DataGrid columns="columns" TRow="Country" rows="countries" keyColumnName="Iso2" showEditColumn="true" showDeleteColumn="true" />
+<DataGrid columns="columns" TRow="Country" GetRowsFunc="countryHttpClient.GetCountriesAsync" keyColumnName="Iso2" showEditColumn="true" showDeleteColumn="true" />
 
 @code {
     private List<Country>? countries;
@@ -29,10 +28,10 @@
         new Column { Name = "CallingCode", HeaderText = "Calling Code" }
     };
 
-    protected override async Task OnInitializedAsync()
-    {
-        countries = await countryHttpClient.GetCountriesAsync();
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     countries = await countryHttpClient.GetCountriesAsync();
 
-        StateHasChanged();
-    }
+    //     StateHasChanged();
+    // }
 }

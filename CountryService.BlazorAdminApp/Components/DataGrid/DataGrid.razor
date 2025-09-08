@@ -1,6 +1,10 @@
-﻿@using Microsoft.Extensions.Logging
+﻿@using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.BlazorAdminApp.Problems
+@using Microsoft.Extensions.Logging
 @typeparam TRow where TRow : class  
 @inject ILogger<DataGrid.DataGrid<TRow>> logger
+@inject NavigationManager navigationManager
+@inject ToastService toastService
 
 <table class="table table-striped table-hover table-bordered mt-3">
 
@@ -56,11 +60,9 @@
                     {
                         <td class="text-center">
                             
-                            @* <a href="@createLink("country/delete", row)">
+                             <a href="@createLink("country/delete", row)">
                                 <i class="bi bi-trash text-danger"></i>
-                            </a> *@
-
-                            <i class="bi bi-trash disabled"></i>
+                            </a> 
 
                         </td>
                     }
@@ -99,23 +101,72 @@
     <tfoot>
         <tr>
             <td colspan="7">
-                Paging
+
+                <div class="row">
+
+                    <div class="col-2">
+                        <p>@pagePosition</p>
+                    </div>
+
+                    <div class="col-8">
+                        <Pagination ActivePageNumber="currentPageNumber"
+                                    TotalPages="totalPages"
+                                    PageChanged="OnPageChanged" 
+                                    Alignment="Alignment.Center" />
+                    </div>
+                    
+                    <div class="col-2">
+                        <select class="form-select" @onchange="OnLimitChanged">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+
+                </div>                
+
             </td>
         </tr>
     </tfoot>
 
 </table>
 
+@* @if (alertContent != null)
+{
+    <div class="alert alert-danger">
+        @((MarkupString)@alertContent)
+    </div>
+} *@
+
+@* <br />
+<br />
+
+<p>@currentPageNumber</p>
+<p>@totalPages</p>
+<p>@limit</p>
+<p>@total</p> *@
+
 <Spinner Color="SpinnerColor.Success" Visible=@(rows == null) />
 
 @code {
+
+    private string alertContent = "Default content.";
+    private string pagePosition = string.Empty;
+
+    private int currentPageNumber = 1;
+    private int totalPages = 0;
+    private int total = 0;
+    private List<TRow>? rows = null;
+
+    [Parameter, EditorRequired]
+    public Func<int?, int?, Task<(int, List<TRow>)>> GetRowsFunc { get; set; }
+
     [Parameter, EditorRequired]
     public List<Column> columns { get; set; }
 
     [Parameter, EditorRequired]
-    public List<TRow>? rows { get; set; }
 
-    [Parameter, EditorRequired]
     public string keyColumnName { get; set; }
 
     [Parameter]
@@ -124,8 +175,84 @@
     [Parameter]
     public bool showDeleteColumn { get; set; } = false;
 
+    [SupplyParameterFromQuery]
+    private int? offset { get; set; } = Shared.Constants.DefaultOffset;
+
+    [SupplyParameterFromQuery]
+    private int? limit { get; set; } = Shared.Constants.DefaultLimit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRowsAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        navigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        base.InvokeAsync(async () =>
+        {
+            await GetRowsAsync();
+        });
+    }
+
     private string createLink(string path, TRow row)
     {
         return path + "/" + row!.GetType().GetProperty(keyColumnName)!.GetValue(row, null).ToString();
+    }
+
+    private void OnPageChanged(int newPageNumber)
+    {
+        offset = (newPageNumber - 1) * limit;
+
+        navigationManager.NavigateTo($"country?offset={offset}&limit={limit}");
+    }
+
+    private void OnLimitChanged(ChangeEventArgs e)
+    {
+        navigationManager.NavigateTo($"country?offset={offset}&limit={e.Value}");
+    }
+
+    private async Task GetRowsAsync()
+    {
+        try
+        {
+            if (offset == null)
+            {
+                offset = Shared.Constants.DefaultOffset;
+            }
+
+            if (limit == null)
+            {
+                limit = Shared.Constants.DefaultLimit;
+            }
+
+            (int, List<TRow>) data = await GetRowsFunc(offset, limit);
+
+            total = data.Item1;
+            rows = data.Item2;            
+
+            currentPageNumber = (offset!.Value / limit!.Value) + 1;
+
+            totalPages = total / limit!.Value;
+            if (total % limit > 0)
+            {
+                totalPages++;
+            }
+
+            pagePosition = $"Showing {offset + 1} to {Math.Min(offset.Value + limit.Value, total)} of {total} countries";
+        }
+        catch (ValidationProblemDetailsException validationProblemDetailsException)
+        {
+            alertContent = ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionTEMP(
+                validationProblemDetailsException);
+
+            pagePosition = string.Empty;
+        }
+
+        StateHasChanged();
     }
 }

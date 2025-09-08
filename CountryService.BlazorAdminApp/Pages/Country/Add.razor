@@ -1,6 +1,7 @@
 ﻿@page "/country/add"
 
 @using CountryService.BlazorAdminApp.HttpClients
+@using CountryService.BlazorAdminApp.Problems
 @using CountryService.Dtos.Country    
 @using System.Threading
 @using Microsoft.Extensions.Logging
@@ -13,7 +14,7 @@
 
 <h1>Add Country</h1>
 
-<EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit" FormName="AddCountry">
+<EditForm EditContext="editContext" OnSubmit="HandleValidSubmit" FormName="AddCountry">
 
     <DataAnnotationsValidator />
 
@@ -62,7 +63,14 @@
 
 </EditForm>
 
+<div class="alert alert-danger">
+    @((MarkupString)@alertContent)
+</div>
+
 @code {
+    
+    private string alertContent = "Default content."; 
+
     private EditContext editContext = default!;
     private Country Model = new(); 
     private ValidationMessageStore validationMessageStore = default!;
@@ -85,24 +93,14 @@
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
-            if (validationProblemDetailsException.ValidationProblemDetails.Type == Shared.Problems.ProblemType.FailedValidation)
-            {
-                if (validationProblemDetailsException.ValidationProblemDetails.Errors != null && 
-                    validationProblemDetailsException.ValidationProblemDetails.Errors.Count > 0)
-                {
-                    foreach (KeyValuePair<string, string[]> error in validationProblemDetailsException.ValidationProblemDetails.Errors)
-                    {
-                        foreach (string message in error.Value)
-                        {
-                            validationMessageStore.Add(() => error.Key, message);
-                        }
-                    }
-                }
-            }
-            else
-            {                
-                toastService.Notify(new(ToastType.Danger, validationProblemDetailsException.ValidationProblemDetails.Title));
-            }
+            alertContent = ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionTEMP(validationProblemDetailsException);
+
+            @* ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionForForm(
+                validationProblemDetailsException, 
+                validationMessageStore, 
+                toastService); *@
         }
+
+        StateHasChanged();
     }
 }

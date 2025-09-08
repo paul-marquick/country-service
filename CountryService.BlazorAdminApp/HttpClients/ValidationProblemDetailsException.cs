@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc;
+using CountryService.BlazorAdminApp.Problems;
 
 namespace CountryService.BlazorAdminApp.HttpClients;
 
@@ -8,11 +8,11 @@ namespace CountryService.BlazorAdminApp.HttpClients;
 /// </summary>
 public class ValidationProblemDetailsException : Exception
 {
-    public ValidationProblemDetailsException(ValidationProblemDetails validationProblemDetails, Exception? innerException = null) :
+    public ValidationProblemDetailsException(ExtendedValidationProblemDetails validationProblemDetails, Exception? innerException = null) :
         base(validationProblemDetails.Title, innerException)
     {
         ValidationProblemDetails = validationProblemDetails;
     }
 
-    public ValidationProblemDetails ValidationProblemDetails { get; set; }
+    public ExtendedValidationProblemDetails ValidationProblemDetails { get; set; }
 }
