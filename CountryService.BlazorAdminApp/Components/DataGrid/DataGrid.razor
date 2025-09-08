@@ -105,7 +105,7 @@
                 <div class="row">
 
                     <div class="col-2">
-                        <p>@(offset + 1) - @(currentPageNumber* limit) / @total</p>
+                        <p>@pagePosition</p>
                     </div>
 
                     <div class="col-8">
@@ -133,25 +133,26 @@
 </table>
 
 @* @if (alertContent != null)
-{ *@
+{
     <div class="alert alert-danger">
         @((MarkupString)@alertContent)
     </div>
-@* } *@
+} *@
 
-<br />
+@* <br />
 <br />
 
 <p>@currentPageNumber</p>
 <p>@totalPages</p>
 <p>@limit</p>
-<p>@total</p>
+<p>@total</p> *@
 
 <Spinner Color="SpinnerColor.Success" Visible=@(rows == null) />
 
 @code {
 
-    private string alertContent = "Default content."; 
+    private string alertContent = "Default content.";
+    private string pagePosition = string.Empty;
 
     private int currentPageNumber = 1;
     private int totalPages = 0;
@@ -165,6 +166,7 @@
     public List<Column> columns { get; set; }
 
     [Parameter, EditorRequired]
+
     public string keyColumnName { get; set; }
 
     [Parameter]
@@ -240,11 +242,15 @@
             {
                 totalPages++;
             }
+
+            pagePosition = $"Showing {offset + 1} to {Math.Min(offset.Value + limit.Value, total)} of {total} countries";
         }
         catch (ValidationProblemDetailsException validationProblemDetailsException)
         {
             alertContent = ProblemDetailsExceptionHandler.HandleValidationProblemDetailsExceptionTEMP(
                 validationProblemDetailsException);
+
+            pagePosition = string.Empty;
         }
 
         StateHasChanged();
