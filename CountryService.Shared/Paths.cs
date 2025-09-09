@@ -21,4 +21,6 @@ public static class Paths
             public const string BasePath = "service-info";
         }
     }
+
+    //TODO: Add Blazor app paths.
 }

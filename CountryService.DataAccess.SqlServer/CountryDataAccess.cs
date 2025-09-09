@@ -143,7 +143,7 @@ public class CountryDataAccess(ILogger<CountryDataAccess> logger, ISqlCreator sq
         {
             if (dbException.Number == 2601 || dbException.Number == 2627) // 2601 index dup, 2627 pk dup.
             {
-                var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+                var constraintName = SqlUtils.GetConstraintName(logger, dbException.Message);
 
                 if (constraintName == null)
                 {
@@ -199,7 +199,7 @@ public class CountryDataAccess(ILogger<CountryDataAccess> logger, ISqlCreator sq
         {
             if (dbException.Number == 2601 || dbException.Number == 2627) 
             {
-                var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+                var constraintName = SqlUtils.GetConstraintName(logger, dbException.Message);
 
                 if (constraintName == null)
                 {
@@ -290,7 +290,7 @@ public class CountryDataAccess(ILogger<CountryDataAccess> logger, ISqlCreator sq
         {
             if (dbException.Number == 2601 || dbException.Number == 2627)
             {
-                var constraintName = Utils.GetConstraintName(logger, dbException.Message);
+                var constraintName = SqlUtils.GetConstraintName(logger, dbException.Message);
 
                 if (constraintName == null)
                 {

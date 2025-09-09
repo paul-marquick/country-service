@@ -6,6 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace CountryService.WebApi.Problems;
 
+/// <summary>
+/// Provides functionality to create standardized problem details objects for HTTP error responses, including validation
+/// problem details and general problem details.
+/// </summary>
+/// <remarks>This class is designed to generate problem details objects conforming to the RFC 7807 specification
+/// for HTTP APIs. It supports creating both general problem details and validation-specific problem details, with
+/// additional metadata such as request and correlation identifiers.</remarks>
+/// <param name="logger"></param>
 public class ProblemDetailsCreator(ILogger<ProblemDetailsCreator> logger) : IProblemDetailsCreator
 {
     public ProblemDetails CreateProblemDetails(

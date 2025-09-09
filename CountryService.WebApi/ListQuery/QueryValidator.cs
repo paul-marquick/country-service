@@ -33,7 +33,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, IComparisonOperatorD
 
         if (offset < 0)
         {
-            modelState.AddModelError(PropertyNames.Offset, "offset must be greater or equal to 0.");
+            modelState.AddModelError(QueryParamNames.Offset, "offset must be greater or equal to 0.");
         }
     }
 
@@ -43,7 +43,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, IComparisonOperatorD
 
         if (!Constants.ValidLimits.Contains(limit))
         {
-            modelState.AddModelError(PropertyNames.Limit, "limit must be 10, 20, 50 or 100.");
+            modelState.AddModelError(QueryParamNames.Limit, "limit must be 10, 20, 50 or 100.");
         }
     }
     
@@ -81,7 +81,7 @@ public class QueryValidator(ILogger<QueryValidator> logger, IComparisonOperatorD
                 // Check the property name is filterable.
                 if (!filterableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
                 {
-                    modelState.AddModelError(PropertyNames.Filters, "Property is invalid.");
+                    modelState.AddModelError(QueryParamNames.Filters, "Property is invalid.");
                 }
 
                 // Check the comparison operator is valid.
@@ -93,14 +93,14 @@ public class QueryValidator(ILogger<QueryValidator> logger, IComparisonOperatorD
                     !comparisonOperator.Equals(ComparisonOperator.LessThanOrEqualTo, StringComparison.OrdinalIgnoreCase) &&
                     !comparisonOperator.Equals(ComparisonOperator.Like, StringComparison.OrdinalIgnoreCase))
                 {
-                    modelState.AddModelError(PropertyNames.Filters, "Comparison operator is invalid.");
+                    modelState.AddModelError(QueryParamNames.Filters, "Comparison operator is invalid.");
                 }
                 else
                 {
                     // Check the property data type and comparison operator are compatible.
                     if (!comparisonOperatorDbType.IsComparisonOperatorForDataType(comparisonOperator, getDataType(propertyName)))
                     {
-                        modelState.AddModelError(PropertyNames.Filters, "Comparison operator is not compatible with the data type of the specified property.");
+                        modelState.AddModelError(QueryParamNames.Filters, "Comparison operator is not compatible with the data type of the specified property.");
                     }
                 }
             }
@@ -137,14 +137,14 @@ public class QueryValidator(ILogger<QueryValidator> logger, IComparisonOperatorD
                 // Check the property name is sortable.
                 if (!sortableProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase))
                 {
-                    modelState.AddModelError(PropertyNames.Sorts, "Property is invalid.");
+                    modelState.AddModelError(QueryParamNames.Sorts, "Property is invalid.");
                 }
 
                 // Check the sort direction is valid.
                 if (!sortDirection.Equals(SortDirection.Ascending, StringComparison.OrdinalIgnoreCase) &&
                     !sortDirection.Equals(SortDirection.Descending, StringComparison.OrdinalIgnoreCase))
                 {
-                    modelState.AddModelError(PropertyNames.Sorts, "Sort direction is invalid.");
+                    modelState.AddModelError(QueryParamNames.Sorts, "Sort direction is invalid.");
                 }
             }
         }

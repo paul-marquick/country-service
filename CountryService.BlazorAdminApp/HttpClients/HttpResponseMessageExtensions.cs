@@ -18,12 +18,12 @@ public static class HttpResponseMessageExtensions
 
     public static int GetCountFromHeaders(this HttpResponseMessage response)
     {
-        return int.Parse(response.Headers.GetValues(AdditionalHeaderNames.Count).First());
+        return int.Parse(response.Headers.GetValues(CustomHeaderNames.Count).First());
     }
 
     public static int GetTotalFromHeaders(this HttpResponseMessage response)
     {
-        return int.Parse(response.Headers.GetValues(AdditionalHeaderNames.Total).First());
+        return int.Parse(response.Headers.GetValues(CustomHeaderNames.Total).First());
     }
 
     public static async Task<T> GetJsonDataAsync<T>(this HttpResponseMessage response)

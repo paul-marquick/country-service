@@ -1,6 +1,6 @@
 ﻿namespace CountryService.Shared;
 
-public static class PropertyNames
+public static class QueryParamNames
 {
     public const string Offset = "offset";
     public const string Limit = "limit";

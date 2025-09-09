@@ -116,7 +116,7 @@ public class CountryController(
 
         List<Dtos.Country.Country> countryDtos = countryMapper.MapModelListToDtoList(queryCountriesResult.Item2);
 
-        Response.Headers[AdditionalHeaderNames.Total] = queryCountriesResult.Item1.ToString();
+        Response.Headers[CustomHeaderNames.Total] = queryCountriesResult.Item1.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
@@ -149,7 +149,7 @@ public class CountryController(
 
         List<Dtos.Country.CountryLookup> countryLookupDtos = countryLookupMapper.MapModelListToDtoList(countryLookups);
 
-        Response.Headers[AdditionalHeaderNames.Count] = countryLookupDtos.Count.ToString();
+        Response.Headers[CustomHeaderNames.Count] = countryLookupDtos.Count.ToString();
 
         if (method == HttpMethod.Head.Method)
         {
