@@ -213,6 +213,9 @@
 
     private void OnLimitChanged(ChangeEventArgs e)
     {
+        // When the limit changes, reset to the first page.
+        offset = 0;
+
         navigationManager.NavigateTo($"country?offset={offset}&limit={e.Value}");
     }
 
