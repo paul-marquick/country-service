@@ -2,6 +2,13 @@ using System.Collections.Generic;
 
 namespace CountryService.DataAccess.ListQuery;
 
+/// <summary>
+/// Represents a query with pagination, filtering, and sorting capabilities.
+/// </summary>
+/// <remarks>This type is used to construct and manage queries that include support for pagination through the
+/// <see cref="OffSet"/> and <see cref="Limit"/> properties, as well as optional filtering and sorting through the <see
+/// cref="Filters"/> and <see cref="Sorts"/> collections. Filters and sorts can be added dynamically using the <see
+/// cref="AddFilter"/> and <see cref="AddSort"/> methods.</remarks>
 public record Query
 {
     public Query(int offset, int limit)

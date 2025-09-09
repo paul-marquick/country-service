@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace CountryService.DataAccess;
 
+/// <summary>
+/// Defines the contract for accessing and managing country data in a database.
+/// </summary>
+/// <remarks>This interface provides methods for querying, inserting, updating, and deleting country records, as
+/// well as performing specific checks such as verifying the existence of a country name. The methods support database
+/// transactions and connections, allowing for efficient and consistent data operations. Implementations of this
+/// interface are expected to handle exceptions related to data integrity and provide meaningful error feedback to the
+/// caller.</remarks>
 public interface ICountryDataAccess
 {
     /// <summary>
