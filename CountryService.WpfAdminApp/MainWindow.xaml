@@ -1,0 +1,24 @@
+﻿<Window x:Class="CountryService.WpfAdminApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CountryService.WpfAdminApp"
+        xmlns:userControls="clr-namespace:CountryService.WpfAdminApp.Views.UserControls"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <userControls:ClearableTextBox Grid.Row="1" Width="250" Height="40" PlaceHolderText="First Name" />
+        <userControls:ClearableTextBox Grid.Row="2" Width="250" Height="40" PlaceHolderText="Last Name" />
+        <userControls:ClearableTextBox Grid.Row="3" Width="250" Height="40" PlaceHolderText="Email Address" />
+        <userControls:ClearableTextBox Grid.Row="4" Width="250" Height="40" PlaceHolderText="Phone" />
+    </Grid>
+</Window>
